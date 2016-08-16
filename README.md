@@ -1,7 +1,5 @@
 Steam Trade Offers Client for Python
 =======
-[![PyPI](https://img.shields.io/pypi/v/steampy.svg)]()
-[![PyPI](https://img.shields.io/pypi/dm/steampy.svg)]()
 
 `steampy` is a library for Python, inspired by node-steam-tradeoffers, node-steam and others libraries for Node.js.
 It was designed as a simple lightweight library, combining features of many steam libraries from Node.js in one python module.
