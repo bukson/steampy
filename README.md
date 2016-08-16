@@ -1,9 +1,9 @@
 Steam Trade Offers Client for Python
 =======
 
-`steampy` is a library for Python, inspired by node-steam-tradeoffers, node-steam and others libraries for Node.js.
-It was designed as a simple lightweight library, combining features of many steam libraries from Node.js in one python module.
-`steampy` is capable of logging to steam, fetching trade offers and handle them in simple manner, using steam user credentials
+`steampy` is a library for Python, inspired by node-steam-tradeoffers, node-steam and other libraries for Node.js.
+It was designed as a simple lightweight library, combining features of many steam libraries from Node.js into a single python module.
+`steampy` is capable of logging into steam, fetching trade offers and handling them in simple manner, using steam user credentials
 and SteamGuard file(no need to extract and pass sessionID and webCookie).
 `steampy` is developed with Python 3 using type hints and many other features.
 
@@ -43,12 +43,12 @@ python storehouse.py
 Methods
 =======
 
-If not specified in documentation, method does not require login to work(it uses API Key from constructor instead)
+Unless specified in documentation, the method does not require login to work(it uses API Key from constructor instead)
 
 
 **login(username: str, password: str, steam_guard: str) -> requests.Response**
 
-Log in to steam account. Allows to accept trade offers and some other methods.
+Log into the steam account. Allows to accept trade offers and some other methods.
 
 ```
 from steampy.client import SteamClient
@@ -59,7 +59,7 @@ steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
 
 **api_call(request_method: str, interface: str, api_method: str, version: str, params: dict = None) -> requests.Response**
 
-Directly call api method from steam api services
+Directly call api method from the steam api services.
 
 [Official steam api site](https://developer.valvesoftware.com/wiki/Steam_Web_API)
 
@@ -77,7 +77,7 @@ summaries =  steam_client.api_call('GET', 'IEconService', 'GetTradeOffersSummary
 
 **get_trade_offers() -> dict**
 
-Fetch trade offers from steam using an API call.
+Fetching trade offers from steam using an API call.
 Method is fetching offers with descriptions that satisfy conditions:
     * Are sent by us or others
     * Are active (means no historical, does not mean having offer state active!)
@@ -90,7 +90,7 @@ Method is fetching offers with descriptions that satisfy conditions:
 **accept_trade_offer(trade_offer_id: str) -> dict**
 
 Using `SteamClient.login` method is required before usage
-This method also use identity secret from SteamGuard file to confirm trade offer.
+This method also uses identity secret from SteamGuard file to confirm the trade offer.
 No need to manually confirm it on mobile app or email.
 
 **decline_trade_offer(trade_offer_id: str) -> dict**
@@ -124,8 +124,8 @@ Test
 ====
 
 All public methods are documented and tested. 
-`guard` module has unit tests, `client` uses acceptance test.
-For acceptance test you have to put `credentials.pwd` and `Steamguard` file into `test` directory.
+`guard` module has unit tests, `client` uses an acceptance test.
+For the acceptance test you have to put `credentials.pwd` and `Steamguard` file into `test` directory.
 
 Example `credentials.pwd` file:
 
@@ -134,7 +134,7 @@ account1 password1 api_key1
 account2 password2 api_key2
 ```
 
-In some test you also have to obtain `transaction_id`.
+In some tests you also have to obtain `transaction_id`.
 You can do it by `SteamClient.get_trade_offers` or by logging manually into steam account in browser and get it from url
 
 License
