@@ -87,6 +87,30 @@ Method is fetching offers with descriptions that satisfy conditions:
 **get_trade_offer(trade_offer_id: str) -> dict**
 
 
+**make_offer(items_from_me: List[Asset], items_from_them: List[Asset], partner_steam_id: str, message:str ='') -> dict:**
+
+Using `SteamClient.login` method is required before usage
+`Asset` is class defined in `client.py`, you can obtain `asset_id` from `SteamClient.get_my_inventory` method.
+This method also uses identity secret from SteamGuard file to confirm the trade offer.
+No need to manually confirm it on mobile app or email.
+
+```
+from steampy.client import SteamClient, Asset
+from steampy.utils import GameOptions
+
+steam_client = SteamClient('MY_API_KEY')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+partner_id = 'PARTNER_ID'
+game = GameOptions.CS
+my_items = client.get_my_inventory(game)
+partner_items = client.get_partner_inventory(partner_id, game)
+my_first_item = next(iter(my_items.values()))
+partner_first_item = next(iter(partner_items.values()))
+my_asset = Asset(my_first_item['id'], game)
+partner_asset = Asset(partner_first_item['id'], game)
+client.make_offer([my_asset], [partner_asset], partner_id, 'Test offer')
+```
+
 **accept_trade_offer(trade_offer_id: str) -> dict**
 
 Using `SteamClient.login` method is required before usage
@@ -116,9 +140,18 @@ client.fetch_price(item, game=GameOptions.CS)
 {'volume': '208', 'lowest_price': '$11.30 USD', 'median_price': '$11.33 USD', 'success': True}
 ```
 
-**get_my_inventory(self, game: GameOptions) -> dict**
+**get_my_inventory(game: GameOptions) -> dict**
 
 Using `SteamClient.login` method is required before usage
+
+Inventory items are merged from items data and items description into dict where items `id` is key
+and descriptions merged with data are value.
+
+**get_partner_inventory(partner_steam_id: str, game: GameOptions) -> dict:**
+
+Using `SteamClient.login` method is required before usage
+
+Inventory items are merged like in `SteamClient.get_my_inventory` method
 
 Test
 ====

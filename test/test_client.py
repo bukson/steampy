@@ -1,6 +1,7 @@
 from unittest import TestCase
 
-from steampy.client import SteamClient, LoginRequired, GameOptions
+from steampy.client import SteamClient, LoginRequired, Asset
+from steampy.utils import GameOptions
 
 
 def load_credentials():
@@ -26,10 +27,19 @@ class TestSteamClient(TestCase):
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         self.assertTrue(client.isLoggedIn)
 
-    def test_get_inventory(self):
+    def test_get_my_inventory(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         inventory = client.get_my_inventory(GameOptions.CS)
+        self.assertIsNotNone(inventory)
+
+    def test_get_partner_inventory(self):
+        client = SteamClient(self.credentials.api_key)
+        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
+        partner_id = ''
+        game = GameOptions.CS
+        client.get_my_inventory(game)
+        inventory = client.get_partner_inventory(partner_id, game)
         self.assertIsNotNone(inventory)
 
     def test_get_trade_offers_summary(self):
@@ -76,5 +86,21 @@ class TestSteamClient(TestCase):
     def test_get_price(self):
         client = SteamClient(self.credentials.api_key)
         item = 'M4A1-S | Cyrex (Factory New)'
-        prices = client.fetch_price(item, game=GameOptions.CS)
+        prices = client.fetch_price(item, GameOptions.CS)
         self.assertTrue(prices['success'])
+
+    def test_make_offer(self):
+        client = SteamClient(self.credentials.api_key)
+        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
+        partner_id = ''
+        game = GameOptions.CS
+        my_items = client.get_my_inventory(game)
+        partner_items = client.get_partner_inventory(partner_id, game)
+        my_first_item = next(iter(my_items.values()))
+        partner_first_item = next(iter(partner_items.values()))
+        my_asset = Asset(my_first_item['id'], game)
+        partner_asset = Asset(partner_first_item['id'], game)
+        response = client.make_offer([my_asset], [partner_asset], partner_id, 'TESTOWA OFERTA')
+        self.assertIsNotNone(response)
+
+

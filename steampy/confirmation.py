@@ -26,9 +26,9 @@ class Tag(enum.Enum):
 class ConfirmationExecutor:
     CONF_URL = "https://steamcommunity.com/mobileconf"
 
-    def __init__(self, trade_offer_id: str, identity_secret: str, steam_id: str, session: requests.Session) -> None:
+    def __init__(self, trade_offer_id: str, identity_secret: str, my_steam_id: str, session: requests.Session) -> None:
         self._trade_offer_id = trade_offer_id
-        self._steam_id = steam_id
+        self._my_steam_id = my_steam_id
         self._identity_secret = identity_secret
         self._session = session
 
@@ -74,9 +74,9 @@ class ConfirmationExecutor:
     def _create_confirmation_params(self, tag_string: str) -> dict:
         timestamp = int(time.time())
         confirmation_key = guard.generate_confirmation_key(self._identity_secret, tag_string, timestamp)
-        android_id = guard.generate_device_id(self._steam_id)
+        android_id = guard.generate_device_id(self._my_steam_id)
         return {'p': android_id,
-                'a': self._steam_id,
+                'a': self._my_steam_id,
                 'k': confirmation_key,
                 't': timestamp,
                 'm': 'android',
