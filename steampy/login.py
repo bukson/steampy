@@ -10,6 +10,7 @@ from steampy import guard
 
 class LoginExecutor:
     COMMUNITY_URL = "https://steamcommunity.com"
+    STORE_URL = 'https://store.steampowered.com'
 
     def __init__(self, username: str, password: str, shared_secret: str, session: requests.Session) -> None:
         self.username = username
@@ -30,10 +31,10 @@ class LoginExecutor:
         encrypted_password = self._encrypt_password(rsa_params)
         rsa_timestamp = rsa_params['rsa_timestamp']
         request_data = self._prepare_login_request_data(encrypted_password, rsa_timestamp)
-        return self.session.post(self.COMMUNITY_URL + '/login/dologin', data=request_data)
+        return self.session.post(self.STORE_URL + '/login/dologin', data=request_data)
 
     def _fetch_rsa_params(self) -> dict:
-        key_response = self.session.post(self.COMMUNITY_URL + '/login/getrsakey/',
+        key_response = self.session.post(self.STORE_URL + '/login/getrsakey/',
                                          data={'username': self.username}).json()
         rsa_mod = int(key_response['publickey_mod'], 16)
         rsa_exp = int(key_response['publickey_exp'], 16)
