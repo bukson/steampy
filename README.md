@@ -87,7 +87,7 @@ Method is fetching offers with descriptions that satisfy conditions:
 **get_trade_offer(trade_offer_id: str) -> dict**
 
 
-**make_offer(items_from_me: List[Asset], items_from_them: List[Asset], partner_steam_id: str, message:str ='') -> dict:**
+**make_offer(items_from_me: List[Asset], items_from_them: List[Asset], partner_steam_id: str, message:str ='') -> dict**
 
 Using `SteamClient.login` method is required before usage
 `Asset` is class defined in `client.py`, you can obtain `asset_id` from `SteamClient.get_my_inventory` method.
@@ -147,7 +147,7 @@ Using `SteamClient.login` method is required before usage
 Inventory items are merged from items data and items description into dict where items `id` is key
 and descriptions merged with data are value.
 
-**get_partner_inventory(partner_steam_id: str, game: GameOptions) -> dict:**
+**get_partner_inventory(partner_steam_id: str, game: GameOptions) -> dict**
 
 Using `SteamClient.login` method is required before usage
 
@@ -169,6 +169,9 @@ account2 password2 api_key2
 
 In some tests you also have to obtain `transaction_id`.
 You can do it by `SteamClient.get_trade_offers` or by logging manually into steam account in browser and get it from url
+
+In some tests you also have to obtain partner steam id.
+You can do it by by logging manually into steam account in browser and get it from url
 
 License
 =======
