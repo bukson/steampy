@@ -142,11 +142,11 @@ client.fetch_price(item, game=GameOptions.CS)
 {'volume': '208', 'lowest_price': '$11.30 USD', 'median_price': '$11.33 USD', 'success': True}
 ```
 
-**get_my_inventory(game: GameOptions) -> dict**
+**get_my_inventory(game: GameOptions, merge: bool = True) -> dict**
 
 Using `SteamClient.login` method is required before usage
 
-Inventory items are merged from items data and items description into dict where items `id` is key
+If `merege` is set `True` then inventory items are merged from items data and items description into dict where items `id` is key
 and descriptions merged with data are value.
 
 Inventory entries looks like this:
@@ -261,18 +261,18 @@ Inventory entries looks like this:
                 'type': 'Classified Rifle'}}
 ```
 
-**get_partner_inventory(partner_steam_id: str, game: GameOptions) -> dict**
+**get_partner_inventory(partner_steam_id: str, game: GameOptions, merge: bool = True) -> dict**
 
 Using `SteamClient.login` method is required before usage
 
-Inventory items are merged like in `SteamClient.get_my_inventory` method
+Inventory items can be merged like in `SteamClient.get_my_inventory` method
 
 Test
 ====
 
 All public methods are documented and tested. 
 `guard` module has unit tests, `client` uses an acceptance test.
-For the acceptance test you have to put `credentials.pwd` and `Steamguard` file into `test` directory.
+For the acceptance test you have to put `credentials.pwd` and `Steamguard` file into `test` directory
 
 Example `credentials.pwd` file:
 

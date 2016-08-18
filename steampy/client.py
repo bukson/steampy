@@ -91,15 +91,17 @@ class SteamClient:
         return msg in response.text
 
     @login_required
-    def get_my_inventory(self, game: GameOptions) -> dict:
+    def get_my_inventory(self, game: GameOptions, merge: bool = True) -> dict:
         url = self.COMMUNITY_URL + '/my/inventory/json/' + \
               game.app_id + '/' + \
               game.context_id
         response_dict = self._session.get(url).json()
-        return merge_items_with_descriptions(response_dict, game)
+        if merge:
+            return merge_items_with_descriptions(response_dict, game)
+        return response_dict
 
     @login_required
-    def get_partner_inventory(self, partner_steam_id: str, game: GameOptions) -> dict:
+    def get_partner_inventory(self, partner_steam_id: str, game: GameOptions, merge: bool = True) -> dict:
         params = {'sessionid': self._get_session_id(),
                   'partner': partner_steam_id,
                   'appid': int(game.app_id),
@@ -111,7 +113,9 @@ class SteamClient:
         response_dict = self._session.get(self.COMMUNITY_URL + '/tradeoffer/new/partnerinventory/',
                                           params=params,
                                           headers=headers).json()
-        return merge_items_with_descriptions(response_dict, game)
+        if merge:
+            return merge_items_with_descriptions(response_dict, game)
+        return response_dict
 
     def _get_session_id(self) -> str:
         return self._session.cookies.get_dict()['sessionid']
