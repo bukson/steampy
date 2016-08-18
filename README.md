@@ -149,6 +149,118 @@ Using `SteamClient.login` method is required before usage
 Inventory items are merged from items data and items description into dict where items `id` is key
 and descriptions merged with data are value.
 
+Inventory entries looks like this:
+```
+{'7146788981': {'actions': [{'link': 'steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S%owner_steamid%A%assetid%D316070896107169653',
+                             'name': 'Inspect in Game...'}],
+                'amount': '1',
+                'appid': '730',
+                'background_color': '',
+                'classid': '1304827205',
+                'commodity': 0,
+                'contextid': '2',
+                'descriptions': [{'type': 'html',
+                                  'value': 'Exterior: Field-Tested'},
+                                 {'type': 'html', 'value': ' '},
+                                 {'type': 'html',
+                                  'value': 'Powerful and reliable, the AK-47 '
+                                           'is one of the most popular assault '
+                                           'rifles in the world. It is most '
+                                           'deadly in short, controlled bursts '
+                                           'of fire. It has been painted using '
+                                           'a carbon fiber hydrographic and a '
+                                           'dry-transfer decal of a red '
+                                           'pinstripe.\n'
+                                           '\n'
+                                           '<i>Never be afraid to push it to '
+                                           'the limit</i>'},
+                                 {'type': 'html', 'value': ' '},
+                                 {'app_data': {'def_index': '65535',
+                                               'is_itemset_name': 1},
+                                  'color': '9da1a9',
+                                  'type': 'html',
+                                  'value': 'The Phoenix Collection'},
+                                 {'type': 'html', 'value': ' '},
+                                 {'app_data': {'def_index': '65535'},
+                                  'type': 'html',
+                                  'value': '<br><div id="sticker_info" '
+                                           'name="sticker_info" title="Sticker '
+                                           'Details" style="border: 2px solid '
+                                           'rgb(102, 102, 102); border-radius: '
+                                           '6px; width=100; margin:4px; '
+                                           'padding:8px;"><center><img '
+                                           'width=64 height=48 '
+                                           'src="https://steamcdn-a.akamaihd.net/apps/730/icons/econ/stickers/eslkatowice2015/pentasports.a6b0ddffefb5507453456c0d2c35b6a57821c171.png"><img '
+                                           'width=64 height=48 '
+                                           'src="https://steamcdn-a.akamaihd.net/apps/730/icons/econ/stickers/eslkatowice2015/pentasports.a6b0ddffefb5507453456c0d2c35b6a57821c171.png"><img '
+                                           'width=64 height=48 '
+                                           'src="https://steamcdn-a.akamaihd.net/apps/730/icons/econ/stickers/eslkatowice2015/pentasports.a6b0ddffefb5507453456c0d2c35b6a57821c171.png"><img '
+                                           'width=64 height=48 '
+                                           'src="https://steamcdn-a.akamaihd.net/apps/730/icons/econ/stickers/cologne2015/mousesports.3e75da497d9f75fa56f463c22db25f29992561ce.png"><br>Sticker: '
+                                           'PENTA Sports  | Katowice 2015, '
+                                           'PENTA Sports  | Katowice 2015, '
+                                           'PENTA Sports  | Katowice 2015, '
+                                           'mousesports | Cologne '
+                                           '2015</center></div>'}],
+                'icon_drag_url': '',
+                'icon_url': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJemkV09-5lpKKqPrxN7LEmyVQ7MEpiLuSrYmnjQO3-UdsZGHyd4_Bd1RvNQ7T_FDrw-_ng5Pu75iY1zI97bhLsvQz',
+                'icon_url_large': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJemkV09-5lpKKqPrxN7LEm1Rd6dd2j6eQ9N2t2wK3-ENsZ23wcIKRdQE2NwyD_FK_kLq9gJDu7p_KyyRr7nNw-z-DyIFJbNUz',
+                'id': '7146788981',
+                'instanceid': '480085569',
+                'market_actions': [{'link': 'steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20M%listingid%A%assetid%D316070896107169653',
+                                    'name': 'Inspect in Game...'}],
+                'market_hash_name': 'AK-47 | Redline (Field-Tested)',
+                'market_name': 'AK-47 | Redline (Field-Tested)',
+                'market_tradable_restriction': '7',
+                'marketable': 1,
+                'name': 'AK-47 | Redline',
+                'name_color': 'D2D2D2',
+                'owner_descriptions': '',
+                'tags': [{'category': 'Type',
+                          'category_name': 'Type',
+                          'internal_name': 'CSGO_Type_Rifle',
+                          'name': 'Rifle'},
+                         {'category': 'Weapon',
+                          'category_name': 'Weapon',
+                          'internal_name': 'weapon_ak47',
+                          'name': 'AK-47'},
+                         {'category': 'ItemSet',
+                          'category_name': 'Collection',
+                          'internal_name': 'set_community_2',
+                          'name': 'The Phoenix Collection'},
+                         {'category': 'Quality',
+                          'category_name': 'Category',
+                          'internal_name': 'normal',
+                          'name': 'Normal'},
+                         {'category': 'Rarity',
+                          'category_name': 'Quality',
+                          'color': 'd32ce6',
+                          'internal_name': 'Rarity_Legendary_Weapon',
+                          'name': 'Classified'},
+                         {'category': 'Exterior',
+                          'category_name': 'Exterior',
+                          'internal_name': 'WearCategory2',
+                          'name': 'Field-Tested'},
+                         {'category': 'Tournament',
+                          'category_name': 'Tournament',
+                          'internal_name': 'Tournament6',
+                          'name': '2015 ESL One Katowice'},
+                         {'category': 'Tournament',
+                          'category_name': 'Tournament',
+                          'internal_name': 'Tournament7',
+                          'name': '2015 ESL One Cologne'},
+                         {'category': 'TournamentTeam',
+                          'category_name': 'Team',
+                          'internal_name': 'Team39',
+                          'name': 'PENTA Sports'},
+                         {'category': 'TournamentTeam',
+                          'category_name': 'Team',
+                          'internal_name': 'Team29',
+                          'name': 'mousesports'}],
+                'tradable': 1,
+                'type': 'Classified Rifle'}}
+```
+
 **get_partner_inventory(partner_steam_id: str, game: GameOptions) -> dict**
 
 Using `SteamClient.login` method is required before usage
