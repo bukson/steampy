@@ -52,8 +52,8 @@ steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
 Examples
 ========
 
-You'll need to install obtain your API key and SteamGuard file in order to run the examples, 
-ant then fill login and password in `storehose.py` file.
+You'll need to obtain your API key and SteamGuard file in order to run the examples, 
+and then fill login and password in `storehose.py` file.
 The `storehouse.py` file contains an example of handling incoming trade offers.
 
 ```
@@ -297,7 +297,7 @@ Load and parse SteamGuard file
 Generate one time code for logging into Steam using shared_secret from SteamGuard file.
 Default timestamp is current time.
 
-**generate_confirmation_key(identity_secret: str, tag: str, timestamp: int = time.time()) -> str**
+**generate_confirmation_key(identity_secret: str, tag: str, timestamp: int = int(time.time())) -> bytes**
 
 Generate mobile device confirmation key for accepting trade offer. 
 Default timestamp is current time.
