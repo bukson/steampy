@@ -5,8 +5,6 @@ import time
 
 from Crypto.Hash import HMAC, SHA
 
-from steampy.confirmation import Tag
-
 
 def load_steam_guard(steam_guard: str) -> dict:
     with open(steam_guard, 'r') as f:
