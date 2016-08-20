@@ -9,6 +9,24 @@ It was designed as a simple lightweight library, combining features of many stea
 and SteamGuard file(no need to extract and pass sessionID and webCookie).
 `steampy` is developed with Python 3 using type hints and many other features.
 
+Table of Content
+================
+
+* [Installation](https://github.com/bukson/steampy#installation)
+
+* [Usage](https://github.com/bukson/steampy#usage)
+
+* [Examples](https://github.com/bukson/steampy#examples)
+
+* [SteamClient methods](https://github.com/bukson/steampy#steamclient-methods)
+
+* [Guard module functions](https://github.com/bukson/steampy#guard-module-functions)
+
+* [Test](https://github.com/bukson/steampy#test)
+
+* [License](https://github.com/bukson/steampy#license)
+
+
 Installation
 ============
 
@@ -24,7 +42,7 @@ Usage
 
 [Obtaining SteamGuard using Android emulation]( https://github.com/codepath/android_guides/wiki/Genymotion-2.0-Emulators-with-Google-Play-support)
 
-```
+```python
 from steampy.client import SteamClient
 
 steam_client = SteamClient('MY_API_KEY')
@@ -42,8 +60,8 @@ The `storehouse.py` file contains an example of handling incoming trade offers.
 python storehouse.py
 ```
 
-Methods
-=======
+SteamClient methods
+===================
 
 Unless specified in documentation, the method does not require login to work(it uses API Key from constructor instead)
 
@@ -52,7 +70,7 @@ Unless specified in documentation, the method does not require login to work(it 
 
 Log into the steam account. Allows to accept trade offers and some other methods.
 
-```
+```python
 from steampy.client import SteamClient
 
 steam_client = SteamClient('MY_API_KEY')
@@ -67,11 +85,11 @@ Directly call api method from the steam api services.
 
 [Unofficial but more elegant](https://lab.xpaw.me/steam_api_documentation.html)
 
-```
+```python
 from steampy.client import SteamClient
 
 steam_client = SteamClient('MY_API_KEY')
-params = {'key': self._api_key}
+params = {'key': 'MY_API_KEY'}
 summaries =  steam_client.api_call('GET', 'IEconService', 'GetTradeOffersSummary', 'v1', params).json()
 ```
 **get_trade_offers_summary() -> dict**
@@ -96,7 +114,7 @@ Using `SteamClient.login` method is required before usage
 This method also uses identity secret from SteamGuard file to confirm the trade offer.
 No need to manually confirm it on mobile app or email.
 
-```
+```python
 from steampy.client import SteamClient, Asset
 from steampy.utils import GameOptions
 
@@ -135,7 +153,7 @@ Currencies are defined in Currency class, currently `Currency.USD`, `Currency.GB
 
 Default currency is USD
 
-```
+```python
 client = SteamClient(self.credentials.api_key)
 item = 'M4A1-S | Cyrex (Factory New)'
 client.fetch_price(item, game=GameOptions.CS)
@@ -150,7 +168,7 @@ If `merege` is set `True` then inventory items are merged from items data and it
 and descriptions merged with data are value.
 
 Inventory entries looks like this:
-```
+```python
 {'7146788981': {'actions': [{'link': 'steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S%owner_steamid%A%assetid%D316070896107169653',
                              'name': 'Inspect in Game...'}],
                 'amount': '1',
@@ -266,6 +284,23 @@ Inventory entries looks like this:
 Using `SteamClient.login` method is required before usage
 
 Inventory items can be merged like in `SteamClient.get_my_inventory` method
+
+guard module functions
+======================
+
+**load_steam_guard(steam_guard: str) -> dict**
+
+Load and parse SteamGuard file
+
+**generate_one_time_code(shared_secret: str, timestamp: int= int(time.time())) -> str**
+
+Generate one time code for logging into Steam using shared_secret from SteamGuard file.
+Default timestamp is current time.
+
+**generate_confirmation_key(identity_secret: str, tag: str, timestamp: int = time.time()) -> str**
+
+Generate mobile device confirmation key for accepting trade offer. 
+Default timestamp is current time.
 
 Test
 ====

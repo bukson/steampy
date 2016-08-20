@@ -26,13 +26,23 @@ def steam_id_to_account_id(steam_id: str) -> str:
     return str(struct.unpack('>L', int(steam_id).to_bytes(8, byteorder='big')[4:])[0])
 
 
-def merge_items_with_descriptions(inventory_response: dict, game: GameOptions) -> dict:
-    rg_inventory = inventory_response['rgInventory']
-    rg_descriptions = inventory_response['rgDescriptions']
+def merge_items_with_descriptions_from_inventory(inventory_response: dict, game: GameOptions) -> dict:
+    inventory = inventory_response['rgInventory']
+    descriptions = inventory_response['rgDescriptions']
+    return merge_items(inventory, descriptions, game)
+
+# def merge_items_with_descriptions_from_offers(offers_response: dict) -> dict:
+#     descriptions = offers_response['response']['descriptions']
+#     for offer in offers_response['response']['trade_offers_received']:
+#         offer[]
+
+
+def merge_items(items: dict, descriptions: dict, game: GameOptions) -> dict:
     merged_items = {}
-    for item_id, item in rg_inventory.items():
+    for item in items.values():
         description_key = item['classid'] + '_' + item.get('instanceid')
-        description = rg_descriptions[description_key]
+        description = descriptions[description_key]
+        item_id = item['id'] or item['assetid']
         description['contextid'] = game.context_id
         description['id'] = item_id
         description['amount'] = item['amount']

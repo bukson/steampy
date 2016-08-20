@@ -6,7 +6,7 @@ import requests
 from steampy import guard
 from steampy.confirmation import ConfirmationExecutor
 from steampy.login import LoginExecutor, InvalidCredentials
-from steampy.utils import text_between, merge_items_with_descriptions, GameOptions, steam_id_to_account_id
+from steampy.utils import text_between, merge_items_with_descriptions_from_inventory, GameOptions, steam_id_to_account_id
 
 
 class Currency(enum.IntEnum):
@@ -97,7 +97,7 @@ class SteamClient:
               game.context_id
         response_dict = self._session.get(url).json()
         if merge:
-            return merge_items_with_descriptions(response_dict, game)
+            return merge_items_with_descriptions_from_inventory(response_dict, game)
         return response_dict
 
     @login_required
@@ -114,7 +114,7 @@ class SteamClient:
                                           params=params,
                                           headers=headers).json()
         if merge:
-            return merge_items_with_descriptions(response_dict, game)
+            return merge_items_with_descriptions_from_inventory(response_dict, game)
         return response_dict
 
     def _get_session_id(self) -> str:
