@@ -6,8 +6,9 @@ import requests
 from steampy import guard
 from steampy.confirmation import ConfirmationExecutor
 from steampy.login import LoginExecutor, InvalidCredentials
-from steampy.utils import text_between, merge_items_with_descriptions_from_inventory, GameOptions, steam_id_to_account_id, \
-    merge_items_with_descriptions_from_offers
+from steampy.utils import text_between, merge_items_with_descriptions_from_inventory, GameOptions, \
+    steam_id_to_account_id, merge_items_with_descriptions_from_offers, get_description_key, \
+    merge_items_with_descriptions_from_offer
 
 
 class Currency(enum.IntEnum):
@@ -139,11 +140,16 @@ class SteamClient:
             return merge_items_with_descriptions_from_offers(response)
         return response
 
-    def get_trade_offer(self, trade_offer_id: str) -> dict:
+    def get_trade_offer(self, trade_offer_id: str, merge: bool = True) -> dict:
         params = {'key': self._api_key,
                   'tradeofferid': trade_offer_id,
                   'language': 'english'}
-        return self.api_call('GET', 'IEconService', 'GetTradeOffer', 'v1', params).json()
+        response = self.api_call('GET', 'IEconService', 'GetTradeOffer', 'v1', params).json()
+        if merge:
+            descriptions = {get_description_key(offer): offer for offer in response['response']['descriptions']}
+            offer = response['response']['offer']
+            response['response']['offer'] = merge_items_with_descriptions_from_offer(offer, descriptions)
+        return response
 
     @login_required
     def accept_trade_offer(self, trade_offer_id: str) -> dict:
