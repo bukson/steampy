@@ -1,5 +1,7 @@
 import enum
 import struct
+from typing import List
+
 
 class GameOptions(enum.Enum):
     DOTA2 = ('570', '2')
@@ -29,22 +31,40 @@ def steam_id_to_account_id(steam_id: str) -> str:
 def merge_items_with_descriptions_from_inventory(inventory_response: dict, game: GameOptions) -> dict:
     inventory = inventory_response['rgInventory']
     descriptions = inventory_response['rgDescriptions']
-    return merge_items(inventory, descriptions, game)
-
-# def merge_items_with_descriptions_from_offers(offers_response: dict) -> dict:
-#     descriptions = offers_response['response']['descriptions']
-#     for offer in offers_response['response']['trade_offers_received']:
-#         offer[]
+    return merge_items(inventory.values(), descriptions, context_id=game.context_id)
 
 
-def merge_items(items: dict, descriptions: dict, game: GameOptions) -> dict:
+def merge_items_with_descriptions_from_offers(offers_response: dict) -> dict:
+    descriptions = {get_description_key(offer): offer for offer in offers_response['response']['descriptions']}
+    received_offers = offers_response['response']['trade_offers_received']
+    sent_offers = offers_response['response']['trade_offers_sent']
+    offers_response['response']['trade_offers_received'] = list(
+        map(lambda offer: merge_items_with_descriptions_from_offer(offer, descriptions), received_offers))
+    offers_response['response']['trade_offers_sent'] = list(
+        map(lambda offer: merge_items_with_descriptions_from_offer(offer, descriptions), sent_offers))
+    return offers_response
+
+
+def merge_items_with_descriptions_from_offer(offer: dict, descriptions: dict) -> dict:
+    merged_items_to_give = merge_items(offer.get('items_to_give', []), descriptions)
+    merged_items_to_receive = merge_items(offer.get('items_to_receive', []), descriptions)
+    offer['items_to_give'] = merged_items_to_give
+    offer['items_to_receive'] = merged_items_to_receive
+    return offer
+
+
+def merge_items(items: List[dict], descriptions: dict, **kwargs) -> dict:
     merged_items = {}
-    for item in items.values():
-        description_key = item['classid'] + '_' + item.get('instanceid')
+    for item in items:
+        description_key = get_description_key(item)
         description = descriptions[description_key]
-        item_id = item['id'] or item['assetid']
-        description['contextid'] = game.context_id
+        item_id = item.get('id') or item['assetid']
+        description['contextid'] = item.get('contextid') or kwargs['context_id']
         description['id'] = item_id
         description['amount'] = item['amount']
         merged_items[item_id] = description
     return merged_items
+
+
+def get_description_key(item: dict) -> str:
+    return item['classid'] + '_' + item['instanceid']

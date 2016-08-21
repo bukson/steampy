@@ -95,7 +95,7 @@ summaries =  steam_client.api_call('GET', 'IEconService', 'GetTradeOffersSummary
 **get_trade_offers_summary() -> dict**
 
 
-**get_trade_offers() -> dict**
+**get_trade_offers(merge: bool = True) -> dict**
 
 Fetching trade offers from steam using an API call.
 Method is fetching offers with descriptions that satisfy conditions:
@@ -103,7 +103,10 @@ Method is fetching offers with descriptions that satisfy conditions:
     * Are active (means no historical, does not mean having offer state active!)
     * Are not historical
     * No time limitation
-    
+
+If `merge` is set `True` then offer items are merged from items data and items description into dict where items `id` is key
+and descriptions merged with data are value.
+
 **get_trade_offer(trade_offer_id: str) -> dict**
 
 
@@ -164,7 +167,7 @@ client.fetch_price(item, game=GameOptions.CS)
 
 Using `SteamClient.login` method is required before usage
 
-If `merege` is set `True` then inventory items are merged from items data and items description into dict where items `id` is key
+If `merge` is set `True` then inventory items are merged from items data and items description into dict where items `id` is key
 and descriptions merged with data are value.
 
 Inventory entries looks like this:

@@ -6,7 +6,8 @@ import requests
 from steampy import guard
 from steampy.confirmation import ConfirmationExecutor
 from steampy.login import LoginExecutor, InvalidCredentials
-from steampy.utils import text_between, merge_items_with_descriptions_from_inventory, GameOptions, steam_id_to_account_id
+from steampy.utils import text_between, merge_items_with_descriptions_from_inventory, GameOptions, steam_id_to_account_id, \
+    merge_items_with_descriptions_from_offers
 
 
 class Currency(enum.IntEnum):
@@ -124,7 +125,7 @@ class SteamClient:
         params = {'key': self._api_key}
         return self.api_call('GET', 'IEconService', 'GetTradeOffersSummary', 'v1', params).json()
 
-    def get_trade_offers(self) -> dict:
+    def get_trade_offers(self, merge: bool = True) -> dict:
         params = {'key': self._api_key,
                   'get_sent_offers': 1,
                   'get_received_offers': 1,
@@ -133,7 +134,10 @@ class SteamClient:
                   'active_only': 1,
                   'historical_only': 0,
                   'time_historical_cutoff': ''}
-        return self.api_call('GET', 'IEconService', 'GetTradeOffers', 'v1', params).json()
+        response = self.api_call('GET', 'IEconService', 'GetTradeOffers', 'v1', params).json()
+        if merge:
+            return merge_items_with_descriptions_from_offers(response)
+        return response
 
     def get_trade_offer(self, trade_offer_id: str) -> dict:
         params = {'key': self._api_key,
