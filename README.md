@@ -49,6 +49,11 @@ steam_client = SteamClient('MY_API_KEY')
 steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
 ```
 
+If you have `steamid`, `shared_secret` and `identity_secret` you can place it in file `Steamguard.txt` instead of fetching SteamGuard file from device.
+```python
+{ "steamid": "YOUR_STEAM_ID_64", "shared_secret": "YOUR_SHARED_SECRET", "identity_secret": "YOUR_IDENTITY_SECRET" } 
+```
+
 Examples
 ========
 
@@ -107,7 +112,7 @@ Method is fetching offers with descriptions that satisfy conditions:
 If `merge` is set `True` then offer items are merged from items data and items description into dict where items `id` is key
 and descriptions merged with data are value.
 
-**get_trade_offer(trade_offer_id: str) -> dict**
+**get_trade_offer(trade_offer_id: str, merge: bool = True) -> dict**
 
 
 **make_offer(items_from_me: List[Asset], items_from_them: List[Asset], partner_steam_id: str, message:str ='') -> dict**
