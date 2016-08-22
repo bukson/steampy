@@ -67,7 +67,7 @@ class TestSteamClient(TestCase):
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         trade_offer_id = '1451378159'
         response_dict = client.accept_trade_offer(trade_offer_id)
-        self.assertTrue(response_dict['success'])
+        self.assertIsNotNone(response_dict)
 
     def test_decline_trade_offer(self):
         client = SteamClient(self.credentials.api_key)
