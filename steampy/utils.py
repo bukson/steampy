@@ -28,6 +28,10 @@ def steam_id_to_account_id(steam_id: str) -> str:
     return str(struct.unpack('>L', int(steam_id).to_bytes(8, byteorder='big')[4:])[0])
 
 
+def price_to_float(price: str) -> float:
+    return float(price[1:].split()[0])
+
+
 def merge_items_with_descriptions_from_inventory(inventory_response: dict, game: GameOptions) -> dict:
     inventory = inventory_response['rgInventory']
     descriptions = inventory_response['rgDescriptions']
@@ -36,8 +40,8 @@ def merge_items_with_descriptions_from_inventory(inventory_response: dict, game:
 
 def merge_items_with_descriptions_from_offers(offers_response: dict) -> dict:
     descriptions = {get_description_key(offer): offer for offer in offers_response['response']['descriptions']}
-    received_offers = offers_response['response']['trade_offers_received']
-    sent_offers = offers_response['response']['trade_offers_sent']
+    received_offers = offers_response['response'].get('trade_offers_received', [])
+    sent_offers = offers_response['response'].get('trade_offers_sent', [])
     offers_response['response']['trade_offers_received'] = list(
         map(lambda offer: merge_items_with_descriptions_from_offer(offer, descriptions), received_offers))
     offers_response['response']['trade_offers_sent'] = list(
