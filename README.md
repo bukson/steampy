@@ -104,8 +104,9 @@ summaries =  steam_client.api_call('GET', 'IEconService', 'GetTradeOffersSummary
 
 Fetching trade offers from steam using an API call.
 Method is fetching offers with descriptions that satisfy conditions:
+
     * Are sent by us or others
-    * Are active (means no historical, does not mean having offer state active!)
+    * Are active (means they have `trade_offer_state` set to 2 (Active))
     * Are not historical
     * No time limitation
 

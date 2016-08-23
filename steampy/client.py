@@ -136,9 +136,20 @@ class SteamClient:
                   'historical_only': 0,
                   'time_historical_cutoff': ''}
         response = self.api_call('GET', 'IEconService', 'GetTradeOffers', 'v1', params).json()
+        response = self._filter_non_active_offers(response)
         if merge:
-            return merge_items_with_descriptions_from_offers(response)
+            response = merge_items_with_descriptions_from_offers(response)
         return response
+
+    @staticmethod
+    def _filter_non_active_offers(offers_response):
+        offers_received = offers_response['response'].get('trade_offers_received', [])
+        offers_sent = offers_response['response'].get('trade_offers_sent', [])
+        offers_response['response']['trade_offers_received'] = list(
+            filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active, offers_received))
+        offers_response['response']['trade_offers_sent'] = list(
+            filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active, offers_sent))
+        return offers_response
 
     def get_trade_offer(self, trade_offer_id: str, merge: bool = True) -> dict:
         params = {'key': self._api_key,
@@ -164,8 +175,8 @@ class SteamClient:
         headers = {'Referer': self._get_trade_offer_url(trade_offer_id)}
         response = self._session.post(accept_url, data=params, headers=headers)
         if response.json().get('needs_mobile_confirmation', False):
-            self._confirm_transaction(trade_offer_id)
-        return response.json()
+            return self._confirm_transaction(trade_offer_id)
+        return response
 
     def _fetch_trade_partner_id(self, trade_offer_id: str) -> dict:
         url = self._get_trade_offer_url(trade_offer_id)
