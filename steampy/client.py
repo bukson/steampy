@@ -178,9 +178,11 @@ class SteamClient:
             return self._confirm_transaction(trade_offer_id)
         return response
 
-    def _fetch_trade_partner_id(self, trade_offer_id: str) -> dict:
+    def _fetch_trade_partner_id(self, trade_offer_id: str) -> str:
         url = self._get_trade_offer_url(trade_offer_id)
         offer_response_text = self._session.get(url).text
+        if 'You have logged in from a new device. In order to protect the items' in offer_response_text:
+            raise SevenDaysHoldException("Account has logged in a new device and can't trade for 7 days")
         return text_between(offer_response_text, "var g_ulTradePartnerSteamID = '", "';")
 
     def _get_trade_offer_url(self, trade_offer_id: str) -> str:
@@ -247,3 +249,7 @@ class SteamClient:
                   'appid': game.app_id,
                   'market_hash_name': item_hash_name}
         return self._session.get(url, params=params).json()
+
+
+class SevenDaysHoldException(Exception):
+    pass
