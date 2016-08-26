@@ -164,10 +164,7 @@ class SteamClient:
 
     @login_required
     def accept_trade_offer(self, trade_offer_id: str) -> dict:
-        try:
-            partner = self._fetch_trade_partner_id(trade_offer_id)
-        except SevenDaysHoldException:
-            return
+        partner = self._fetch_trade_partner_id(trade_offer_id)
         session_id = self._get_session_id()
         accept_url = self.COMMUNITY_URL + '/tradeoffer/' + trade_offer_id + '/accept'
         params = {'sessionid': session_id,
@@ -184,8 +181,8 @@ class SteamClient:
     def _fetch_trade_partner_id(self, trade_offer_id: str) -> str:
         url = self._get_trade_offer_url(trade_offer_id)
         offer_response_text = self._session.get(url).text
-        if "You have logged in from a new device. In order to protect the items" in offer_response_text:
-            raise SevenDaysHoldException
+        if 'You have logged in from a new device. In order to protect the items' in offer_response_text:
+            raise SevenDaysHoldException('Account has logged in a new device and can\'t trade for 7 days')
         else:
             return text_between(offer_response_text, "var g_ulTradePartnerSteamID = '", "';")
 
@@ -256,4 +253,4 @@ class SteamClient:
 
 
 class SevenDaysHoldException(Exception):
-    """Account has logged in a new device and can't trade for 7 days"""
+    pass
