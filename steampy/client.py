@@ -182,9 +182,8 @@ class SteamClient:
         url = self._get_trade_offer_url(trade_offer_id)
         offer_response_text = self._session.get(url).text
         if 'You have logged in from a new device. In order to protect the items' in offer_response_text:
-            raise SevenDaysHoldException('Account has logged in a new device and can\'t trade for 7 days')
-        else:
-            return text_between(offer_response_text, "var g_ulTradePartnerSteamID = '", "';")
+            raise SevenDaysHoldException("Account has logged in a new device and can't trade for 7 days")
+        return text_between(offer_response_text, "var g_ulTradePartnerSteamID = '", "';")
 
     def _get_trade_offer_url(self, trade_offer_id: str) -> str:
         return self.COMMUNITY_URL + '/tradeoffer/' + trade_offer_id
