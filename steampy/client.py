@@ -248,8 +248,15 @@ class SteamClient:
                   'currency': currency,
                   'appid': game.app_id,
                   'market_hash_name': item_hash_name}
-        return self._session.get(url, params=params).json()
+        response = self._session.get(url, params=params)
+        if response.status_code == 429:
+            raise TooManyRequests("You can fetch maximum 20 prices in 60s period")
+        return response.json()
 
 
 class SevenDaysHoldException(Exception):
+    pass
+
+
+class TooManyRequests(Exception):
     pass

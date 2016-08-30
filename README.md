@@ -162,6 +162,8 @@ Currencies are defined in Currency class, currently `Currency.USD`, `Currency.GB
 
 Default currency is USD
 
+May rise `TooManyRequests` exception if used more than 20 times in 60 seconds.
+
 ```python
 client = SteamClient(self.credentials.api_key)
 item = 'M4A1-S | Cyrex (Factory New)'

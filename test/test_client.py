@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from steampy.client import SteamClient, LoginRequired, Asset
+from steampy.client import SteamClient, LoginRequired, Asset, TooManyRequests
 from steampy.utils import GameOptions
 
 
@@ -88,6 +88,16 @@ class TestSteamClient(TestCase):
         item = 'M4A1-S | Cyrex (Factory New)'
         prices = client.fetch_price(item, GameOptions.CS)
         self.assertTrue(prices['success'])
+
+    def test_get_price_to_many_requests(self):
+        def request_loop() -> None:
+            item = 'M4A1-S | Cyrex (Factory New)'
+            for _ in range(21):
+                client.fetch_price(item, GameOptions.CS)
+
+        client = SteamClient(self.credentials.api_key)
+        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
+        self.assertRaises(TooManyRequests, request_loop)
 
     def test_make_offer(self):
         client = SteamClient(self.credentials.api_key)
