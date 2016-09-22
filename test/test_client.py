@@ -114,3 +114,29 @@ class TestSteamClient(TestCase):
         self.assertIsNotNone(response)
 
 
+    def test_make_offer_url(self):
+        sample_trade_url="https://steamcommunity.com/tradeoffer/new/?partner=314218906&token=sgA4FdNm"  # a sample trade url with escrow time of 15 days cause mobile auth not added
+        client = SteamClient(self.credentials.api_key)
+        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
+        partner_id = '76561198274484634' # partner id of the sample_trade_url . there must be a way to get this from the trade url . but i didnt know so i mentioned both explicitly
+        game = GameOptions.CS
+        my_items = client.get_my_inventory(game)
+        partner_items = client.get_partner_inventory(partner_id, game)
+        my_first_item = next(iter(my_items.values()))
+        partner_first_item = next(iter(partner_items.values()))
+        my_asset = Asset(my_first_item['id'], game)
+        partner_asset = Asset(partner_first_item['id'], game)
+        response = client.make_offer_url([my_asset], [partner_asset],sample_trade_url, partner_id, 'TESTOWA OFERTA')
+        self.assertIsNotNone(response)
+
+    def test_get_escrow_duration(self):
+        sample_trade_url="https://steamcommunity.com/tradeoffer/new/?partner=314218906&token=sgA4FdNm"  # a sample trade url with escrow time of 15 days cause mobile auth not added
+        client = SteamClient(self.credentials.api_key)
+        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
+        response=steam_client.get_escrow_duration(sample_trade_url)
+        self.assertEqual(response,15)
+
+
+
+
+
