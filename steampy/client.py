@@ -241,7 +241,68 @@ class SteamClient:
         if response.get('needs_mobile_confirmation'):
             return self._confirm_transaction(response['tradeofferid'])
         return response
+        
+#takes a trade url and returns the maximum escrow duration between u and ur partner
+    @login_required
+    def get_escrow_duration(self, trade_offer_url: str) -> int:
 
+        start = trade_offer_url.index('steamcommunity.com') + len('steamcommunity.com')
+        end_trade_url=trade_offer_url[start:]
+
+        headers = {'Referer': self.COMMUNITY_URL + end_trade_url,
+                   'Origin': self.COMMUNITY_URL}
+        response = self._session.get(trade_offer_url, headers=headers).text
+        my_escrow_duration=int(text_between(response,"var g_daysMyEscrow = ",";"))
+        their_escrow_duration=int(text_between(response,"var g_daysTheirEscrow = ",";"))
+        
+        return max(my_escrow_duration,their_escrow_duration)
+
+
+    #same as make_offer but takes a trade url of your partner and allows u to send offer as non friends
+    @login_required
+    def make_offer_url(self, items_from_me: List[Asset], items_from_them: List[Asset], trade_url: str, partner_steam_id: str,
+                   message: str = '') -> dict:
+
+        start = trade_offer_url.index('steamcommunity.com') + len('steamcommunity.com')
+        end_trade_url=trade_offer_url[start:]
+
+        token_start=trade_offer_url.index('token=')+len('token=')
+        token=trade_offer_url[token_start:]
+
+        offer = {
+            'newversion': True,
+            'version': 4,
+            'me': {
+                'assets': [asset.to_dict() for asset in items_from_me],
+                'currency': [],
+                'ready': False
+            },
+            'them': {
+                'assets': [asset.to_dict() for asset in items_from_them],
+                'currency': [],
+                'ready': False
+            }
+        }
+        session_id = self._get_session_id()
+        url = self.COMMUNITY_URL + '/tradeoffer/new/send'
+        server_id = 1
+        params = {
+            'sessionid': session_id,
+            'serverid': server_id,
+            'partner': partner_steam_id,
+            'tradeoffermessage': message,
+            'json_tradeoffer': json.dumps(offer),
+            'captcha': '',
+            'trade_offer_create_params': '{"trade_offer_access_token":"token"}'
+        }
+        partner_account_id = steam_id_to_account_id(partner_steam_id)
+        headers = {'Referer': self.COMMUNITY_URL + end_trade_url,
+                   'Origin': self.COMMUNITY_URL}
+        response = self._session.post(url, data=params, headers=headers).text
+        print(response)
+        if response.get('needs_mobile_confirmation'):
+            return self._confirm_transaction(response['tradeofferid'])
+        return response
     def fetch_price(self, item_hash_name: str, game: GameOptions, currency: str = Currency.USD) -> dict:
         url = self.COMMUNITY_URL + '/market/priceoverview/'
         params = {'country': 'PL',
