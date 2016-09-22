@@ -260,7 +260,7 @@ class SteamClient:
 
     #same as make_offer but takes a trade url of your partner and allows u to send offer as non friends
     @login_required
-    def make_offer_url(self, items_from_me: List[Asset], items_from_them: List[Asset], trade_url: str, partner_steam_id: str,
+    def make_offer_url(self, items_from_me: List[Asset], items_from_them: List[Asset], trade_offer_url: str, partner_steam_id: str,
                    message: str = '') -> dict:
 
         start = trade_offer_url.index('steamcommunity.com') + len('steamcommunity.com')
@@ -293,12 +293,12 @@ class SteamClient:
             'tradeoffermessage': message,
             'json_tradeoffer': json.dumps(offer),
             'captcha': '',
-            'trade_offer_create_params': '{"trade_offer_access_token":"token"}'
+            'trade_offer_create_params': '{"trade_offer_access_token":"'+token+'"}'
         }
         partner_account_id = steam_id_to_account_id(partner_steam_id)
         headers = {'Referer': self.COMMUNITY_URL + end_trade_url,
                    'Origin': self.COMMUNITY_URL}
-        response = self._session.post(url, data=params, headers=headers).text
+        response = self._session.post(url, data=params, headers=headers).json()
         print(response)
         if response.get('needs_mobile_confirmation'):
             return self._confirm_transaction(response['tradeofferid'])
