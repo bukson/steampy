@@ -7,7 +7,7 @@ from steampy import guard
 from steampy.confirmation import ConfirmationExecutor
 from steampy.login import LoginExecutor, InvalidCredentials
 from steampy.utils import text_between, merge_items_with_descriptions_from_inventory, GameOptions, \
-    steam_id_to_account_id, merge_items_with_descriptions_from_offers, get_description_key, \
+    steam_id_to_account_id, account_id_to_steam_id, merge_items_with_descriptions_from_offers, get_description_key, \
     merge_items_with_descriptions_from_offer
 
 
@@ -242,10 +242,8 @@ class SteamClient:
             return self._confirm_transaction(response['tradeofferid'])
         return response
         
-#takes a trade url and returns the maximum escrow duration between u and ur partner
     @login_required
     def get_escrow_duration(self, trade_offer_url: str) -> int:
-
         start = trade_offer_url.index('steamcommunity.com') + len('steamcommunity.com')
         end_trade_url=trade_offer_url[start:]
 
@@ -258,9 +256,8 @@ class SteamClient:
         return max(my_escrow_duration,their_escrow_duration)
 
 
-    #same as make_offer but takes a trade url of your partner and allows u to send offer as non friends
     @login_required
-    def make_offer_url(self, items_from_me: List[Asset], items_from_them: List[Asset], trade_offer_url: str, partner_steam_id: str,
+    def make_offer_with_trade_url(self, items_from_me: List[Asset], items_from_them: List[Asset], trade_offer_url: str,
                    message: str = '') -> dict:
 
         start = trade_offer_url.index('steamcommunity.com') + len('steamcommunity.com')
@@ -268,6 +265,11 @@ class SteamClient:
 
         token_start=trade_offer_url.index('token=')+len('token=')
         token=trade_offer_url[token_start:]
+
+        partner_account_id_start = trade_offer_url.index('?partner=')+len('?partner=')
+        partner_account_id_end = trade_offer_url.index('&token=')
+        partner_account_id = trade_offer_url[partner_account_id_start:partner_account_id_end]
+        partner_steam_id=account_id_to_steam_id(partner_account_id)
 
         offer = {
             'newversion': True,
@@ -295,7 +297,6 @@ class SteamClient:
             'captcha': '',
             'trade_offer_create_params': '{"trade_offer_access_token":"'+token+'"}'
         }
-        partner_account_id = steam_id_to_account_id(partner_steam_id)
         headers = {'Referer': self.COMMUNITY_URL + end_trade_url,
                    'Origin': self.COMMUNITY_URL}
         response = self._session.post(url, data=params, headers=headers).json()
