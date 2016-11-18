@@ -156,7 +156,7 @@ Cancel trade offer that **we** sent to other user.
 
 **get_price(item_hash_name: str, game: GameOptions, currency: str = Currency.USD) -> dict**
 
-Games are defined in GameOptions class, currently `GameOptions.DOTA2` and `GameOptions.CS`
+Games are defined in GameOptions class, currently `GameOptions.DOTA2`, `GameOptions.CS` and `GameOptions.TF2`
 
 Currencies are defined in Currency class, currently `Currency.USD`, `Currency.GBP`, `Currency.EURO`, `Currency.CHF`
 
