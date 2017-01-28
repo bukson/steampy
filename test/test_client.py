@@ -27,6 +27,12 @@ class TestSteamClient(TestCase):
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         self.assertTrue(client.isLoggedIn)
 
+    def test_sessionid_cookie(self):
+        client = SteamClient(self.credentials.api_key)
+        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
+        cookies = client._session.cookies.get_dict("steamcommunity.com")
+        self.assertTrue("sessionid" in cookies)
+
     def test_get_my_inventory(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)

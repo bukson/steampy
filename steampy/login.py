@@ -1,5 +1,6 @@
 import base64
 import time
+import requests.cookies
 
 import requests
 from Crypto.Cipher import PKCS1_v1_5
@@ -24,6 +25,7 @@ class LoginExecutor:
         self._check_for_captcha(login_response)
         login_response = self._enter_steam_guard_if_necessary(login_response)
         self._perform_redirects(login_response.json())
+        self.set_sessionid_cookie()
         return self.session
 
     def _send_login_request(self) -> requests.Response:
@@ -32,6 +34,15 @@ class LoginExecutor:
         rsa_timestamp = rsa_params['rsa_timestamp']
         request_data = self._prepare_login_request_data(encrypted_password, rsa_timestamp)
         return self.session.post(self.STORE_URL + '/login/dologin', data=request_data)
+
+    # set the "sessionid" cookie for the domain "steamcommunity.com"
+    def set_sessionid_cookie(self):
+        sessionid = self.session.cookies.get_dict()['sessionid']
+        community_domain = self.COMMUNITY_URL[8:]
+        kwargs = {"name": "sessionid",
+                  "value": sessionid,
+                  "domain": community_domain}
+        self.session.cookies.set(**kwargs)
 
     def _fetch_rsa_params(self) -> dict:
         key_response = self.session.post(self.STORE_URL + '/login/getrsakey/',
