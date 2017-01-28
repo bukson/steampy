@@ -1,6 +1,5 @@
 import base64
 import time
-import requests.cookies
 
 import requests
 from Crypto.Cipher import PKCS1_v1_5
