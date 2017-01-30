@@ -122,6 +122,7 @@ Using `SteamClient.login` method is required before usage
 `Asset` is class defined in `client.py`, you can obtain `asset_id` from `SteamClient.get_my_inventory` method.
 This method also uses identity secret from SteamGuard file to confirm the trade offer.
 No need to manually confirm it on mobile app or email.
+This method works when partner is your friend or steam.
 
 ```python
 from steampy.client import SteamClient, Asset
@@ -139,6 +140,18 @@ my_asset = Asset(my_first_item['id'], game)
 partner_asset = Asset(partner_first_item['id'], game)
 steam_client.make_offer([my_asset], [partner_asset], partner_id, 'Test offer')
 ```
+
+**make_offer_with_url(items_from_me: List[Asset], items_from_them: List[Asset], trade_offer_url: str, message: str = '') -> dict**
+
+Using `SteamClient.login` method is required before usage
+This method is similar to `SteamClient.make_offer`, but it takes trade url instead of friend account id.
+It works even when partner isn't your steam friend
+
+**get_escrow_duration(trade_offer_url: str) -> int**
+
+Using `SteamClient.login` method is required before usage
+
+Check the escrow duration for trade between you and partner(given partner trade offer url)
 
 **accept_trade_offer(trade_offer_id: str) -> dict**
 

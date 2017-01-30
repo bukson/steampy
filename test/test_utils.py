@@ -3,7 +3,7 @@ from unittest import TestCase
 from steampy import utils
 
 
-class TestGuard(TestCase):
+class TestUtils(TestCase):
 
     def test_text_between(self):
         text = 'var a = "dupadupa";'
@@ -24,3 +24,8 @@ class TestGuard(TestCase):
         price = '$11.33 USD'
         float_price = utils.price_to_float(price)
         self.assertEquals(float_price, 11.33)
+
+    def test_get_key_value_from_url(self):
+        url = 'https://steamcommunity.com/tradeoffer/new/?partner=aaa&token=bbb'
+        self.assertEqual(utils.get_key_value_from_url(url, 'partner'), 'aaa')
+        self.assertEqual(utils.get_key_value_from_url(url, 'token'), 'bbb')

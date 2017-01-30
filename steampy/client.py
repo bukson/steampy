@@ -1,4 +1,5 @@
 import enum
+import urllib.parse as urlparse
 from typing import List
 
 import json
@@ -8,7 +9,7 @@ from steampy.confirmation import ConfirmationExecutor
 from steampy.login import LoginExecutor, InvalidCredentials
 from steampy.utils import text_between, merge_items_with_descriptions_from_inventory, GameOptions, \
     steam_id_to_account_id, merge_items_with_descriptions_from_offers, get_description_key, \
-    merge_items_with_descriptions_from_offer
+    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url
 
 
 class Currency(enum.IntEnum):
@@ -208,20 +209,7 @@ class SteamClient:
     @login_required
     def make_offer(self, items_from_me: List[Asset], items_from_them: List[Asset], partner_steam_id: str,
                    message: str = '') -> dict:
-        offer = {
-            'newversion': True,
-            'version': 4,
-            'me': {
-                'assets': [asset.to_dict() for asset in items_from_me],
-                'currency': [],
-                'ready': False
-            },
-            'them': {
-                'assets': [asset.to_dict() for asset in items_from_them],
-                'currency': [],
-                'ready': False
-            }
-        }
+        offer = self._create_offer_dict(items_from_me, items_from_them)
         session_id = self._get_session_id()
         url = self.COMMUNITY_URL + '/tradeoffer/new/send'
         server_id = 1
@@ -236,6 +224,59 @@ class SteamClient:
         }
         partner_account_id = steam_id_to_account_id(partner_steam_id)
         headers = {'Referer': self.COMMUNITY_URL + '/tradeoffer/new/?partner=' + partner_account_id,
+                   'Origin': self.COMMUNITY_URL}
+        response = self._session.post(url, data=params, headers=headers).json()
+        if response.get('needs_mobile_confirmation'):
+            return self._confirm_transaction(response['tradeofferid'])
+        return response
+
+    @staticmethod
+    def _create_offer_dict(items_from_me: List[Asset], items_from_them: List[Asset]) -> dict:
+        return {
+            'newversion': True,
+            'version': 4,
+            'me': {
+                'assets': [asset.to_dict() for asset in items_from_me],
+                'currency': [],
+                'ready': False
+            },
+            'them': {
+                'assets': [asset.to_dict() for asset in items_from_them],
+                'currency': [],
+                'ready': False
+            }
+        }
+
+    @login_required
+    def get_escrow_duration(self, trade_offer_url: str) -> int:
+        headers = {'Referer': self.COMMUNITY_URL + urlparse.urlparse(trade_offer_url).path,
+                   'Origin': self.COMMUNITY_URL}
+        response = self._session.get(trade_offer_url, headers=headers).text
+        my_escrow_duration = int(text_between(response, "var g_daysMyEscrow = ", ";"))
+        their_escrow_duration = int(text_between(response, "var g_daysTheirEscrow = ", ";"))
+        return max(my_escrow_duration, their_escrow_duration)
+
+    @login_required
+    def make_offer_with_url(self, items_from_me: List[Asset], items_from_them: List[Asset],
+                            trade_offer_url: str, message: str = '') -> dict:
+        token = get_key_value_from_url(trade_offer_url, 'token')
+        partner_account_id = get_key_value_from_url(trade_offer_url, 'partner')
+        partner_steam_id = account_id_to_steam_id(partner_account_id)
+        offer = self._create_offer_dict(items_from_me, items_from_them)
+        session_id = self._get_session_id()
+        url = self.COMMUNITY_URL + '/tradeoffer/new/send'
+        server_id = 1
+        trade_offer_create_params = {'trade_offer_access_token': token}
+        params = {
+            'sessionid': session_id,
+            'serverid': server_id,
+            'partner': partner_steam_id,
+            'tradeoffermessage': message,
+            'json_tradeoffer': json.dumps(offer),
+            'captcha': '',
+            'trade_offer_create_params': json.dumps(trade_offer_create_params)
+        }
+        headers = {'Referer': self.COMMUNITY_URL + urlparse.urlparse(trade_offer_url).path,
                    'Origin': self.COMMUNITY_URL}
         response = self._session.post(url, data=params, headers=headers).json()
         if response.get('needs_mobile_confirmation'):

@@ -1,5 +1,6 @@
 import enum
 import struct
+import urllib.parse as urlparse
 from typing import List
 
 
@@ -73,3 +74,8 @@ def merge_items(items: List[dict], descriptions: dict, **kwargs) -> dict:
 
 def get_description_key(item: dict) -> str:
     return item['classid'] + '_' + item['instanceid']
+
+
+def get_key_value_from_url(url: str, key: str) -> str:
+    params = urlparse.urlparse(url).query
+    return urlparse.parse_qs(params)[key][0]
