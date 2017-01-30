@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from steampy.client import SteamClient, LoginRequired, Asset, TooManyRequests
-from steampy.utils import GameOptions
+from steampy.utils import GameOptions, account_id_to_steam_id
 
 
 def load_credentials():
@@ -113,4 +113,27 @@ class TestSteamClient(TestCase):
         response = client.make_offer([my_asset], [partner_asset], partner_id, 'TESTOWA OFERTA')
         self.assertIsNotNone(response)
 
+    def test_make_offer_url(self):
+        partner_account_id = '32384925'
+        partner_token = '7vqRtBpC'
+        sample_trade_url = 'https://steamcommunity.com/tradeoffer/new/?partner=' + partner_account_id + '&token=' + partner_token
+        client = SteamClient(self.credentials.api_key)
+        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
+        client._session.request('HEAD', 'http://steamcommunity.com')
+        partner_steam_id = account_id_to_steam_id(partner_account_id)
+        game = GameOptions.CS
+        my_items = client.get_my_inventory(game, merge=False)['rgInventory']
+        partner_items = client.get_partner_inventory(partner_steam_id, game, merge=False)['rgInventory']
+        my_first_item = next(iter(my_items.values()))
+        partner_first_item = next(iter(partner_items.values()))
+        my_asset = Asset(my_first_item['id'], game)
+        partner_asset = Asset(partner_first_item['id'], game)
+        response = client.make_offer_with_url([my_asset], [partner_asset], sample_trade_url, 'TESTOWA OFERTA')
+        self.assertIsNotNone(response)
 
+    def test_get_escrow_duration(self):
+        sample_trade_url = "https://steamcommunity.com/tradeoffer/new/?partner=314218906&token=sgA4FdNm"  # a sample trade url with escrow time of 15 days cause mobile auth not added
+        client = SteamClient(self.credentials.api_key)
+        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
+        response = client.get_escrow_duration(sample_trade_url)
+        self.assertEqual(response, 15)
