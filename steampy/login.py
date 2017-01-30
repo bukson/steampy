@@ -34,7 +34,6 @@ class LoginExecutor:
         request_data = self._prepare_login_request_data(encrypted_password, rsa_timestamp)
         return self.session.post(self.STORE_URL + '/login/dologin', data=request_data)
 
-    # set the "sessionid" cookie for the domain "steamcommunity.com"
     def set_sessionid_cookie(self):
         sessionid = self.session.cookies.get_dict()['sessionid']
         community_domain = self.COMMUNITY_URL[8:]

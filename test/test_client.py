@@ -27,6 +27,19 @@ class TestSteamClient(TestCase):
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         self.assertTrue(client.isLoggedIn)
 
+    def test_send_offer_without_sessionid_cookie(self):
+        client = SteamClient(self.credentials.api_key)
+        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
+        client._session.cookies.set('sessionid', None, domain="steamcommunity.com")
+        cookies = client._session.cookies.get_dict('steamcommunity.com')
+        self.assertFalse('sessionid' in cookies)
+        game = GameOptions.TF2
+        asset_id = ''
+        my_asset = Asset(asset_id, game)
+        trade_offer_url = ''
+        resp = client.make_offer_with_url([my_asset], [], trade_offer_url, "TEST")
+        self.assertFalse(resp)
+
     def test_sessionid_cookie(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
