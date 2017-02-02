@@ -34,11 +34,11 @@ class TestSteamClient(TestCase):
         cookies = client._session.cookies.get_dict('steamcommunity.com')
         self.assertFalse('sessionid' in cookies)
         game = GameOptions.TF2
-        asset_id = ''
+        asset_id = '5484738563'
         my_asset = Asset(asset_id, game)
-        trade_offer_url = ''
-        resp = client.make_offer_with_url([my_asset], [], trade_offer_url, "TEST")
-        self.assertFalse(resp)
+        trade_offer_url = 'https://steamcommunity.com/tradeoffer/new/?partner=137955933&token=ShD0TeOP'
+        make_offer = lambda: client.make_offer_with_url([my_asset], [], trade_offer_url, "TEST")
+        self.assertRaises(AttributeError, make_offer)
 
     def test_sessionid_cookie(self):
         client = SteamClient(self.credentials.api_key)

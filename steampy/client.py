@@ -225,7 +225,7 @@ class SteamClient:
         partner_account_id = steam_id_to_account_id(partner_steam_id)
         headers = {'Referer': self.COMMUNITY_URL + '/tradeoffer/new/?partner=' + partner_account_id,
                    'Origin': self.COMMUNITY_URL}
-        response = self._session.post(url, data=params, headers=headers).json() or {}
+        response = self._session.post(url, data=params, headers=headers).json()
         if response.get('needs_mobile_confirmation'):
             return self._confirm_transaction(response['tradeofferid'])
         return response
@@ -278,7 +278,7 @@ class SteamClient:
         }
         headers = {'Referer': self.COMMUNITY_URL + urlparse.urlparse(trade_offer_url).path,
                    'Origin': self.COMMUNITY_URL}
-        response = self._session.post(url, data=params, headers=headers).json() or {}
+        response = self._session.post(url, data=params, headers=headers).json()
         if response.get('needs_mobile_confirmation'):
             return self._confirm_transaction(response['tradeofferid'])
         return response
