@@ -4,7 +4,7 @@ import sys
 if not sys.version_info[0] == 3 and sys.version_info[1] < 5:
     sys.exit('Python < 3.5 is not supported')
 
-version = '0.3'
+version = '0.31'
 
 setup(
     name='steampy',
@@ -21,5 +21,6 @@ setup(
     install_requires=[
         "requests",
         "beautifulsoup4",
+        "rsa"
     ],
 )

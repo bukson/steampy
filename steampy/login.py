@@ -2,7 +2,7 @@ import base64
 import time
 import requests
 from steampy import guard
-
+import rsa
 
 class LoginExecutor:
     COMMUNITY_URL = "https://steamcommunity.com"
@@ -45,12 +45,11 @@ class LoginExecutor:
         rsa_mod = int(key_response['publickey_mod'], 16)
         rsa_exp = int(key_response['publickey_exp'], 16)
         rsa_timestamp = key_response['timestamp']
-        return {'rsa_key': RSA.construct((rsa_mod, rsa_exp)),
+        return {'rsa_key': rsa.PublicKey(rsa_mod, rsa_exp),
                 'rsa_timestamp': rsa_timestamp}
 
     def _encrypt_password(self, rsa_params: dict) -> str:
-        return base64.b64encode(
-            PKCS1_v1_5.new(rsa_params['rsa_key']).encrypt(self.password.encode('utf-8')))
+        return base64.b64encode(rsa.encrypt(self.password.encode('utf-8'), rsa_params['rsa_key']))
 
     def _prepare_login_request_data(self, encrypted_password: str, rsa_timestamp: str) -> dict:
         return {
