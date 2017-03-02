@@ -1,10 +1,6 @@
 import base64
 import time
-
 import requests
-from Crypto.Cipher import PKCS1_v1_5
-from Crypto.PublicKey import RSA
-
 from steampy import guard
 
 
