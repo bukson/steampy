@@ -7,7 +7,7 @@ Steam Trade Offers Client for Python
 It was designed as a simple lightweight library, combining features of many steam libraries from Node.js into a single python module.
 `steampy` is capable of logging into steam, fetching trade offers and handling them in simple manner, using steam user credentials
 and SteamGuard file(no need to extract and pass sessionID and webCookie).
-`steampy` is developed with Python 3 using type hints and many other features.
+`steampy` is developed with Python 3 using type hints and many other features its supported for Windows, Linux and MacOs.
 
 Table of Content
 ================
@@ -80,6 +80,19 @@ from steampy.client import SteamClient
 
 steam_client = SteamClient('MY_API_KEY')
 steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+```
+
+**logout() -> None**
+
+Using `SteamClient.login` method is required before usage
+Logout from steam.
+
+```python
+from steampy.client import SteamClient
+
+steam_client = SteamClient('MY_API_KEY')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+steam_client.logout()
 ```
 
 **api_call(request_method: str, interface: str, api_method: str, version: str, params: dict = None) -> requests.Response**
