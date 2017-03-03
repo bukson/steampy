@@ -25,14 +25,17 @@ class TestSteamClient(TestCase):
     def test_login(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
-        self.assertTrue(client.isLoggedIn)
+
+    def test_is_session_alive(self):
+        client = SteamClient(self.credentials.api_key)
+        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
+        self.assertTrue(client.is_session_alive())
 
     def test_logout(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
-        self.assertTrue(client.isLoggedIn)
+        self.assertTrue(client.is_session_alive())
         client.logout()
-        self.assertFalse(client.isLoggedIn)
 
     def test_send_offer_without_sessionid_cookie(self):
         client = SteamClient(self.credentials.api_key)
@@ -50,8 +53,10 @@ class TestSteamClient(TestCase):
     def test_sessionid_cookie(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
-        cookies = client._session.cookies.get_dict("steamcommunity.com")
-        self.assertTrue("sessionid" in cookies)
+        community_cookies = client._session.cookies.get_dict("steamcommunity.com")
+        store_cookies = client._session.cookies.get_dict("store.steampowered.com")
+        self.assertTrue("sessionid" in community_cookies)
+        self.assertTrue("sessionid" in store_cookies)
 
     def test_get_my_inventory(self):
         client = SteamClient(self.credentials.api_key)
