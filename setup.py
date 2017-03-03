@@ -21,6 +21,6 @@ setup(
     install_requires=[
         "requests",
         "beautifulsoup4",
-        'pycrypto'
+        "rsa"
     ],
 )
