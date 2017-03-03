@@ -77,6 +77,19 @@ class SteamClient:
         LoginExecutor(username, password, self.steam_guard['shared_secret'], self._session).login()
         self.isLoggedIn = True
 
+    @login_required
+    def logout(self) -> None:
+        url = LoginExecutor.STORE_URL + '/logout/'
+        params = {'sessionid': self._get_session_id()}
+        logout_response = requests.post(url, params)
+        self._assert_logged_out(logout_response)
+        self.isLoggedIn = False
+
+    @staticmethod
+    def _assert_logged_out(response: requests.Response) -> None:
+        if 'Login' not in response.text:
+            raise Exception("Logout unsuccessful")
+
     def api_call(self, request_method: str, interface: str, api_method: str, version: str,
                  params: dict = None) -> requests.Response:
         url = '/'.join([self.API_URL, interface, api_method, version])

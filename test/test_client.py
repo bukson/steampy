@@ -27,6 +27,13 @@ class TestSteamClient(TestCase):
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         self.assertTrue(client.isLoggedIn)
 
+    def test_logout(self):
+        client = SteamClient(self.credentials.api_key)
+        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
+        self.assertTrue(client.isLoggedIn)
+        client.logout()
+        self.assertFalse(client.isLoggedIn)
+
     def test_send_offer_without_sessionid_cookie(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
