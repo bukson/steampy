@@ -7,7 +7,7 @@ Steam Trade Offers Client for Python
 It was designed as a simple lightweight library, combining features of many steam libraries from Node.js into a single python module.
 `steampy` is capable of logging into steam, fetching trade offers and handling them in simple manner, using steam user credentials
 and SteamGuard file(no need to extract and pass sessionID and webCookie).
-`steampy` is developed with Python 3 using type hints and many other features.
+`steampy` is developed with Python 3 using type hints and many other features its supported for Windows, Linux and MacOs.
 
 Table of Content
 ================
@@ -51,7 +51,11 @@ steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
 
 If you have `steamid`, `shared_secret` and `identity_secret` you can place it in file `Steamguard.txt` instead of fetching SteamGuard file from device.
 ```python
-{ "steamid": "YOUR_STEAM_ID_64", "shared_secret": "YOUR_SHARED_SECRET", "identity_secret": "YOUR_IDENTITY_SECRET" } 
+{
+    "steamid": "YOUR_STEAM_ID_64",
+    "shared_secret": "YOUR_SHARED_SECRET",
+    "identity_secret": "YOUR_IDENTITY_SECRET",
+}
 ```
 
 Examples
@@ -80,6 +84,33 @@ from steampy.client import SteamClient
 
 steam_client = SteamClient('MY_API_KEY')
 steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+```
+
+**logout() -> None**
+
+Using `SteamClient.login` method is required before usage
+Logout from steam.
+
+```python
+from steampy.client import SteamClient
+
+steam_client = SteamClient('MY_API_KEY')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+steam_client.logout()
+```
+
+**is_session_alive() -> None**
+
+Using `SteamClient.login` method is required before usage
+Check if session is alive. This method fetches main page and check
+if user name is there. Thanks for vasia123 for this solution.
+
+```python
+from steampy.client import SteamClient
+
+steam_client = SteamClient('MY_API_KEY')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+is_session_alive = steam_client.is_session_alive()
 ```
 
 **api_call(request_method: str, interface: str, api_method: str, version: str, params: dict = None) -> requests.Response**

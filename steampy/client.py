@@ -50,7 +50,7 @@ class TradeOfferState(enum.IntEnum):
 
 def login_required(func):
     def func_wrapper(self, *args, **kwargs):
-        if not self.isLoggedIn:
+        if not self.was_login_executed:
             raise LoginRequired('Use login method first')
         else:
             return func(self, *args, **kwargs)
@@ -70,12 +70,29 @@ class SteamClient:
         self._api_key = api_key
         self._session = requests.Session()
         self.steam_guard = None
-        self.isLoggedIn = False
+        self.was_login_executed = False
+        self.username = None
 
     def login(self, username: str, password: str, steam_guard: str) -> None:
         self.steam_guard = guard.load_steam_guard(steam_guard)
+        self.username = username
         LoginExecutor(username, password, self.steam_guard['shared_secret'], self._session).login()
-        self.isLoggedIn = True
+        self.was_login_executed = True
+
+    @login_required
+    def logout(self) -> None:
+        url = LoginExecutor.STORE_URL + '/logout/'
+        params = {'sessionid': self._get_session_id()}
+        self._session.post(url, params)
+        if self.is_session_alive():
+            raise Exception("Logout unsuccessful")
+        self.was_login_executed = False
+
+    @login_required
+    def is_session_alive(self):
+        steam_login = self.username
+        main_page_response = self._session.get(self.COMMUNITY_URL)
+        return steam_login in main_page_response.text
 
     def api_call(self, request_method: str, interface: str, api_method: str, version: str,
                  params: dict = None) -> requests.Response:

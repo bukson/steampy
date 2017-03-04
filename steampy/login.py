@@ -4,6 +4,7 @@ import requests
 from steampy import guard
 import rsa
 
+
 class LoginExecutor:
     COMMUNITY_URL = "https://steamcommunity.com"
     STORE_URL = 'https://store.steampowered.com'
@@ -21,7 +22,7 @@ class LoginExecutor:
         login_response = self._enter_steam_guard_if_necessary(login_response)
         self._assert_valid_credentials(login_response)
         self._perform_redirects(login_response.json())
-        self.set_sessionid_cookie()
+        self.set_sessionid_cookies()
         return self.session
 
     def _send_login_request(self) -> requests.Response:
@@ -31,13 +32,20 @@ class LoginExecutor:
         request_data = self._prepare_login_request_data(encrypted_password, rsa_timestamp)
         return self.session.post(self.STORE_URL + '/login/dologin', data=request_data)
 
-    def set_sessionid_cookie(self):
+    def set_sessionid_cookies(self):
         sessionid = self.session.cookies.get_dict()['sessionid']
         community_domain = self.COMMUNITY_URL[8:]
-        kwargs = {"name": "sessionid",
-                  "value": sessionid,
-                  "domain": community_domain}
-        self.session.cookies.set(**kwargs)
+        store_domain = self.STORE_URL[8:]
+        community_cookie = self._create_session_id_cookie(sessionid, community_domain)
+        store_cookie = self._create_session_id_cookie(sessionid, store_domain)
+        self.session.cookies.set(**community_cookie)
+        self.session.cookies.set(**store_cookie)
+
+    @staticmethod
+    def _create_session_id_cookie(sessionid: str, domain: str) -> dict:
+        return {"name": "sessionid",
+                "value": sessionid,
+                "domain": domain}
 
     def _fetch_rsa_params(self) -> dict:
         key_response = self.session.post(self.STORE_URL + '/login/getrsakey/',
