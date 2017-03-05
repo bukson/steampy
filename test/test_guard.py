@@ -20,3 +20,8 @@ class TestGuard(TestCase):
         timestamp = 1470838334
         confirmation_key = guard.generate_confirmation_key(self.identity_secret, Tag.CONF.value, timestamp)
         self.assertEquals(confirmation_key, b'pWqjnkcwqni+t/n+5xXaEa0SGeA=')
+
+    def test_generate_device_id(self):
+        steam_id = "12341234123412345"
+        device_id = guard.generate_device_id(steam_id)
+        self.assertEquals(device_id, "android:677cf5aa-3300-7807-d1e2-c408142742e2")
