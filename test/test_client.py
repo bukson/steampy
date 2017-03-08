@@ -168,3 +168,13 @@ class TestSteamClient(TestCase):
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         response = client.get_escrow_duration(sample_trade_url)
         self.assertEqual(response, 15)
+
+    def test_get_all_listings_from_market(self):
+        client = SteamClient(self.credentials.api_key)
+        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
+        listings = client.get_my_market_listings()
+        self.assertTrue(len(listings) == 2)
+        self.assertTrue(len(listings.get("buy_orders")) == 1)
+        self.assertTrue(len(listings.get("sell_listings")) == 1)
+        self.assertIsInstance(next(iter(listings.get("sell_listings").values())).get("description"), dict)
+

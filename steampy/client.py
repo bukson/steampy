@@ -9,7 +9,9 @@ from steampy.confirmation import ConfirmationExecutor
 from steampy.login import LoginExecutor, InvalidCredentials
 from steampy.utils import text_between, merge_items_with_descriptions_from_inventory, GameOptions, \
     steam_id_to_account_id, merge_items_with_descriptions_from_offers, get_description_key, \
-    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url
+    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url, \
+    get_listing_id_to_assets_address_from_html, get_market_listings_from_html, \
+    merge_items_with_descriptions_from_listing
 
 
 class Currency(enum.IntEnum):
@@ -310,6 +312,17 @@ class SteamClient:
         if response.status_code == 429:
             raise TooManyRequests("You can fetch maximum 20 prices in 60s period")
         return response.json()
+
+    @login_required
+    def get_my_market_listings(self) -> dict:
+        response = self._session.get("%s/market" % SteamClient.COMMUNITY_URL)
+        if response.status_code == 200:
+            assets_descriptions = json.loads(text_between(response.text, "var g_rgAssets = ", ";"))
+            listing_id_to_assets_address = get_listing_id_to_assets_address_from_html(response.text)
+            listings = get_market_listings_from_html(response.text)
+            listings = merge_items_with_descriptions_from_listing(listings, listing_id_to_assets_address,
+                                                                  assets_descriptions)
+            return listings
 
 
 class SevenDaysHoldException(Exception):
