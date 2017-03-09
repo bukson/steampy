@@ -319,15 +319,14 @@ class SteamClient:
     @login_required
     def get_my_market_listings(self) -> dict:
         response = self._session.get("%s/market" % SteamClient.COMMUNITY_URL)
-        if response.status_code == 200:
-            assets_descriptions = json.loads(text_between(response.text, "var g_rgAssets = ", ";"))
-            listing_id_to_assets_address = get_listing_id_to_assets_address_from_html(response.text)
-            listings = get_market_listings_from_html(response.text)
-            listings = merge_items_with_descriptions_from_listing(listings, listing_id_to_assets_address,
-                                                                  assets_descriptions)
-            return listings
-        else:
-            raise FetchException("Steam market page return a %s" % response.status_code)
+        if response.status_code != 200:
+            raise ApiException("Http Error Code: %s" % response.status_code)
+        assets_descriptions = json.loads(text_between(response.text, "var g_rgAssets = ", ";"))
+        listing_id_to_assets_address = get_listing_id_to_assets_address_from_html(response.text)
+        listings = get_market_listings_from_html(response.text)
+        listings = merge_items_with_descriptions_from_listing(listings, listing_id_to_assets_address,
+                                                              assets_descriptions)
+        return listings
 
     @login_required
     def create_sell_listing(self, assetid: str, game: GameOptions, money_to_receive: int) -> dict:
@@ -362,12 +361,13 @@ class SteamClient:
         return response
 
     @login_required
-    def remove_sell_listing(self, sell_listing_id: str) -> dict:
+    def remove_sell_listing(self, sell_listing_id: str) -> None:
         data = {"sessionid": self._get_session_id()}
         headers = {'Referer': "http://steamcommunity.com/market/"}
         url = "http://steamcommunity.com/market/removelisting/%s" % sell_listing_id
         response = self._session.post(url, data=data, headers=headers).json()
-        return response
+        if response.status_code != 200:
+            raise ApiException("Http Error Code: %s" % response.status_code)
 
     @login_required
     def cancel_buy_order(self, buy_order_id) -> dict:
@@ -388,5 +388,5 @@ class TooManyRequests(Exception):
     pass
 
 
-class FetchException(Exception):
+class ApiException(Exception):
     pass
