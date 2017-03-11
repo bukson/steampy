@@ -1,7 +1,7 @@
 from unittest import TestCase
-
-from steampy.client import SteamClient, LoginRequired, Asset, TooManyRequests, Currency
 from steampy.utils import GameOptions, account_id_to_steam_id
+from steampy.client import SteamClient, LoginRequired, Asset,  Currency
+from steampy.market import TooManyRequests
 
 
 def load_credentials():
@@ -117,14 +117,14 @@ class TestSteamClient(TestCase):
     def test_get_price(self):
         client = SteamClient(self.credentials.api_key)
         item = 'M4A1-S | Cyrex (Factory New)'
-        prices = client.fetch_price(item, GameOptions.CS)
+        prices = client.market.fetch_price(item, GameOptions.CS)
         self.assertTrue(prices['success'])
 
     def test_get_price_to_many_requests(self):
         def request_loop() -> None:
             item = 'M4A1-S | Cyrex (Factory New)'
             for _ in range(21):
-                client.fetch_price(item, GameOptions.CS)
+                client.market.fetch_price(item, GameOptions.CS)
 
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
@@ -172,7 +172,7 @@ class TestSteamClient(TestCase):
     def test_get_all_listings_from_market(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
-        listings = client.get_my_market_listings()
+        listings = client.market.get_my_market_listings()
         self.assertTrue(len(listings) == 2)
         self.assertTrue(len(listings.get("buy_orders")) == 1)
         self.assertTrue(len(listings.get("sell_listings")) == 1)
@@ -189,24 +189,24 @@ class TestSteamClient(TestCase):
                 asset_id_to_sell = asset_id
                 break
         self.assertIsNotNone(asset_id_to_sell, "You need at least 1 marketable item to pass this test")
-        response = client.create_sell_listing(asset_id_to_sell, game, 10000)
+        response = client.market.create_sell_listing(asset_id_to_sell, game, 10000)
         self.assertTrue(response["success"])
-        sell_listings = client.get_my_market_listings()["sell_listings"]
+        sell_listings = client.market.get_my_market_listings()["sell_listings"]
         listing_to_cancel = None
         for listing in sell_listings.values():
             if listing["description"]["id"] == asset_id_to_sell:
                 listing_to_cancel = listing["listing_id"]
                 break
         self.assertIsNotNone(listing_to_cancel)
-        response = client.remove_sell_listing(listing_to_cancel)
+        response = client.market.remove_sell_listing(listing_to_cancel)
 
     def test_create_and_cancel_buy_order(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         # PUT THE REAL CURRENCY OF YOUR STEAM WALLET, OTHER CURRENCIES WILL NOT WORK
-        response = client.create_buy_order("AK-47 | Redline (Field-Tested)", 10, 2, GameOptions.CS, Currency.EURO)
+        response = client.market.create_buy_order("AK-47 | Redline (Field-Tested)", 10, 2, GameOptions.CS, Currency.EURO)
         buy_order_id = response["buy_orderid"]
-        self.assertTrue(response["success"])
+        self.assertTrue(response["success"] == 1)
         self.assertIsNotNone(buy_order_id)
-        response = client.cancel_buy_order(buy_order_id)
+        response = client.market.cancel_buy_order(buy_order_id)
         self.assertTrue(response["success"])

@@ -9,9 +9,7 @@ from steampy.confirmation import ConfirmationExecutor
 from steampy.login import LoginExecutor, InvalidCredentials
 from steampy.utils import text_between, merge_items_with_descriptions_from_inventory, GameOptions, \
     steam_id_to_account_id, merge_items_with_descriptions_from_offers, get_description_key, \
-    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url, \
-    get_listing_id_to_assets_address_from_html, get_market_listings_from_html, \
-    merge_items_with_descriptions_from_listing
+    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url
 
 
 class Currency(enum.IntEnum):
@@ -74,12 +72,15 @@ class SteamClient:
         self.steam_guard = None
         self.was_login_executed = False
         self.username = None
+        self.market = SteamMarket(self._session)
 
     def login(self, username: str, password: str, steam_guard: str) -> None:
         self.steam_guard = guard.load_steam_guard(steam_guard)
         self.username = username
         LoginExecutor(username, password, self.steam_guard['shared_secret'], self._session).login()
         self.was_login_executed = True
+        self.market.steam_guard = self.steam_guard
+        self.market.session_id = self._get_session_id()
 
     @login_required
     def logout(self) -> None:
@@ -213,11 +214,6 @@ class SteamClient:
                                                      self._session)
         return confirmation_executor.send_trade_allow_request(trade_offer_id)
 
-    def _confirm_sell_listing(self, asset_id: str) -> dict:
-        con_executor = ConfirmationExecutor(self.steam_guard['identity_secret'], self.steam_guard['steamid'],
-                                            self._session)
-        return con_executor.confirm_sell_listing(asset_id)
-
     def decline_trade_offer(self, trade_offer_id: str) -> dict:
         params = {'key': self._api_key,
                   'tradeofferid': trade_offer_id}
@@ -305,88 +301,6 @@ class SteamClient:
             return self._confirm_transaction(response['tradeofferid'])
         return response
 
-    def fetch_price(self, item_hash_name: str, game: GameOptions, currency: str = Currency.USD) -> dict:
-        url = self.COMMUNITY_URL + '/market/priceoverview/'
-        params = {'country': 'PL',
-                  'currency': currency,
-                  'appid': game.app_id,
-                  'market_hash_name': item_hash_name}
-        response = self._session.get(url, params=params)
-        if response.status_code == 429:
-            raise TooManyRequests("You can fetch maximum 20 prices in 60s period")
-        return response.json()
-
-    @login_required
-    def get_my_market_listings(self) -> dict:
-        response = self._session.get("%s/market" % SteamClient.COMMUNITY_URL)
-        if response.status_code != 200:
-            raise ApiException("Http Error Code: %s" % response.status_code)
-        assets_descriptions = json.loads(text_between(response.text, "var g_rgAssets = ", ";"))
-        listing_id_to_assets_address = get_listing_id_to_assets_address_from_html(response.text)
-        listings = get_market_listings_from_html(response.text)
-        listings = merge_items_with_descriptions_from_listing(listings, listing_id_to_assets_address,
-                                                              assets_descriptions)
-        return listings
-
-    @login_required
-    def create_sell_listing(self, assetid: str, game: GameOptions, money_to_receive: int) -> dict:
-        data = {
-            "assetid": assetid,
-            "sessionid": self._get_session_id(),
-            "contextid": game.context_id,
-            "appid": game.app_id,
-            "amount": 1,
-            "price": money_to_receive
-        }
-        headers = {'Referer': "http://steamcommunity.com/profiles/%s/inventory" % self.steam_guard['steamid']}
-        response = self._session.post("https://steamcommunity.com/market/sellitem/", data, headers=headers).json()
-        if response.get("needs_mobile_confirmation"):
-            return self._confirm_sell_listing(assetid)
-        return response
-
-    @login_required
-    def create_buy_order(self, market_name: str, price_single_item: int, quantity: int, game: GameOptions,
-                         currency: Currency = Currency.USD) -> dict:
-        data = {
-            "sessionid": self._get_session_id(),
-            "currency": currency.value,
-            "appid": game.app_id,
-            "market_hash_name": market_name,
-            "price_total": price_single_item * quantity,
-            "quantity": quantity
-        }
-        headers = {'Referer': "http://steamcommunity.com/market/listings/%s/%s" % (game.app_id, market_name)}
-        response = self._session.post("https://steamcommunity.com/market/createbuyorder/", data, headers=headers)
-        response = response.json()
-        return response
-
-    @login_required
-    def remove_sell_listing(self, sell_listing_id: str) -> None:
-        data = {"sessionid": self._get_session_id()}
-        headers = {'Referer': "http://steamcommunity.com/market/"}
-        url = "http://steamcommunity.com/market/removelisting/%s" % sell_listing_id
-        response = self._session.post(url, data=data, headers=headers).json()
-        if response.status_code != 200:
-            raise ApiException("Http Error Code: %s" % response.status_code)
-
-    @login_required
-    def cancel_buy_order(self, buy_order_id) -> dict:
-        data = {
-            "sessionid": self._get_session_id(),
-            "buy_orderid": buy_order_id
-        }
-        headers = {"Referer": "http://steamcommunity.com/market"}
-        response = self._session.post("http://steamcommunity.com/market/cancelbuyorder/", data, headers=headers).json()
-        return response
-
 
 class SevenDaysHoldException(Exception):
-    pass
-
-
-class TooManyRequests(Exception):
-    pass
-
-
-class ApiException(Exception):
     pass

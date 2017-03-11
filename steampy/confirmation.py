@@ -31,24 +31,23 @@ class ConfirmationExecutor:
         self._my_steam_id = my_steam_id
         self._identity_secret = identity_secret
         self._session = session
-        self._confirmation = None
 
     def send_trade_allow_request(self, trade_offer_id: str) -> dict:
         confirmations = self._get_confirmations()
-        self._confirmation = self._select_trade_offer_confirmation(confirmations, trade_offer_id)
-        return self._send_confirmation()
+        confirmation = self._select_trade_offer_confirmation(confirmations, trade_offer_id)
+        return self._send_confirmation(confirmation)
 
     def confirm_sell_listing(self, asset_id: str) -> dict:
         confirmations = self._get_confirmations()
-        self._confirmation = self._select_sell_listing_confirmation(confirmations, asset_id)
-        return self._send_confirmation()
+        confirmation = self._select_sell_listing_confirmation(confirmations, asset_id)
+        return self._send_confirmation(confirmation)
 
-    def _send_confirmation(self) -> dict:
+    def _send_confirmation(self, confirmation: Confirmation) -> dict:
         tag = Tag.ALLOW
         params = self._create_confirmation_params(tag.value)
         params['op'] = tag.value,
-        params['cid'] = self._confirmation.data_confid
-        params['ck'] = self._confirmation.data_key
+        params['cid'] = confirmation.data_confid
+        params['ck'] = confirmation.data_key
         headers = {'X-Requested-With': 'XMLHttpRequest'}
         return self._session.get(self.CONF_URL + '/ajaxop', params=params, headers=headers).json()
 
