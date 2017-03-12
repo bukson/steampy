@@ -1,7 +1,9 @@
 from unittest import TestCase
-from steampy.utils import GameOptions, account_id_to_steam_id
-from steampy.client import SteamClient, LoginRequired, Asset,  Currency
-from steampy.market import TooManyRequests
+
+from steampy.client import SteamClient
+from steampy.exceptions import LoginRequired, TooManyRequests
+from steampy.models import GameOptions, Asset, Currency
+from steampy.utils import account_id_to_steam_id
 
 
 def load_credentials():
@@ -61,15 +63,14 @@ class TestSteamClient(TestCase):
     def test_get_my_inventory(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
-        inventory = client.get_my_inventory(GameOptions.CS)
+        inventory = client.get_my_inventory(GameOptions.TF2)
         self.assertIsNotNone(inventory)
 
     def test_get_partner_inventory(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         partner_id = ''
-        game = GameOptions.CS
-        client.get_my_inventory(game)
+        game = GameOptions.TF2
         inventory = client.get_partner_inventory(partner_id, game)
         self.assertIsNotNone(inventory)
 

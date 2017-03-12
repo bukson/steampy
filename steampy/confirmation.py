@@ -7,6 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from steampy import guard
+from steampy.exceptions import ConfirmationExpected
 from steampy.login import InvalidCredentials
 
 
@@ -119,7 +120,3 @@ class ConfirmationExecutor:
         soup = BeautifulSoup(confirmation_details_page, 'html.parser')
         full_offer_id = soup.select('.tradeoffer')[0]['id']
         return full_offer_id.split('_')[1]
-
-
-class ConfirmationExpected(Exception):
-    pass

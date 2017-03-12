@@ -1,4 +1,3 @@
-import enum
 import struct
 import urllib.parse as urlparse
 import re
@@ -6,15 +5,7 @@ from typing import List
 
 from bs4 import BeautifulSoup, Tag
 
-
-class GameOptions(enum.Enum):
-    DOTA2 = ('570', '2')
-    CS = ('730', '2')
-    TF2 = ('440', '2')
-
-    def __init__(self, app_id: str, context_id: str) -> None:
-        self.app_id = app_id
-        self.context_id = context_id
+from steampy.models import GameOptions
 
 
 def text_between(text: str, begin: str, end: str) -> str:
