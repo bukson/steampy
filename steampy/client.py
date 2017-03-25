@@ -247,6 +247,12 @@ class SteamClient:
             return self._confirm_transaction(response['tradeofferid'])
         return response
 
+    def get_profile(self, steam_id: str) -> dict:
+        params = {'steamids': steam_id, 'key': self._api_key}
+        response = self.api_call('GET', 'ISteamUser', 'GetPlayerSummaries', 'v0002', params)
+        data = response.json()
+        return data['response']['players'][0]
+
     @staticmethod
     def _create_offer_dict(items_from_me: List[Asset], items_from_them: List[Asset]) -> dict:
         return {
