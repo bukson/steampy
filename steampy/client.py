@@ -244,7 +244,7 @@ class SteamClient:
                    'Origin': self.COMMUNITY_URL}
         response = self._session.post(url, data=params, headers=headers).json()
         if response.get('needs_mobile_confirmation'):
-            return self._confirm_transaction(response['tradeofferid'])
+            response.update(self._confirm_transaction(response['tradeofferid']))
         return response
 
     def get_profile(self, steam_id: str) -> dict:
@@ -303,7 +303,7 @@ class SteamClient:
                    'Origin': self.COMMUNITY_URL}
         response = self._session.post(url, data=params, headers=headers).json()
         if response.get('needs_mobile_confirmation'):
-            return self._confirm_transaction(response['tradeofferid'])
+            response.update(self._confirm_transaction(response['tradeofferid']))
         return response
 
     def fetch_price(self, item_hash_name: str, game: GameOptions, currency: str = Currency.USD) -> dict:
