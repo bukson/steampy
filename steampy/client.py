@@ -12,7 +12,7 @@ from steampy.utils import text_between, merge_items_with_descriptions_from_inven
     merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url
 
 
-class Currency(aenum.IntEnum):
+class Currency(aenum.Enum):
     USD = 1
     GBP = 2
     EURO = 3
@@ -34,7 +34,7 @@ class Asset:
         }
 
 
-class TradeOfferState(aenum.IntEnum):
+class TradeOfferState(aenum.Enum):
     Invalid = 1
     Active = 2
     Accepted = 3
@@ -164,9 +164,9 @@ class SteamClient:
         offers_received = offers_response['response'].get('trade_offers_received', [])
         offers_sent = offers_response['response'].get('trade_offers_sent', [])
         offers_response['response']['trade_offers_received'] = list(
-            filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active, offers_received))
+            filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active.value, offers_received))
         offers_response['response']['trade_offers_sent'] = list(
-            filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active, offers_sent))
+            filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active.value, offers_sent))
         return offers_response
 
     def get_trade_offer(self, trade_offer_id: str, merge: bool = True) -> dict:
@@ -309,7 +309,7 @@ class SteamClient:
     def fetch_price(self, item_hash_name: str, game: GameOptions, currency: str = Currency.USD) -> dict:
         url = self.COMMUNITY_URL + '/market/priceoverview/'
         params = {'country': 'PL',
-                  'currency': currency,
+                  'currency': currency.value,
                   'appid': game.value[0],
                   'market_hash_name': item_hash_name}
         response = self._session.get(url, params=params)
