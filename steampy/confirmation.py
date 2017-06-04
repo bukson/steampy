@@ -1,4 +1,5 @@
 import enum
+import json
 import time
 from typing import List
 
@@ -6,6 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from steampy import guard
+from steampy.exceptions import ConfirmationExpected
 from steampy.login import InvalidCredentials
 
 
@@ -26,15 +28,22 @@ class Tag(enum.Enum):
 class ConfirmationExecutor:
     CONF_URL = "https://steamcommunity.com/mobileconf"
 
-    def __init__(self, trade_offer_id: str, identity_secret: str, my_steam_id: str, session: requests.Session) -> None:
-        self._trade_offer_id = trade_offer_id
+    def __init__(self, identity_secret: str, my_steam_id: str, session: requests.Session) -> None:
         self._my_steam_id = my_steam_id
         self._identity_secret = identity_secret
         self._session = session
 
-    def send_trade_allow_request(self) -> dict:
+    def send_trade_allow_request(self, trade_offer_id: str) -> dict:
         confirmations = self._get_confirmations()
-        confirmation = self._select_trade_offer_confirmation(confirmations)
+        confirmation = self._select_trade_offer_confirmation(confirmations, trade_offer_id)
+        return self._send_confirmation(confirmation)
+
+    def confirm_sell_listing(self, asset_id: str) -> dict:
+        confirmations = self._get_confirmations()
+        confirmation = self._select_sell_listing_confirmation(confirmations, asset_id)
+        return self._send_confirmation(confirmation)
+
+    def _send_confirmation(self, confirmation: Confirmation) -> dict:
         tag = Tag.ALLOW
         params = self._create_confirmation_params(tag.value)
         params['op'] = tag.value,
@@ -82,20 +91,32 @@ class ConfirmationExecutor:
                 'm': 'android',
                 'tag': tag_string}
 
-    def _select_trade_offer_confirmation(self, confirmations: List[Confirmation]) -> Confirmation:
+    def _select_trade_offer_confirmation(self, confirmations: List[Confirmation], trade_offer_id: str) -> Confirmation:
         for confirmation in confirmations:
             confirmation_details_page = self._fetch_confirmation_details_page(confirmation)
             confirmation_id = self._get_confirmation_trade_offer_id(confirmation_details_page)
-            if confirmation_id == self._trade_offer_id:
+            if confirmation_id == trade_offer_id:
                 return confirmation
         raise ConfirmationExpected
+
+    def _select_sell_listing_confirmation(self, confirmations: List[Confirmation], asset_id: str) -> Confirmation:
+        for confirmation in confirmations:
+            confirmation_details_page = self._fetch_confirmation_details_page(confirmation)
+            confirmation_id = self._get_confirmation_sell_listing_id(confirmation_details_page)
+            if confirmation_id == asset_id:
+                return confirmation
+        raise ConfirmationExpected
+
+    @staticmethod
+    def _get_confirmation_sell_listing_id(confirmation_details_page: str) -> str:
+        soup = BeautifulSoup(confirmation_details_page, 'html.parser')
+        scr_raw = soup.select("script")[2].text.strip()
+        scr_raw = scr_raw[scr_raw.index("'confiteminfo', ") + 16:]
+        scr_raw = scr_raw[:scr_raw.index(", UserYou")].replace("\n", "")
+        return json.loads(scr_raw)["id"]
 
     @staticmethod
     def _get_confirmation_trade_offer_id(confirmation_details_page: str) -> str:
         soup = BeautifulSoup(confirmation_details_page, 'html.parser')
         full_offer_id = soup.select('.tradeoffer')[0]['id']
         return full_offer_id.split('_')[1]
-
-
-class ConfirmationExpected(Exception):
-    pass

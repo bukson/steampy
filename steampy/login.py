@@ -4,6 +4,8 @@ import requests
 from steampy import guard
 import rsa
 
+from steampy.exceptions import InvalidCredentials, CaptchaRequired
+
 
 class LoginExecutor:
     COMMUNITY_URL = "https://steamcommunity.com"
@@ -99,11 +101,3 @@ class LoginExecutor:
 
     def _fetch_home_page(self, session: requests.Session) -> requests.Response:
         return session.post(self.COMMUNITY_URL + '/my/home/')
-
-
-class InvalidCredentials(Exception):
-    pass
-
-
-class CaptchaRequired(Exception):
-    pass
