@@ -143,6 +143,7 @@ class TestSteamClient(TestCase):
         partner_asset = Asset(partner_first_item['id'], game)
         response = client.make_offer([my_asset], [partner_asset], partner_id, 'TESTOWA OFERTA')
         self.assertIsNotNone(response)
+        self.assertIn('tradeofferid', response.keys())
 
     def test_make_offer_url(self):
         partner_account_id = '32384925'
@@ -161,6 +162,7 @@ class TestSteamClient(TestCase):
         partner_asset = Asset(partner_first_item['id'], game)
         response = client.make_offer_with_url([my_asset], [partner_asset], sample_trade_url, 'TESTOWA OFERTA')
         self.assertIsNotNone(response)
+        self.assertIn('tradeofferid', response.keys())
 
     def test_get_escrow_duration(self):
         sample_trade_url = "https://steamcommunity.com/tradeoffer/new/?partner=314218906&token=sgA4FdNm"  # a sample trade url with escrow time of 15 days cause mobile auth not added
