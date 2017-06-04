@@ -20,6 +20,8 @@ Table of Content
 
 * [SteamClient methods](https://github.com/bukson/steampy#steamclient-methods)
 
+* [Market methods](https://github.com/bukson/steampy#market-methods)
+
 * [Guard module functions](https://github.com/bukson/steampy#guard-module-functions)
 
 * [Test](https://github.com/bukson/steampy#test)
@@ -200,23 +202,6 @@ Decline trade offer that **other** user sent to us.
 
 Cancel trade offer that **we** sent to other user.
 
-**get_price(item_hash_name: str, game: GameOptions, currency: str = Currency.USD) -> dict**
-
-Games are defined in GameOptions class, currently `GameOptions.DOTA2`, `GameOptions.CS` and `GameOptions.TF2`
-
-Currencies are defined in Currency class, currently `Currency.USD`, `Currency.GBP`, `Currency.EURO`, `Currency.CHF`
-
-Default currency is USD
-
-May rise `TooManyRequests` exception if used more than 20 times in 60 seconds.
-
-```python
-client = SteamClient(self.credentials.api_key)
-item = 'M4A1-S | Cyrex (Factory New)'
-client.fetch_price(item, game=GameOptions.CS)
-{'volume': '208', 'lowest_price': '$11.30 USD', 'median_price': '$11.33 USD', 'success': True}
-```
-
 **get_my_inventory(game: GameOptions, merge: bool = True) -> dict**
 
 Using `SteamClient.login` method is required before usage
@@ -341,6 +326,57 @@ Inventory entries looks like this:
 Using `SteamClient.login` method is required before usage
 
 Inventory items can be merged like in `SteamClient.get_my_inventory` method
+
+market methods
+==============
+
+**fetch_price(item_hash_name: str, game: GameOptions, currency: str = Currency.USD) -> dict**
+
+Games are defined in GameOptions class, currently `GameOptions.DOTA2`, `GameOptions.CS` and `GameOptions.TF2`
+
+Currencies are defined in Currency class, currently `Currency.USD`, `Currency.GBP`, `Currency.EURO`, `Currency.CHF`
+
+Default currency is USD
+
+May rise `TooManyRequests` exception if used more than 20 times in 60 seconds.
+
+```python
+client = SteamClient(self.credentials.api_key)
+item = 'M4A1-S | Cyrex (Factory New)'
+client.fetch_price(item, game=GameOptions.CS)
+{'volume': '208', 'lowest_price': '$11.30 USD', 'median_price': '$11.33 USD', 'success': True}
+```
+
+
+**get_my_market_listings() -> dict**
+
+Using `SteamClient.login` method is required before usage
+
+Returns market listings posted by user
+
+**create_sell_order(assetid: str, game: GameOptions, money_to_receive: str) -> dict**
+
+Using `SteamClient.login` method is required before usage
+
+Create sell order of the asset on the steam market.
+ 
+**create_buy_order(market_name: str, price_single_item: str, quantity: int, game: GameOptions, currency: Currency = Currency.USD) -> dict**
+
+Using `SteamClient.login` method is required before usage
+
+Create buy order of the assets on the steam market.
+
+**cancel_sell_order(sell_listing_id: str) -> None**
+
+Using `SteamClient.login` method is required before usage
+
+Cancel previously requested sell order on steam market.
+
+**cancel_buy_order(buy_order_id) -> dict**
+
+Using `SteamClient.login` method is required before usage
+
+Cancel previously requested buy order on steam market.
 
 guard module functions
 ======================
