@@ -1,17 +1,17 @@
-import enum
+import aenum
 import struct
 import urllib.parse as urlparse
 from typing import List
 
 
-class GameOptions(enum.Enum):
+class GameOptions(aenum.Enum):
     DOTA2 = ('570', '2')
     CS = ('730', '2')
     TF2 = ('440', '2')
+    STEAM_MAIN = ('753','6')
 
-    def __init__(self, app_id: str, context_id: str) -> None:
-        self.app_id = app_id
-        self.context_id = context_id
+    def custom(name,app,ctx):
+        extend_enum(GameOptions,name,(app,ctx))
 
 
 def text_between(text: str, begin: str, end: str) -> str:

@@ -1,4 +1,4 @@
-import enum
+import aenum
 import urllib.parse as urlparse
 from typing import List
 
@@ -12,7 +12,7 @@ from steampy.utils import text_between, merge_items_with_descriptions_from_inven
     merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url
 
 
-class Currency(enum.IntEnum):
+class Currency(aenum.Enum):
     USD = 1
     GBP = 2
     EURO = 3
@@ -22,19 +22,19 @@ class Currency(enum.IntEnum):
 class Asset:
     def __init__(self, asset_id: str, game: GameOptions, amount: int = 1) -> None:
         self.asset_id = asset_id
-        self.game = game
+        self.game = game.value
         self.amount = amount
 
     def to_dict(self):
         return {
-            'appid': int(self.game.app_id),
-            'contextid': self.game.context_id,
+            'appid': int(self.game[0]),
+            'contextid': self.game[1],
             'amount': self.amount,
             'assetid': self.asset_id
         }
 
 
-class TradeOfferState(enum.IntEnum):
+class TradeOfferState(aenum.Enum):
     Invalid = 1
     Active = 2
     Accepted = 3
@@ -113,8 +113,8 @@ class SteamClient:
     @login_required
     def get_my_inventory(self, game: GameOptions, merge: bool = True) -> dict:
         url = self.COMMUNITY_URL + '/my/inventory/json/' + \
-              game.app_id + '/' + \
-              game.context_id
+              game.value[0] + '/' + \
+              game.value[1]
         response_dict = self._session.get(url).json()
         if merge:
             return merge_items_with_descriptions_from_inventory(response_dict, game)
@@ -124,8 +124,8 @@ class SteamClient:
     def get_partner_inventory(self, partner_steam_id: str, game: GameOptions, merge: bool = True) -> dict:
         params = {'sessionid': self._get_session_id(),
                   'partner': partner_steam_id,
-                  'appid': int(game.app_id),
-                  'contextid': game.context_id}
+                  'appid': int(game.value[0]),
+                  'contextid': game.value[1]}
         partner_account_id = steam_id_to_account_id(partner_steam_id)
         headers = {'X-Requested-With': 'XMLHttpRequest',
                    'Referer': self.COMMUNITY_URL + '/tradeoffer/new/?partner=' + partner_account_id,
@@ -164,9 +164,9 @@ class SteamClient:
         offers_received = offers_response['response'].get('trade_offers_received', [])
         offers_sent = offers_response['response'].get('trade_offers_sent', [])
         offers_response['response']['trade_offers_received'] = list(
-            filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active, offers_received))
+            filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active.value, offers_received))
         offers_response['response']['trade_offers_sent'] = list(
-            filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active, offers_sent))
+            filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active.value, offers_sent))
         return offers_response
 
     def get_trade_offer(self, trade_offer_id: str, merge: bool = True) -> dict:
@@ -309,8 +309,8 @@ class SteamClient:
     def fetch_price(self, item_hash_name: str, game: GameOptions, currency: str = Currency.USD) -> dict:
         url = self.COMMUNITY_URL + '/market/priceoverview/'
         params = {'country': 'PL',
-                  'currency': currency,
-                  'appid': game.app_id,
+                  'currency': currency.value,
+                  'appid': game.value[0],
                   'market_hash_name': item_hash_name}
         response = self._session.get(url, params=params)
         if response.status_code == 429:
