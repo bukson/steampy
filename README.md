@@ -154,6 +154,7 @@ Using `SteamClient.login` method is required before usage
 This method also uses identity secret from SteamGuard file to confirm the trade offer.
 No need to manually confirm it on mobile app or email.
 This method works when partner is your friend or steam.
+In returned dict there will be trade offer id by the key `tradeofferid`.
 
 ```python
 from steampy.client import SteamClient, Asset
@@ -177,6 +178,7 @@ steam_client.make_offer([my_asset], [partner_asset], partner_id, 'Test offer')
 Using `SteamClient.login` method is required before usage
 This method is similar to `SteamClient.make_offer`, but it takes trade url instead of friend account id.
 It works even when partner isn't your steam friend
+In returned dict there will be trade offer id by the key `tradeofferid`.
 
 **get_escrow_duration(trade_offer_url: str) -> int**
 
