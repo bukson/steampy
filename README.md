@@ -383,7 +383,7 @@ guard module functions
 
 **load_steam_guard(steam_guard: str) -> dict**
 
-Load and parse SteamGuard file
+If `steam_guard` is file name then load and parse it, else just parse `steam_guard` as json string.
 
 **generate_one_time_code(shared_secret: str, timestamp: int= int(time.time())) -> str**
 
