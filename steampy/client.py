@@ -53,7 +53,7 @@ class SteamClient:
     def is_session_alive(self):
         steam_login = self.username
         main_page_response = self._session.get(SteamUrl.COMMUNITY_URL)
-        return steam_login in main_page_response.text
+        return steam_login.lower() in main_page_response.text.lower()
 
     def api_call(self, request_method: str, interface: str, api_method: str, version: str,
                  params: dict = None) -> requests.Response:
