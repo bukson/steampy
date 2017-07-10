@@ -385,10 +385,10 @@ guard module functions
 
 If `steam_guard` is file name then load and parse it, else just parse `steam_guard` as json string.
 
-**generate_one_time_code(shared_secret: str, timestamp: int= int(time.time())) -> str**
+**generate_one_time_code(shared_secret: str, timestamp: int = None) -> str**
 
 Generate one time code for logging into Steam using shared_secret from SteamGuard file.
-Default timestamp is current time.
+If none timestamp provided, timestamp will be set to current time.
 
 **generate_confirmation_key(identity_secret: str, tag: str, timestamp: int = int(time.time())) -> bytes**
 
