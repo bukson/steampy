@@ -109,6 +109,12 @@ def get_sell_listings_from_node(node: Tag) -> dict:
     return sell_listings_dict
 
 
+def get_market_sell_listings_from_api(html: str) -> dict:
+    document = BeautifulSoup(html, "html.parser")
+    sell_listings_dict = get_sell_listings_from_node(document)
+    return {"sell_listings": sell_listings_dict}
+
+
 def get_buy_orders_from_node(node: Tag) -> dict:
     buy_orders_raw = node.findAll("div", {"id": re.compile('mybuyorder_\\d+')})
     buy_orders_dict = {}
