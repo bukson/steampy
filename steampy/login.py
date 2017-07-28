@@ -17,6 +17,7 @@ class LoginExecutor:
         self.one_time_code = ''
         self.shared_secret = shared_secret
         self.session = session
+        self.repeats = 0
 
     def login(self) -> requests.Session:
         login_response = self._send_login_request()
@@ -56,9 +57,13 @@ class LoginExecutor:
             rsa_mod = int(key_response['publickey_mod'], 16)
             rsa_exp = int(key_response['publickey_exp'], 16)
             rsa_timestamp = key_response['timestamp']
+            self.repeats = 0
             return {'rsa_key': rsa.PublicKey(rsa_mod, rsa_exp),
                     'rsa_timestamp': rsa_timestamp}
         except KeyError: 
+            if self.repeats >= 5:
+                raise ValueError('Could not obtain rsa-key')
+            self.repeats += 1
             return self._fetch_rsa_params()
 
     def _encrypt_password(self, rsa_params: dict) -> str:
