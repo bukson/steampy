@@ -49,14 +49,21 @@ class LoginExecutor:
                 "value": sessionid,
                 "domain": domain}
 
-    def _fetch_rsa_params(self) -> dict:
+    def _fetch_rsa_params(self, current_number_of_repetitions: int = 0) -> dict:
+        maximal_number_of_repetitions = 5
         key_response = self.session.post(self.STORE_URL + '/login/getrsakey/',
                                          data={'username': self.username}).json()
-        rsa_mod = int(key_response['publickey_mod'], 16)
-        rsa_exp = int(key_response['publickey_exp'], 16)
-        rsa_timestamp = key_response['timestamp']
-        return {'rsa_key': rsa.PublicKey(rsa_mod, rsa_exp),
-                'rsa_timestamp': rsa_timestamp}
+        try:
+            rsa_mod = int(key_response['publickey_mod'], 16)
+            rsa_exp = int(key_response['publickey_exp'], 16)
+            rsa_timestamp = key_response['timestamp']
+            return {'rsa_key': rsa.PublicKey(rsa_mod, rsa_exp),
+                    'rsa_timestamp': rsa_timestamp}
+        except KeyError:
+            if current_number_of_repetitions < maximal_number_of_repetitions:
+                return self._fetch_rsa_params(current_number_of_repetitions + 1)
+            else:
+                raise ValueError('Could not obtain rsa-key')
 
     def _encrypt_password(self, rsa_params: dict) -> str:
         return base64.b64encode(rsa.encrypt(self.password.encode('utf-8'), rsa_params['rsa_key']))
