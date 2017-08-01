@@ -6,7 +6,7 @@ from steampy.confirmation import ConfirmationExecutor
 from steampy.exceptions import ApiException, TooManyRequests, LoginRequired
 from steampy.models import Currency, SteamUrl, GameOptions
 from steampy.utils import text_between, get_listing_id_to_assets_address_from_html, get_market_listings_from_html, \
-    merge_items_with_descriptions_from_listing
+    merge_items_with_descriptions_from_listing, get_market_sell_listings_from_api
 
 
 def login_required(func):
@@ -52,6 +52,21 @@ class SteamMarket:
         listings = get_market_listings_from_html(response.text)
         listings = merge_items_with_descriptions_from_listing(listings, listing_id_to_assets_address,
                                                               assets_descriptions)
+        if '<span id="tabContentsMyActiveMarketListings_end">' in response.text:
+            n_showing = int(text_between(response.text, '<span id="tabContentsMyActiveMarketListings_end">', '</span>'))
+            n_total = int(text_between(response.text, '<span id="tabContentsMyActiveMarketListings_total">', '</span>'))
+            if n_total > n_showing:
+                url = "%s/market/mylistings/render/?query=&start=%s&count=%s" % (SteamUrl.COMMUNITY_URL, n_showing, -1)
+                response = self._session.get(url)
+                if response.status_code != 200:
+                    raise ApiException("There was a problem getting the listings. http code: %s" % response.status_code)
+                jresp = response.json()
+                listing_id_to_assets_address = get_listing_id_to_assets_address_from_html(jresp.get("hovers"))
+                listings_2 = get_market_sell_listings_from_api(jresp.get("results_html"))
+                listings_2 = merge_items_with_descriptions_from_listing(listings_2, listing_id_to_assets_address,
+                                                                        jresp.get("assets"))
+                listings["sell_listings"] = {**listings["sell_listings"], **listings_2["sell_listings"]}
+
         return listings
 
     @login_required
