@@ -1,9 +1,12 @@
 import enum
+from collections import namedtuple
 
 
-class GameOptions(enum.Enum):
-    DOTA2 = ('570', '2')
-    CS = ('730', '2')
+class GameOptions:
+    PredefinedOptions = namedtuple('PredefinedOptions', ['app_id', 'context_id'])
+
+    DOTA2 = PredefinedOptions('570', '2')
+    CS = PredefinedOptions('730', '2')
     TF2 = ('440', '2')
 
     def __init__(self, app_id: str, context_id: str) -> None:
