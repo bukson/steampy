@@ -9,6 +9,13 @@ class TestUtils(TestCase):
         text = 'var a = "dupadupa";'
         text_between = utils.text_between(text, 'var a = "', '";')
         self.assertEquals(text_between, 'dupadupa')
+        
+    def test_texts_between(self):
+        text = "<li>element 1</li>\n<li>some random element</li>"
+        items = []
+        for el in utils.texts_between(text, "<li>", "</li>"):
+            items.append(el)
+        self.assertEquals(items, ["element 1", "some random element"])
 
     def test_account_id_to_steam_id(self):
         account_id = '358617487'

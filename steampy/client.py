@@ -9,9 +9,9 @@ from steampy.exceptions import SevenDaysHoldException, LoginRequired
 from steampy.login import LoginExecutor, InvalidCredentials
 from steampy.market import SteamMarket
 from steampy.models import Asset, TradeOfferState, SteamUrl, GameOptions
-from steampy.utils import text_between, merge_items_with_descriptions_from_inventory, steam_id_to_account_id, \
-    merge_items_with_descriptions_from_offers, get_description_key, merge_items_with_descriptions_from_offer, \
-    account_id_to_steam_id, get_key_value_from_url
+from steampy.utils import text_between, texts_between, merge_items_with_descriptions_from_inventory, \
+    steam_id_to_account_id, merge_items_with_descriptions_from_offers, get_description_key, \
+    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url
 
 
 def login_required(func):
@@ -140,6 +140,13 @@ class SteamClient:
             offer = response['response']['offer']
             response['response']['offer'] = merge_items_with_descriptions_from_offer(offer, descriptions)
         return response
+    
+    def get_trade_receipt(self, trade_id: str) -> list:
+        html = self._session.get("https://steamcommunity.com/trade/{}/receipt".format(trade_id)).content.decode()
+        items = []
+        for item in texts_between(html, "oItem = ", ";\r\n\toItem"):
+            items.append(json.loads(item))
+        return items
 
     @login_required
     def accept_trade_offer(self, trade_offer_id: str) -> dict:
