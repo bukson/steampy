@@ -14,6 +14,17 @@ def text_between(text: str, begin: str, end: str) -> str:
     return text[start:end]
 
 
+def texts_between(text: str, begin: str, end: str):
+    stop = 0
+    while True:
+        try:
+            start = text.index(begin, stop) + len(begin)
+            stop = text.index(end, start)
+            yield text[start:stop]
+        except:
+            raise StopIteration
+
+
 def account_id_to_steam_id(account_id: str) -> str:
     first_bytes = int(account_id).to_bytes(4, byteorder='big')
     last_bytes = 0x1100001.to_bytes(4, byteorder='big')
