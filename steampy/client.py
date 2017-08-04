@@ -9,9 +9,9 @@ from steampy.exceptions import SevenDaysHoldException, LoginRequired
 from steampy.login import LoginExecutor, InvalidCredentials
 from steampy.market import SteamMarket
 from steampy.models import Asset, TradeOfferState, SteamUrl, GameOptions
-from steampy.utils import text_between, merge_items_with_descriptions_from_inventory, steam_id_to_account_id, \
-    merge_items_with_descriptions_from_offers, get_description_key, merge_items_with_descriptions_from_offer, \
-    account_id_to_steam_id, get_key_value_from_url
+from steampy.utils import text_between, texts_between, merge_items_with_descriptions_from_inventory, \
+    steam_id_to_account_id, merge_items_with_descriptions_from_offers, get_description_key, \
+    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url
 
 
 def login_required(func):
@@ -22,6 +22,26 @@ def login_required(func):
             return func(self, *args, **kwargs)
 
     return func_wrapper
+
+
+class TradeOffer:
+    def __init__(self, data: dict, session: requests.Session):
+        self.data = data
+        self._session = session
+
+    def __getitem__(self, key):
+        return self.data[key]
+
+    def __repr__(self):
+        return str(self.data)
+
+    def get_receipt(self) -> list:
+        receipt_id = self.data['response']['offer']['tradeid']
+        html = self._session.get("https://steamcommunity.com/trade/{}/receipt".format(receipt_id)).content.decode()
+        items = []
+        for item in texts_between(html, "oItem = ", ";\r\n\toItem"):
+            items.append(json.loads(item))
+        return items
 
 
 class SteamClient:
@@ -130,7 +150,7 @@ class SteamClient:
             filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active, offers_sent))
         return offers_response
 
-    def get_trade_offer(self, trade_offer_id: str, merge: bool = True) -> dict:
+    def get_trade_offer(self, trade_offer_id: str, merge: bool = True) -> TradeOffer:
         params = {'key': self._api_key,
                   'tradeofferid': trade_offer_id,
                   'language': 'english'}
@@ -139,7 +159,7 @@ class SteamClient:
             descriptions = {get_description_key(offer): offer for offer in response['response']['descriptions']}
             offer = response['response']['offer']
             response['response']['offer'] = merge_items_with_descriptions_from_offer(offer, descriptions)
-        return response
+        return TradeOffer(response, self._session)
 
     @login_required
     def accept_trade_offer(self, trade_offer_id: str) -> dict:
