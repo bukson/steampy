@@ -130,7 +130,7 @@ class SteamClient:
             filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active, offers_sent))
         return offers_response
 
-    def get_trade_offer(self, trade_offer_id: str, merge: bool = True) -> TradeOffer:
+    def get_trade_offer(self, trade_offer_id: str, merge: bool = True) -> dict:
         params = {'key': self._api_key,
                   'tradeofferid': trade_offer_id,
                   'language': 'english'}
