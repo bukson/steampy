@@ -24,26 +24,6 @@ def login_required(func):
     return func_wrapper
 
 
-class TradeOffer:
-    def __init__(self, data: dict, session: requests.Session):
-        self.data = data
-        self._session = session
-
-    def __getitem__(self, key):
-        return self.data[key]
-
-    def __repr__(self):
-        return str(self.data)
-
-    def get_receipt(self) -> list:
-        receipt_id = self.data['response']['offer']['tradeid']
-        html = self._session.get("https://steamcommunity.com/trade/{}/receipt".format(receipt_id)).content.decode()
-        items = []
-        for item in texts_between(html, "oItem = ", ";\r\n\toItem"):
-            items.append(json.loads(item))
-        return items
-
-
 class SteamClient:
     def __init__(self, api_key: str) -> None:
         self._api_key = api_key
@@ -159,7 +139,14 @@ class SteamClient:
             descriptions = {get_description_key(offer): offer for offer in response['response']['descriptions']}
             offer = response['response']['offer']
             response['response']['offer'] = merge_items_with_descriptions_from_offer(offer, descriptions)
-        return TradeOffer(response, self._session)
+        return response
+    
+    def get_trade_receipt(self, trade_id) -> list:
+        html = self._session.get("https://steamcommunity.com/trade/{}/receipt".format(trade_id)).content.decode()
+        items = []
+        for item in texts_between(html, "oItem = ", ";\r\n\toItem"):
+            items.append(json.loads(item))
+        return items
 
     @login_required
     def accept_trade_offer(self, trade_offer_id: str) -> dict:
