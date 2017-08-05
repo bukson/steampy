@@ -141,7 +141,7 @@ class SteamClient:
             response['response']['offer'] = merge_items_with_descriptions_from_offer(offer, descriptions)
         return response
     
-    def get_trade_receipt(self, trade_id) -> list:
+    def get_trade_receipt(self, trade_id: str) -> list:
         html = self._session.get("https://steamcommunity.com/trade/{}/receipt".format(trade_id)).content.decode()
         items = []
         for item in texts_between(html, "oItem = ", ";\r\n\toItem"):
