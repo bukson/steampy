@@ -149,6 +149,13 @@ and descriptions merged with data are value.
 **get_trade_offer(trade_offer_id: str, merge: bool = True) -> dict**
 
 
+**get_trade_receipt(trade_id: str) -> list**
+
+Getting the receipt for a trade with all item information after the items has been traded.
+Do NOT store any item ids before you got the receipt since the ids may change.
+"trade_id" can be found in trade offers: `offer['response']['offer']['tradeid']`. Do not use ´tradeofferid´.
+
+
 **make_offer(items_from_me: List[Asset], items_from_them: List[Asset], partner_steam_id: str, message:str ='') -> dict**
 
 Using `SteamClient.login` method is required before usage
