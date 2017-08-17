@@ -7,7 +7,10 @@ from bs4 import BeautifulSoup, Tag
 
 from steampy.models import GameOptions
 
-
+class APIException(Exception):
+    def __init__(self, *args, **kwargs):
+        Exception.__init__(self, *args, **kwargs)
+        
 def text_between(text: str, begin: str, end: str) -> str:
     start = text.index(begin) + len(begin)
     end = text.index(end, start)

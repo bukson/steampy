@@ -11,7 +11,8 @@ from steampy.market import SteamMarket
 from steampy.models import Asset, TradeOfferState, SteamUrl, GameOptions
 from steampy.utils import text_between, texts_between, merge_items_with_descriptions_from_inventory, \
     steam_id_to_account_id, merge_items_with_descriptions_from_offers, get_description_key, \
-    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url
+    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url, \
+    APIException
 
 
 def login_required(func):
@@ -150,7 +151,10 @@ class SteamClient:
 
     @login_required
     def accept_trade_offer(self, trade_offer_id: str) -> dict:
-        partner = self._fetch_trade_partner_id(trade_offer_id)
+        try:
+            partner = self._fetch_trade_partner_id(trade_offer_id)
+        except ValueError:
+            raise APIException("Unable to accept trade at current state")
         session_id = self._get_session_id()
         accept_url = SteamUrl.COMMUNITY_URL + '/tradeoffer/' + trade_offer_id + '/accept'
         params = {'sessionid': session_id,
