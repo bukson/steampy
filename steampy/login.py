@@ -79,7 +79,7 @@ class LoginExecutor:
             'captcha_text': '',
             'emailsteamid': '',
             'rsatimestamp': rsa_timestamp,
-            'remember_login': 'false',
+            'remember_login': 'true',
             'donotcache': str(int(time.time() * 1000))
         }
 
