@@ -45,10 +45,10 @@ for item in inventory.values():
         item_amounts[item['market_name']] += 1
     else:
         item_amounts[item['market_name']] = 1
-print(f'Done reading inventory for game: {app_id}')
+print('Done reading inventory for game: {}'.format(app_id))
 
 #dump all the information into inventory_(app_id)_(context_id).json file
 print('Saving information....')
-with open(f'inventory_{app_id}_{context_id}.json', 'w') as file:
+with open('inventory_{0}_{1}.json'.format(app_id, context_id), 'w') as file:
     dump(item_amounts, file)
-print(f'Done! Saved to file: inventory_{app_id}_{context_id}.json')
+print('Done! Saved to file: inventory_{0}_{1}.json'.format(app_id, context_id))
