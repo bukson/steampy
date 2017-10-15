@@ -269,15 +269,6 @@ class SteamClient:
             response.update(self._confirm_transaction(response['tradeofferid']))
         return response
 
-    @login_required
-    def get_escrow_duration(self, trade_offer_url: str) -> int:
-        headers = {'Referer': SteamUrl.COMMUNITY_URL + urlparse.urlparse(trade_offer_url).path,
-                   'Origin': SteamUrl.COMMUNITY_URL}
-        response = self._session.get(trade_offer_url, headers=headers).text
-        my_escrow_duration = int(text_between(response, "var g_daysMyEscrow = ", ";"))
-        their_escrow_duration = int(text_between(response, "var g_daysTheirEscrow = ", ";"))
-        return max(my_escrow_duration, their_escrow_duration)
-
     @staticmethod
     def _get_trade_offer_url(trade_offer_id: str) -> str:
         return SteamUrl.COMMUNITY_URL + '/tradeoffer/' + trade_offer_id
