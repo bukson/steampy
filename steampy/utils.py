@@ -1,3 +1,4 @@
+import copy
 import struct
 import urllib.parse as urlparse
 import re
@@ -77,7 +78,7 @@ def merge_items(items: List[dict], descriptions: dict, **kwargs) -> dict:
     merged_items = {}
     for item in items:
         description_key = get_description_key(item)
-        description = descriptions[description_key]
+        description = copy.copy(descriptions[description_key])
         item_id = item.get('id') or item['assetid']
         description['contextid'] = item.get('contextid') or kwargs['context_id']
         description['id'] = item_id
