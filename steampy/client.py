@@ -31,14 +31,23 @@ class SteamClient:
         self.steam_guard = None
         self.was_login_executed = False
         self.username = None
+        self.password = None
         self.market = SteamMarket(self._session)
 
     def login(self, username: str, password: str, steam_guard: str) -> None:
         self.steam_guard = guard.load_steam_guard(steam_guard)
         self.username = username
+        self.password = password
         LoginExecutor(username, password, self.steam_guard['shared_secret'], self._session).login()
         self.was_login_executed = True
         self.market._set_login_executed(self.steam_guard, self._get_session_id())
+        
+    def relogin(self):
+        if self.username is not None and self.password is not None and self.steam_guard is not None:
+            LoginExecutor(self.username, self.password, self.steam_guard['shared_secret'], self._session).login()
+            self.was_login_executed = True
+        else:
+            raise ValueError("Must have logged in before to use this method")
 
     @login_required
     def logout(self) -> None:
