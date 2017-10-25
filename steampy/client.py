@@ -151,8 +151,8 @@ class SteamClient:
     @login_required
     def accept_trade_offer(self, trade_offer_id: str) -> dict:
         trade = self.get_trade_offer(trade_offer_id)
-            if trade['trade_offer_state'] is not TradeOfferState.Active:
-                raise ApiException("Invalid trade offer state: {}".format(trade['trade_offer_state']))
+        if trade['trade_offer_state'] is not TradeOfferState.Active:
+            raise ApiException("Invalid trade offer state: {}".format(trade['trade_offer_state']))
         partner = self._fetch_trade_partner_id(trade_offer_id)
         session_id = self._get_session_id()
         accept_url = SteamUrl.COMMUNITY_URL + '/tradeoffer/' + trade_offer_id + '/accept'
