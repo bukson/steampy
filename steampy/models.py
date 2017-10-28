@@ -7,7 +7,7 @@ class GameOptions:
 
     DOTA2 = PredefinedOptions('570', '2')
     CS = PredefinedOptions('730', '2')
-    TF2 = ('440', '2')
+    TF2 = PredefinedOptions('440', '2')
 
     def __init__(self, app_id: str, context_id: str) -> None:
         self.app_id = app_id
