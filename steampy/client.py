@@ -275,20 +275,3 @@ class SteamClient:
     @staticmethod
     def _get_trade_offer_url(trade_offer_id: str) -> str:
         return SteamUrl.COMMUNITY_URL + '/tradeoffer/' + trade_offer_id
-
-    @staticmethod
-    def _create_offer_dict(items_from_me: List[Asset], items_from_them: List[Asset]) -> dict:
-        return {
-            'newversion': True,
-            'version': 4,
-            'me': {
-                'assets': [asset.to_dict() for asset in items_from_me],
-                'currency': [],
-                'ready': False
-            },
-            'them': {
-                'assets': [asset.to_dict() for asset in items_from_them],
-                'currency': [],
-                'ready': False
-            }
-        }
