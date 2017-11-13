@@ -55,6 +55,21 @@ class SteamClient:
         main_page_response = self._session.get(SteamUrl.COMMUNITY_URL)
         return steam_login.lower() in main_page_response.text.lower()
 
+    @login_required
+    def refresh_session(self):
+        self._session.cookies.clear(domain="store.steampowered.com",path="/",name="sessionid")
+        self._session.get("https://store.steampowered.com")
+        return self._session.cookies.get_dict()['sessionid']
+
+    @login_required
+    def write_comment(self,steamid: str,comment: str):
+        data = {
+            "sessionid":self._get_session_id(),
+            "comment":comment,
+        }
+        response = self._session.post("https://steamcommunity.com/comment/Profile/post/"+steamid+"/-1/",data=data).json()
+        return response
+
     def api_call(self, request_method: str, interface: str, api_method: str, version: str,
                  params: dict = None) -> requests.Response:
         url = '/'.join([SteamUrl.API_URL, interface, api_method, version])
