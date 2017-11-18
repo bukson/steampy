@@ -164,8 +164,8 @@ class SteamClient:
                   'partner': partner,
                   'captcha': ''}
         headers = {'Referer': self._get_trade_offer_url(trade_offer_id)}
-        response = self._session.post(accept_url, data=params, headers=headers)
-        if response.json().get('needs_mobile_confirmation', False):
+        response = self._session.post(accept_url, data=params, headers=headers).json()
+        if response.get('needs_mobile_confirmation', False):
             return self._confirm_transaction(trade_offer_id)
         return response
 
