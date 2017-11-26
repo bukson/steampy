@@ -140,7 +140,28 @@ class SteamClient:
             offer = response['response']['offer']
             response['response']['offer'] = merge_items_with_descriptions_from_offer(offer, descriptions)
         return response
-    
+
+    def get_trade_history(self,
+                          max_trades=100,
+                          start_after_time=None,
+                          start_after_tradeid=None,
+                          get_descriptions=True,
+                          navigating_back=True,
+                          include_failed=True,
+                          include_total=True) -> dict:
+        params = {
+            'key': self._api_key,
+            'max_trades': max_trades,
+            'start_after_time': start_after_time,
+            'start_after_tradeid': start_after_tradeid,
+            'get_descriptions': get_descriptions,
+            'navigating_back': navigating_back,
+            'include_failed': include_failed,
+            'include_total': include_total
+        }
+        response = self.api_call('GET', 'IEconService', 'GetTradeHistory', 'v1', params).json()
+        return response
+
     def get_trade_receipt(self, trade_id: str) -> list:
         html = self._session.get("https://steamcommunity.com/trade/{}/receipt".format(trade_id)).content.decode()
         items = []
