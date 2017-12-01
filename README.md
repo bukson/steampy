@@ -349,9 +349,9 @@ Default currency is USD
 May rise `TooManyRequests` exception if used more than 20 times in 60 seconds.
 
 ```python
-client = SteamClient(self.credentials.api_key)
+steam_client = SteamClient(self.credentials.api_key)
 item = 'M4A1-S | Cyrex (Factory New)'
-client.market.fetch_price(item, game=GameOptions.CS)
+steam_client.market.fetch_price(item, game=GameOptions.CS)
 {'volume': '208', 'lowest_price': '$11.30 USD', 'median_price': '$11.33 USD', 'success': True}
 ```
 
@@ -363,9 +363,9 @@ Using `SteamClient.login` method is required before usage
 Returns market listings posted by user
 
 ```python
-client = SteamClient(self.credentials.api_key)
+steam_client = SteamClient(self.credentials.api_key)
 steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
-listings = client.market.get_my_market_listings()
+listings = steam_client.market.get_my_market_listings()
 ```
 
 
@@ -376,11 +376,11 @@ Using `SteamClient.login` method is required before usage
 Create sell order of the asset on the steam market.
 
 ```python
-client = SteamClient(self.credentials.api_key)
+steam_client = SteamClient(self.credentials.api_key)
 steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
 asset_id_to_sell = 'some_asset_id'
 game = GameOptions.DOTA2
-sell_response = client.market.create_sell_order(asset_id_to_sell, game, "10000")
+sell_response = steam_client.market.create_sell_order(asset_id_to_sell, game, "10000")
 ```
  
 **create_buy_order(market_name: str, price_single_item: str, quantity: int, game: GameOptions, currency: Currency = Currency.USD) -> dict**
@@ -390,9 +390,9 @@ Using `SteamClient.login` method is required before usage
 Create buy order of the assets on the steam market.
 
 ```python
-client = SteamClient(self.credentials.api_key)
+steam_client = SteamClient(self.credentials.api_key)
 steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
-response = client.market.create_buy_order("AK-47 | Redline (Field-Tested)", "10.34", 2, GameOptions.CS, Currency.EURO)
+response = steam_client.market.create_buy_order("AK-47 | Redline (Field-Tested)", "10.34", 2, GameOptions.CS, Currency.EURO)
 buy_order_id = response["buy_orderid"]
 ```
 
@@ -403,10 +403,10 @@ Using `SteamClient.login` method is required before usage
 Cancel previously requested sell order on steam market.
 
 ```python
-client = SteamClient(self.credentials.api_key)
+steam_client = SteamClient(self.credentials.api_key)
 steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
 sell_order_id = "some_sell_order_id"
-response = client.market.cancel_sell_order(sell_order_id)
+response = steam_client.market.cancel_sell_order(sell_order_id)
 ```
 
 **cancel_buy_order(buy_order_id) -> dict**
@@ -416,10 +416,10 @@ Using `SteamClient.login` method is required before usage
 Cancel previously requested buy order on steam market.
 
 ```python
-client = SteamClient(self.credentials.api_key)
+steam_client = SteamClient(self.credentials.api_key)
 steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
 buy_order_id = "some_buy_order_id"
-response = client.market.cancel_buy_order(buy_order_id)
+response = steam_client.market.cancel_buy_order(buy_order_id)
 ```
 
 guard module functions
