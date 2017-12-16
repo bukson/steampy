@@ -4,6 +4,7 @@ from typing import List
 import json
 import requests
 from steampy import guard
+from steampy.chat import SteamChat
 from steampy.confirmation import ConfirmationExecutor
 from steampy.exceptions import SevenDaysHoldException, LoginRequired, ApiException
 from steampy.login import LoginExecutor, InvalidCredentials
@@ -32,6 +33,7 @@ class SteamClient:
         self.was_login_executed = False
         self.username = None
         self.market = SteamMarket(self._session)
+        self.chat = SteamChat(self._session)
 
     def login(self, username: str, password: str, steam_guard: str) -> None:
         self.steam_guard = guard.load_steam_guard(steam_guard)
@@ -39,6 +41,7 @@ class SteamClient:
         LoginExecutor(username, password, self.steam_guard['shared_secret'], self._session).login()
         self.was_login_executed = True
         self.market._set_login_executed(self.steam_guard, self._get_session_id())
+        self.chat._login()
 
     @login_required
     def logout(self) -> None:
@@ -48,6 +51,7 @@ class SteamClient:
         if self.is_session_alive():
             raise Exception("Logout unsuccessful")
         self.was_login_executed = False
+        self.chat._logout()
 
     @login_required
     def is_session_alive(self):
