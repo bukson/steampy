@@ -1,16 +1,17 @@
 import bs4
 import re
-from steampy.models import Endpoints
+from steampy.models import Endpoints, SteamUrl
+from steampy.utils import account_id_to_steam_id
 
 
 class SteamChat():
 
     def __init__(self, session):
         self._session = session
-        self._chat_params = {"access_token": self._get_access_token()}
+        self._chat_params = {}
 
     def _get_access_token(self):
-        response = self._session.get("https://steamcommunity.com/chat")
+        response = self._session.get(SteamUrl.COMMUNITY_URL + "/chat")
         response.raise_for_status()
         response_soup = bs4.BeautifulSoup(response.text, "html.parser")
         elems = response_soup.select("body > div > div > div > script[type]")
@@ -32,14 +33,22 @@ class SteamChat():
         else:
             return response
 
-    def chat_login(self, ui_mode="web"):
+    def _login(self, ui_mode="web"):
         self._chat_params["ui_mode"] = ui_mode
+        self._chat_params["access_token"] = self._get_access_token()
         endpoint = Endpoints.CHAT_LOGIN
         params = {"ui_mode": self._chat_params.get("ui_mode"),
                   "access_token": self._chat_params.get("access_token")}
         response = self._api_call(endpoint, params)
         self._chat_params.update(response.json())
         return response
+
+    def _logout(self):
+        endpoint = Endpoints.CHAT_LOGOUT
+        params = {"access_token": self._chat_params.get("access_token"),
+                  "umqid": self._chat_params.get("umqid")}
+        self._chat_params = {}
+        return self._api_call(endpoint, params)
 
     def send_message(self, steamid_64, text):
         endpoint = Endpoints.SEND_MESSAGE
@@ -48,13 +57,6 @@ class SteamChat():
                   "text": text,
                   "type": "saytext",
                   "umqid": self._chat_params.get("umqid")}
-        return self._api_call(endpoint, params)
-
-    def chat_logout(self):
-        endpoint = Endpoints.CHAT_LOGOUT
-        params = {"access_token": self._chat_params.get("access_token"),
-                  "umqid": self._chat_params.get("umqid")}
-        self._chat_params = {}
         return self._api_call(endpoint, params)
 
     def chat_poll(self):
@@ -75,6 +77,6 @@ class SteamChat():
         for message in messages:
             text = message.get("text")
             if text:
-                accountid_from = message.get("accountid_from")
+                accountid_from = account_id_to_steam_id(message.get("accountid_from"))
                 message_list.append({"from": accountid_from, "message": text})
         return message_list

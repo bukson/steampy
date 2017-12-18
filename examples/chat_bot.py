@@ -1,6 +1,5 @@
 import time
 from steampy.client import SteamClient
-from steampy.chat import SteamChat  # works on the root of the project
 
 # Set API key
 api_key = ''
@@ -20,14 +19,12 @@ def main():
         return
     client = SteamClient(api_key)
     client.login(username, password, steamguard_path)
-    chat = SteamChat(client._session)
-    chat.chat_login()
     print('Bot logged in successfully, polling messages every 10 seconds')
     while True:
         time.sleep(10)
-        messages = chat.chat_poll()
+        messages = client.chat.chat_poll()
         for message in messages:
-            print("Got message from", message.get("from"), ": ", message.get("message"))
+            client.chat.send_message(message.get("from"), "Got your message: " + message.get("message"))
 
 
 def are_credentials_filled() -> bool:
