@@ -25,6 +25,8 @@ Table of Content
 
 * [Guard module functions](https://github.com/bukson/steampy#guard-module-functions)
 
+* [SteamChat methods](https://github.com/bukson/steampy#steamchat-methods)
+
 * [Test](https://github.com/bukson/steampy#test)
 
 * [License](https://github.com/bukson/steampy#license)
@@ -438,6 +440,17 @@ If none timestamp provided, timestamp will be set to current time.
 
 Generate mobile device confirmation key for accepting trade offer. 
 Default timestamp is current time.
+
+SteamChat methods
+==============
+
+**send_message(steamid_64: str =, text: str) -> requests.Response**
+
+Send the string contained in `text` to the desired `steamid_64`.
+
+**chat_poll() -> list**
+
+Return a list with all messages received as dictionaries `{"from": steamid_64, "message": text}`.
 
 Test
 ====
