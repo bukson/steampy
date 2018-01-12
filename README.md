@@ -448,7 +448,7 @@ SteamChat methods
 
 Send the string contained in `text` to the desired `steamid_64`.
 
-**chat_poll() -> list**
+**fetch_messages() -> list**
 
 Return a list with all messages received as dictionaries `{"from": steamid_64, "message": text}`.
 
