@@ -5,9 +5,11 @@ from collections import namedtuple
 class GameOptions:
     PredefinedOptions = namedtuple('PredefinedOptions', ['app_id', 'context_id'])
 
+    STEAM = PredefinedOptions('753', '6')
     DOTA2 = PredefinedOptions('570', '2')
     CS = PredefinedOptions('730', '2')
     TF2 = PredefinedOptions('440', '2')
+    PUBG = PredefinedOptions('578080', '2')
 
     def __init__(self, app_id: str, context_id: str) -> None:
         self.app_id = app_id
