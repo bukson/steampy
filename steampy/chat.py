@@ -59,7 +59,7 @@ class SteamChat():
                   "umqid": self._chat_params.get("umqid")}
         return self._api_call(endpoint, params)
 
-    def fetch_messages(self):
+    def poll_events(self) -> dict:
         endpoint = Endpoints.CHAT_POLL
         params = {"access_token": self._chat_params.get("access_token"),
                   "umqid": self._chat_params.get("umqid"),
@@ -69,14 +69,27 @@ class SteamChat():
                   "secidletime": 0,
                   "use_accountids": 1}
         response = self._api_call(endpoint, params, timeout_ignore=True)
-        if response is None:
-            return []
-        self._chat_params["message"] = response.json().get("messagelast")
-        messages = response.json().get("messages")
-        message_list = []
+        if not response:
+            return {}
+        data = response.json()
+        self._chat_params["message"] = data["messagelast"]
+        return response.json()
+
+    def fetch_messages(self) -> dict:
+        message_list = {
+            'sent': [],
+            'received': []
+        }
+        events = self.poll_events()
+        if not events:
+            return message_list
+        messages = events["messages"]
         for message in messages:
             text = message.get("text")
-            if text:
+            if message['type'] == "saytext":
                 accountid_from = account_id_to_steam_id(message.get("accountid_from"))
-                message_list.append({"from": accountid_from, "message": text})
+                message_list['received'].append({"partner": accountid_from, "message": text})
+            elif message['type'] == "my_saytext":
+                accountid_from = account_id_to_steam_id(message.get("accountid_from"))
+                message_list['sent'].append({"partner": accountid_from, "message": text})
         return message_list
