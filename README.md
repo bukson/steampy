@@ -453,12 +453,14 @@ Send the string contained in `text` to the desired `steamid_64`.
 
 Returns a dictionary with all new sent and received messages:
 
-`{
+```
+{
     'sent': [
         {'partner': "[steamid]", 'message': "This is a message."}
     ],
     'received': []
-}`
+}
+```
 
 `client.chat.fetch_messages()`
 
