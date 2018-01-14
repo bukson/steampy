@@ -447,6 +447,7 @@ SteamChat methods
 **send_message(steamid_64: str, text: str) -> requests.Response**
 
 Send the string contained in `text` to the desired `steamid_64`.
+
 `client.chat.send_message("[steamid]", "This is a message.")`
 
 **fetch_messages() -> dict**
