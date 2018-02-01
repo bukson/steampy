@@ -444,13 +444,26 @@ Default timestamp is current time.
 SteamChat methods
 ==============
 
-**send_message(steamid_64: str =, text: str) -> requests.Response**
+**send_message(steamid_64: str, text: str) -> requests.Response**
 
 Send the string contained in `text` to the desired `steamid_64`.
 
-**chat_poll() -> list**
+`client.chat.send_message("[steamid]", "This is a message.")`
 
-Return a list with all messages received as dictionaries `{"from": steamid_64, "message": text}`.
+**fetch_messages() -> dict**
+
+Returns a dictionary with all new sent and received messages:
+
+```
+{
+    'sent': [
+        {'partner': "[steamid]", 'message': "This is a message."}
+    ],
+    'received': []
+}
+```
+
+`client.chat.fetch_messages()`
 
 Test
 ====

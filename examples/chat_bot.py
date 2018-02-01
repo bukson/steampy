@@ -22,9 +22,9 @@ def main():
     print('Bot logged in successfully, polling messages every 10 seconds')
     while True:
         time.sleep(10)
-        messages = client.chat.fetch_messages()
+        messages = client.chat.fetch_messages()['received']
         for message in messages:
-            client.chat.send_message(message.get("from"), "Got your message: " + message.get("message"))
+            client.chat.send_message(message['partner'], "Got your message: " + message['message'])
 
 
 def are_credentials_filled() -> bool:
