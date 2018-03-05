@@ -43,7 +43,11 @@ def price_to_float(price: str) -> float:
 def merge_items_with_descriptions_from_inventory(inventory_response: dict, game: GameOptions) -> dict:
     inventory = inventory_response['rgInventory']
     descriptions = inventory_response['rgDescriptions']
-    return merge_items(inventory.values(), descriptions, context_id=game.context_id)
+    if inventory:
+        inventory = inventory.values()
+    else:
+        inventory = {}
+    return merge_items(inventory, descriptions, context_id=game.context_id)
 
 
 def merge_items_with_descriptions_from_offers(offers_response: dict) -> dict:
