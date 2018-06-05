@@ -154,6 +154,7 @@ and descriptions merged with data are value.
 
 **get_trade_receipt(trade_id: str) -> list**
 
+Using `SteamClient.login` method is required before usage
 Getting the receipt for a trade with all item information after the items has been traded.
 Do NOT store any item ids before you got the receipt since the ids may change.
 "trade_id" can be found in trade offers: `offer['response']['offer']['tradeid']`. Do not use ´tradeofferid´.
@@ -342,7 +343,8 @@ market methods
 
 **fetch_price(item_hash_name: str, game: GameOptions, currency: str = Currency.USD) -> dict**
 
-Games are defined in GameOptions class, currently `GameOptions.DOTA2`, `GameOptions.CS` and `GameOptions.TF2`
+Some games are predefined in `GameOptions` class, such as `GameOptions.DOTA2`, `GameOptions.CS` and `GameOptions.TF2,
+but `GameOptions` object can be constructed with custom parameters.
 
 Currencies are defined in Currency class, currently `Currency.USD`, `Currency.GBP`, `Currency.EURO`, `Currency.CHF`
 
