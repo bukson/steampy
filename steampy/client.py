@@ -166,6 +166,7 @@ class SteamClient:
         response = self.api_call('GET', 'IEconService', 'GetTradeHistory', 'v1', params).json()
         return response
 
+    @login_required
     def get_trade_receipt(self, trade_id: str) -> list:
         html = self._session.get("https://steamcommunity.com/trade/{}/receipt".format(trade_id)).content.decode()
         items = []
