@@ -41,7 +41,6 @@ class SteamClient:
         LoginExecutor(username, password, self.steam_guard['shared_secret'], self._session).login()
         self.was_login_executed = True
         self.market._set_login_executed(self.steam_guard, self._get_session_id())
-        self.chat._login()
 
     @login_required
     def logout(self) -> None:
