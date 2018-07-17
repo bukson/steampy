@@ -1,5 +1,5 @@
 import urllib.parse as urlparse
-from typing import List
+from typing import List, Callable
 
 import json
 import requests
@@ -26,6 +26,7 @@ def login_required(func):
 
 
 class SteamClient:
+
     def __init__(self, api_key: str) -> None:
         self._api_key = api_key
         self._session = requests.Session()
@@ -35,10 +36,28 @@ class SteamClient:
         self.market = SteamMarket(self._session)
         self.chat = SteamChat(self._session)
 
-    def login(self, username: str, password: str, steam_guard: str) -> None:
-        self.steam_guard = guard.load_steam_guard(steam_guard)
+    def login(self, username: str, password: str, third) -> None:
+
         self.username = username
-        LoginExecutor(username, password, self.steam_guard['shared_secret'], self._session).login()
+
+        if type(third) is str:
+            self.login_mobile(password, third)
+        elif callable(third):
+            self.login_email_auth(password, third)
+        else:
+            raise TypeError("Invalid third parameter type")
+
+
+    def login_email_auth(self, password: str, authCallback: Callable):
+        LoginExecutor(self.username, password, '', authCallback, self._session).login()
+        self.was_login_executed = True
+        self.market._set_login_executed(self.steam_guard, self._get_session_id())
+        return
+
+
+    def login_mobile(self, password: str, steam_guard: str) -> None:
+        self.steam_guard = guard.load_steam_guard(steam_guard)
+        LoginExecutor(self.username, password, self.steam_guard['shared_secret'], None, self._session).login()
         self.was_login_executed = True
         self.market._set_login_executed(self.steam_guard, self._get_session_id())
 
@@ -50,7 +69,8 @@ class SteamClient:
         if self.is_session_alive():
             raise Exception("Logout unsuccessful")
         self.was_login_executed = False
-        self.chat._logout()
+        # commented since there's no automatic chat login
+        #self.chat._logout()
 
     @login_required
     def is_session_alive(self):

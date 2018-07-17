@@ -6,15 +6,19 @@ import rsa
 
 from steampy.exceptions import InvalidCredentials, CaptchaRequired
 
+from typing import Callable
+
 
 class LoginExecutor:
     COMMUNITY_URL = "https://steamcommunity.com"
     STORE_URL = 'https://store.steampowered.com'
 
-    def __init__(self, username: str, password: str, shared_secret: str, session: requests.Session) -> None:
+    def __init__(self, username: str, password: str, shared_secret: str, authCallback: Callable, session: requests.Session) -> None:
         self.username = username
         self.password = password
         self.one_time_code = ''
+        self.email_auth = ''
+        self.email_callback = authCallback
         self.shared_secret = shared_secret
         self.session = session
 
@@ -73,7 +77,8 @@ class LoginExecutor:
             'password': encrypted_password,
             'username': self.username,
             'twofactorcode': self.one_time_code,
-            'emailauth': '',
+            'emailauth': self.email_auth,
+            'loginfriendlyname': 'krystal',
             'loginfriendlyname': '',
             'captchagid': '-1',
             'captcha_text': '',
@@ -89,9 +94,16 @@ class LoginExecutor:
             raise CaptchaRequired('Captcha required')
 
     def _enter_steam_guard_if_necessary(self, login_response: requests.Response) -> requests.Response:
-        if login_response.json()['requires_twofactor']:
+
+        response = login_response.json()
+        if response['requires_twofactor']:
             self.one_time_code = guard.generate_one_time_code(self.shared_secret)
             return self._send_login_request()
+        elif response['emailauth_needed']:
+            self.email_auth = self.email_callback()
+            return self._send_login_request()
+            
+
         return login_response
 
     @staticmethod
