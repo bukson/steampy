@@ -36,20 +36,20 @@ class SteamClient:
         self.market = SteamMarket(self._session)
         self.chat = SteamChat(self._session)
 
-    def login(self, username: str, password: str, third) -> None:
+    def login(self, username: str, password: str, third, saveCallback: Callable = None, steamAuth: dict = {}) -> None:
 
         self.username = username
 
         if type(third) is str:
             self.login_mobile(password, third)
         elif callable(third):
-            self.login_email_auth(password, third)
+            self.login_email_auth(password, third, saveCallback, steamAuth)
         else:
             raise TypeError("Invalid third parameter type")
 
 
-    def login_email_auth(self, password: str, authCallback: Callable):
-        LoginExecutor(self.username, password, '', authCallback, self._session).login()
+    def login_email_auth(self, password: str, authCallback: Callable, saveCallback: Callable, steamAuth: dict):
+        LoginExecutor(self.username, password, '', authCallback, saveCallback, steamAuth, self._session).login()
         self.was_login_executed = True
         self.market._set_login_executed(self.steam_guard, self._get_session_id())
         return
@@ -57,7 +57,7 @@ class SteamClient:
 
     def login_mobile(self, password: str, steam_guard: str) -> None:
         self.steam_guard = guard.load_steam_guard(steam_guard)
-        LoginExecutor(self.username, password, self.steam_guard['shared_secret'], None, self._session).login()
+        LoginExecutor(self.username, password, self.steam_guard['shared_secret'], None, None, {}, self._session).login()
         self.was_login_executed = True
         self.market._set_login_executed(self.steam_guard, self._get_session_id())
 

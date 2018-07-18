@@ -13,20 +13,24 @@ class LoginExecutor:
     COMMUNITY_URL = "https://steamcommunity.com"
     STORE_URL = 'https://store.steampowered.com'
 
-    def __init__(self, username: str, password: str, shared_secret: str, authCallback: Callable, session: requests.Session) -> None:
+    def __init__(self, username: str, password: str, shared_secret: str, authCallback: Callable, saveCallback: Callable, steamAuth: dict, session: requests.Session) -> None:
         self.username = username
         self.password = password
         self.one_time_code = ''
         self.email_auth = ''
         self.email_callback = authCallback
+        self.saveCallback = saveCallback
+        self.steamAuth = steamAuth
         self.shared_secret = shared_secret
         self.session = session
 
     def login(self) -> requests.Session:
+        self._set_steamauth_cookies()
         login_response = self._send_login_request()
         self._check_for_captcha(login_response)
         login_response = self._enter_steam_guard_if_necessary(login_response)
         self._assert_valid_credentials(login_response)
+        self._save_steam_auth(login_response)
         self._perform_redirects(login_response.json())
         self.set_sessionid_cookies()
         return self.session
@@ -46,6 +50,10 @@ class LoginExecutor:
         store_cookie = self._create_session_id_cookie(sessionid, store_domain)
         self.session.cookies.set(**community_cookie)
         self.session.cookies.set(**store_cookie)
+
+    def _set_steamauth_cookies(self) -> None:
+        for k, v in self.steamAuth.items():
+            self.session.cookies.set(k, v)
 
     @staticmethod
     def _create_session_id_cookie(sessionid: str, domain: str) -> dict:
@@ -96,6 +104,9 @@ class LoginExecutor:
     def _enter_steam_guard_if_necessary(self, login_response: requests.Response) -> requests.Response:
 
         response = login_response.json()
+        if response['success']:
+            return login_response
+
         if response['requires_twofactor']:
             self.one_time_code = guard.generate_one_time_code(self.shared_secret)
             return self._send_login_request()
@@ -110,6 +121,10 @@ class LoginExecutor:
     def _assert_valid_credentials(login_response: requests.Response) -> None:
         if not login_response.json()['success']:
             raise InvalidCredentials(login_response.json()['message'])
+
+    def _save_steam_auth(self, login_response: requests.Response) -> None:
+        if callable(self.saveCallback):
+            self.saveCallback(login_response.json()['transfer_parameters'])
 
     def _perform_redirects(self, response_dict: dict) -> None:
         parameters = response_dict.get('transfer_parameters')
