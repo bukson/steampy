@@ -403,6 +403,21 @@ steam_client.market.fetch_price(item, game=GameOptions.CS)
 {'volume': '208', 'lowest_price': '$11.30 USD', 'median_price': '$11.33 USD', 'success': True}
 ```
 
+**fetch_price_history(item_hash_name: str, game: GameOptions, currency: str = Currency.USD) -> dict**
+
+Using `SteamClient.login` method is required before usage
+
+Returns list of price history of and item.
+```python
+with SteamClient(self.credentials.api_key, self.credentials.login,
+                 self.credentials.password, self.steam_guard_file) as client:
+    item = 'M4A1-S | Cyrex (Factory New)'
+    response = client.market.fetch_price_history(item, GameOptions.CS)
+    response['prices'][0]
+    ['Jul 02 2014 01: +0', 417.777, '40']
+```
+
+Each entry in `response['prices']` is a list, with first entry being date, second entry price, and third entry a volume.
 
 **get_my_market_listings() -> dict**
 

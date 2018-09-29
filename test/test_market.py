@@ -32,6 +32,14 @@ class TestMarket(TestCase):
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         self.assertRaises(TooManyRequests, request_loop)
 
+    def test_get_price_history(self):
+        with SteamClient(self.credentials.api_key, self.credentials.login,
+                         self.credentials.password, self.steam_guard_file) as client:
+            item = 'M4A1-S | Cyrex (Factory New)'
+            response = client.market.fetch_price_history(item, GameOptions.CS)
+            self.assertTrue(response['success'])
+            self.assertIn('prices', response)
+
     def test_get_all_listings_from_market(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)

@@ -43,6 +43,18 @@ class SteamMarket:
         return response.json()
 
     @login_required
+    def fetch_price_history(self, item_hash_name: str, game: GameOptions, currency: str = Currency.USD) -> dict:
+        url = SteamUrl.COMMUNITY_URL + '/market/pricehistory/'
+        params = {'country': 'PL',
+                  'currency': currency,
+                  'appid': game.app_id,
+                  'market_hash_name': item_hash_name}
+        response = self._session.get(url, params=params)
+        if response.status_code == 429:
+            raise TooManyRequests("You can fetch maximum 20 prices in 60s period")
+        return response.json()
+
+    @login_required
     def get_my_market_listings(self) -> dict:
         response = self._session.get("%s/market" % SteamUrl.COMMUNITY_URL)
         if response.status_code != 200:
