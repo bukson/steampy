@@ -57,7 +57,7 @@ class TestSteamClient(TestCase):
     def test_get_my_inventory(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
-        inventory = client.get_my_inventory(GameOptions.TF2)
+        inventory = client.get_my_inventory(GameOptions.CS)
         self.assertIsNotNone(inventory)
 
     def test_get_partner_inventory(self):

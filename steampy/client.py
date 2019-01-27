@@ -86,28 +86,18 @@ class SteamClient:
         return msg in response.text
 
     @login_required
-    def get_my_inventory(self, game: GameOptions, merge: bool = True) -> dict:
-        url = SteamUrl.COMMUNITY_URL + '/my/inventory/json/' + \
-              game.app_id + '/' + \
-              game.context_id
-        response_dict = self._session.get(url).json()
-        if merge:
-            return merge_items_with_descriptions_from_inventory(response_dict, game)
-        return response_dict
+    def get_my_inventory(self, game: GameOptions, merge: bool = True, count: int = 5000) -> dict:
+        steam_id = self.steam_guard['steamid']
+        return self.get_partner_inventory(steam_id, game, merge, count)
 
     @login_required
-    def get_partner_inventory(self, partner_steam_id: str, game: GameOptions, merge: bool = True) -> dict:
-        params = {'sessionid': self._get_session_id(),
-                  'partner': partner_steam_id,
-                  'appid': int(game.app_id),
-                  'contextid': game.context_id}
-        partner_account_id = steam_id_to_account_id(partner_steam_id)
-        headers = {'X-Requested-With': 'XMLHttpRequest',
-                   'Referer': SteamUrl.COMMUNITY_URL + '/tradeoffer/new/?partner=' + partner_account_id,
-                   'X-Prototype-Version': '1.7'}
-        response_dict = self._session.get(SteamUrl.COMMUNITY_URL + '/tradeoffer/new/partnerinventory/',
-                                          params=params,
-                                          headers=headers).json()
+    def get_partner_inventory(self, partner_steam_id: str, game: GameOptions, merge: bool = True, count: int = 5000) -> dict:
+        url = '/'.join([SteamUrl.COMMUNITY_URL, 'inventory', partner_steam_id, game.app_id, game.context_id])
+        params = {'l': 'english',
+                  'count': count}
+        response_dict = self._session.get(url, params=params).json()
+        if response_dict['success'] != 1:
+            raise ApiException('Success value should be 1.')
         if merge:
             return merge_items_with_descriptions_from_inventory(response_dict, game)
         return response_dict
