@@ -213,12 +213,13 @@ partner_asset = Asset(partner_first_item['id'], game)
 steam_client.make_offer([my_asset], [partner_asset], partner_id, 'Test offer')
 ```
 
-**make_offer_with_url(items_from_me: List[Asset], items_from_them: List[Asset], trade_offer_url: str, message: str = '') -> dict**
+**make_offer_with_url(items_from_me: List[Asset], items_from_them: List[Asset], trade_offer_url: str, message: str = '', case_sensitive: bool = True) -> dict**
 
 Using `SteamClient.login` method is required before usage
 This method is similar to `SteamClient.make_offer`, but it takes trade url instead of friend account id.
 It works even when partner isn't your steam friend
 In returned dict there will be trade offer id by the key `tradeofferid`.
+If `case_sensitive` is False, then url params with be parsed with case insensitive params keys.
 
 **get_escrow_duration(trade_offer_url: str) -> int**
 

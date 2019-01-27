@@ -295,9 +295,9 @@ class SteamClient:
 
     @login_required
     def make_offer_with_url(self, items_from_me: List[Asset], items_from_them: List[Asset],
-                            trade_offer_url: str, message: str = '') -> dict:
-        token = get_key_value_from_url(trade_offer_url, 'token')
-        partner_account_id = get_key_value_from_url(trade_offer_url, 'partner')
+                            trade_offer_url: str, message: str = '', case_sensitive: bool=True) -> dict:
+        token = get_key_value_from_url(trade_offer_url, 'token', case_sensitive)
+        partner_account_id = get_key_value_from_url(trade_offer_url, 'partner', case_sensitive)
         partner_steam_id = account_id_to_steam_id(partner_account_id)
         offer = self._create_offer_dict(items_from_me, items_from_them)
         session_id = self._get_session_id()

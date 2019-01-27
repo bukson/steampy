@@ -2,6 +2,7 @@ import copy
 import struct
 import urllib.parse as urlparse
 import re
+from requests.structures import CaseInsensitiveDict
 from typing import List
 
 from bs4 import BeautifulSoup, Tag
@@ -158,9 +159,12 @@ def get_description_key(item: dict) -> str:
     return item['classid'] + '_' + item['instanceid']
 
 
-def get_key_value_from_url(url: str, key: str) -> str:
+def get_key_value_from_url(url: str, key: str, case_sensitive: bool=True) -> str:
     params = urlparse.urlparse(url).query
-    return urlparse.parse_qs(params)[key][0]
+    if case_sensitive:
+        return urlparse.parse_qs(params)[key][0]
+    else:
+        return CaseInsensitiveDict(urlparse.parse_qs(params))[key][0]
 
 
 def load_credentials():

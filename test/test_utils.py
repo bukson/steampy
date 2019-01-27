@@ -36,3 +36,8 @@ class TestUtils(TestCase):
         url = 'https://steamcommunity.com/tradeoffer/new/?partner=aaa&token=bbb'
         self.assertEqual(utils.get_key_value_from_url(url, 'partner'), 'aaa')
         self.assertEqual(utils.get_key_value_from_url(url, 'token'), 'bbb')
+
+    def test_get_key_value_from_url_case_insensitive(self):
+        url = 'https://steamcommunity.com/tradeoffer/new/?Partner=aaa&Token=bbb'
+        self.assertEqual(utils.get_key_value_from_url(url, 'partner', case_sensitive=False), 'aaa')
+        self.assertEqual(utils.get_key_value_from_url(url, 'token', case_sensitive=False), 'bbb')
