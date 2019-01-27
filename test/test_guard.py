@@ -6,10 +6,11 @@ from steampy.confirmation import Tag
 
 
 class TestGuard(TestCase):
-    def __init__(self, *args, **kwargs):
-        super(TestGuard, self).__init__(*args, **kwargs)
-        self.shared_secret = base64.b64encode('1234567890abcdefghij'.encode('utf-8'))
-        self.identity_secret = base64.b64encode('abcdefghijklmnoprstu'.encode('utf-8'))
+
+    @classmethod
+    def setUpClass(cls):
+        cls.shared_secret = base64.b64encode('1234567890abcdefghij'.encode('utf-8'))
+        cls.identity_secret = base64.b64encode('abcdefghijklmnoprstu'.encode('utf-8'))
 
     def test_one_time_code(self):
         timestamp = 1469184207

@@ -74,6 +74,15 @@ The `storehouse.py` file contains an example of handling incoming trade offers.
 python storehouse.py
 ```
 
+If you want to generate authentication codes and use steampy as steam desktop authenticator
+then fill required secrets in `desktop_authenticator.py` file.
+The `desktop_authenticator.py` file contains examples of generating such one time codes/
+
+```
+python desktop_authenticator.py
+```
+
+
 SteamClient methods
 ===================
 
