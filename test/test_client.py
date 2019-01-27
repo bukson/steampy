@@ -1,28 +1,17 @@
 from unittest import TestCase
 
 from steampy.client import SteamClient
-from steampy.exceptions import LoginRequired, TooManyRequests
-from steampy.models import GameOptions, Asset, Currency
-from steampy.utils import account_id_to_steam_id
-
-
-def load_credentials():
-    with open('credentials.pwd', 'r') as f:
-        return [Credentials(line.split()[0], line.split()[1], line.split()[2]) for line in f]
-
-
-class Credentials:
-    def __init__(self, login: str, password: str, api_key: str):
-        self.login = login
-        self.password = password
-        self.api_key = api_key
+from steampy.exceptions import LoginRequired
+from steampy.models import GameOptions, Asset
+from steampy.utils import account_id_to_steam_id, load_credentials
 
 
 class TestSteamClient(TestCase):
-    def __init__(self, *args, **kwargs):
-        super(TestSteamClient, self).__init__(*args, **kwargs)
-        self.credentials = load_credentials()[0]
-        self.steam_guard_file = 'Steamguard'
+
+    @classmethod
+    def setUpClass(cls):
+        cls.credentials = load_credentials()[0]
+        cls.steam_guard_file = 'Steamguard'
 
     def test_login(self):
         client = SteamClient(self.credentials.api_key)
@@ -115,22 +104,6 @@ class TestSteamClient(TestCase):
         response_dict = client.cancel_trade_offer(trade_offer_id)
         self.assertEqual(response_dict['response'], {})
 
-    def test_get_price(self):
-        client = SteamClient(self.credentials.api_key)
-        item = 'M4A1-S | Cyrex (Factory New)'
-        prices = client.market.fetch_price(item, GameOptions.CS)
-        self.assertTrue(prices['success'])
-
-    def test_get_price_to_many_requests(self):
-        def request_loop() -> None:
-            item = 'M4A1-S | Cyrex (Factory New)'
-            for _ in range(21):
-                client.market.fetch_price(item, GameOptions.CS)
-
-        client = SteamClient(self.credentials.api_key)
-        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
-        self.assertRaises(TooManyRequests, request_loop)
-
     def test_make_offer(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
@@ -172,44 +145,3 @@ class TestSteamClient(TestCase):
         response = client.get_escrow_duration(sample_trade_url)
         self.assertEqual(response, 15)
 
-    def test_get_all_listings_from_market(self):
-        client = SteamClient(self.credentials.api_key)
-        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
-        listings = client.market.get_my_market_listings()
-        self.assertTrue(len(listings) == 2)
-        self.assertTrue(len(listings.get("buy_orders")) == 1)
-        self.assertTrue(len(listings.get("sell_listings")) == 1)
-        self.assertIsInstance(next(iter(listings.get("sell_listings").values())).get("description"), dict)
-
-    def test_create_and_remove_sell_listing(self):
-        client = SteamClient(self.credentials.api_key)
-        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
-        game = GameOptions.DOTA2
-        inventory = client.get_my_inventory(game)
-        asset_id_to_sell = None
-        for asset_id, item in inventory.items():
-            if item.get("marketable") == 1:
-                asset_id_to_sell = asset_id
-                break
-        self.assertIsNotNone(asset_id_to_sell, "You need at least 1 marketable item to pass this test")
-        response = client.market.create_sell_order(asset_id_to_sell, game, "10000")
-        self.assertTrue(response["success"])
-        sell_listings = client.market.get_my_market_listings()["sell_listings"]
-        listing_to_cancel = None
-        for listing in sell_listings.values():
-            if listing["description"]["id"] == asset_id_to_sell:
-                listing_to_cancel = listing["listing_id"]
-                break
-        self.assertIsNotNone(listing_to_cancel)
-        response = client.market.cancel_sell_order(listing_to_cancel)
-
-    def test_create_and_cancel_buy_order(self):
-        client = SteamClient(self.credentials.api_key)
-        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
-        # PUT THE REAL CURRENCY OF YOUR STEAM WALLET, OTHER CURRENCIES WILL NOT WORK
-        response = client.market.create_buy_order("AK-47 | Redline (Field-Tested)", "10.34", 2, GameOptions.CS, Currency.EURO)
-        buy_order_id = response["buy_orderid"]
-        self.assertTrue(response["success"] == 1)
-        self.assertIsNotNone(buy_order_id)
-        response = client.market.cancel_buy_order(buy_order_id)
-        self.assertTrue(response["success"])

@@ -45,8 +45,8 @@ class SteamClient:
     @login_required
     def logout(self) -> None:
         url = LoginExecutor.STORE_URL + '/logout/'
-        params = {'sessionid': self._get_session_id()}
-        self._session.post(url, params)
+        data = {'sessionid': self._get_session_id()}
+        self._session.post(url, data=data)
         if self.is_session_alive():
             raise Exception("Logout unsuccessful")
         self.was_login_executed = False

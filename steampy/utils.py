@@ -161,3 +161,15 @@ def get_description_key(item: dict) -> str:
 def get_key_value_from_url(url: str, key: str) -> str:
     params = urlparse.urlparse(url).query
     return urlparse.parse_qs(params)[key][0]
+
+
+def load_credentials():
+    with open('credentials.pwd', 'r') as f:
+        return [Credentials(line.split()[0], line.split()[1], line.split()[2]) for line in f]
+
+
+class Credentials:
+    def __init__(self, login: str, password: str, api_key: str):
+        self.login = login
+        self.password = password
+        self.api_key = api_key
