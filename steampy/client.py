@@ -26,18 +26,20 @@ def login_required(func):
 
 
 class SteamClient:
-    def __init__(self, api_key: str) -> None:
+    def __init__(self, api_key: str, username: str = None, password: str = None, steam_guard:str = None) -> None:
         self._api_key = api_key
         self._session = requests.Session()
-        self.steam_guard = None
+        self.steam_guard = steam_guard
         self.was_login_executed = False
-        self.username = None
+        self.username = username
+        self._password = password
         self.market = SteamMarket(self._session)
         self.chat = SteamChat(self._session)
 
     def login(self, username: str, password: str, steam_guard: str) -> None:
         self.steam_guard = guard.load_steam_guard(steam_guard)
         self.username = username
+        self._password = password
         LoginExecutor(username, password, self.steam_guard['shared_secret'], self._session).login()
         self.was_login_executed = True
         self.market._set_login_executed(self.steam_guard, self._get_session_id())
@@ -50,7 +52,16 @@ class SteamClient:
         if self.is_session_alive():
             raise Exception("Logout unsuccessful")
         self.was_login_executed = False
-        self.chat._logout()
+
+    def __enter__(self):
+        if None in [self.username, self._password, self.steam_guard]:
+            raise InvalidCredentials('You have to pass username, password and steam_guard'
+                                     'parameters when using "with" statement')
+        self.login(self.username, self._password, self.steam_guard)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.logout()
 
     @login_required
     def is_session_alive(self):

@@ -28,6 +28,11 @@ class TestSteamClient(TestCase):
         self.assertTrue(client.is_session_alive())
         client.logout()
 
+    def test_client_with_statement(self):
+        with SteamClient(self.credentials.api_key, self.credentials.login,
+                         self.credentials.password, self.steam_guard_file) as client:
+            self.assertTrue(client.is_session_alive())
+
     def test_send_offer_without_sessionid_cookie(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
@@ -144,4 +149,3 @@ class TestSteamClient(TestCase):
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         response = client.get_escrow_duration(sample_trade_url)
         self.assertEqual(response, 15)
-
