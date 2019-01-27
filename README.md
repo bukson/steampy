@@ -241,12 +241,14 @@ Decline trade offer that **other** user sent to us.
 
 Cancel trade offer that **we** sent to other user.
 
-**get_my_inventory(game: GameOptions, merge: bool = True) -> dict**
+**get_my_inventory(game: GameOptions, merge: bool = True, count: int = 5000) -> dict**
 
 Using `SteamClient.login` method is required before usage
 
 If `merge` is set `True` then inventory items are merged from items data and items description into dict where items `id` is key
 and descriptions merged with data are value.
+
+`Count` parameter is default max number of items, that can be fetched.
 
 Inventory entries looks like this:
 ```python
@@ -360,11 +362,13 @@ Inventory entries looks like this:
                 'type': 'Classified Rifle'}}
 ```
 
-**get_partner_inventory(partner_steam_id: str, game: GameOptions, merge: bool = True) -> dict**
+**get_partner_inventory(partner_steam_id: str, game: GameOptions, merge: bool = True, count: int = 5000) -> dict**
 
 Using `SteamClient.login` method is required before usage
 
 Inventory items can be merged like in `SteamClient.get_my_inventory` method
+
+`Count` parameter is default max number of items, that can be fetched.
 
 market methods
 ==============
