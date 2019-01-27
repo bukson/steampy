@@ -25,8 +25,8 @@ def texts_between(text: str, begin: str, end: str):
             start = text.index(begin, stop) + len(begin)
             stop = text.index(end, start)
             yield text[start:stop]
-        except:
-            raise StopIteration
+        except ValueError:
+            return
 
 
 def account_id_to_steam_id(account_id: str) -> str:
@@ -40,7 +40,10 @@ def steam_id_to_account_id(steam_id: str) -> str:
 
 
 def price_to_float(price: str) -> float:
-    return float(price[1:].split()[0])
+    pattern = '\D?(\\d*)(\\.|,)?(\\d*)'
+    tokens = re.search(pattern, price, re.UNICODE)
+    float_str = tokens.group(1) + '.' + tokens.group(3)
+    return float(float_str)
 
 
 def merge_items_with_descriptions_from_inventory(inventory_response: dict, game: GameOptions) -> dict:

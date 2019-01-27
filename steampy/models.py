@@ -55,6 +55,8 @@ class TradeOfferState(enum.IntEnum):
 class SteamUrl:
     API_URL = "https://api.steampowered.com"
     COMMUNITY_URL = "https://steamcommunity.com"
+    STORE_URL = 'https://store.steampowered.com'
+
 
 class Endpoints:
     CHAT_LOGIN = SteamUrl.API_URL + "/ISteamWebUserPresenceOAuth/Logon/v1"

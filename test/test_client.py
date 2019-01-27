@@ -152,3 +152,11 @@ class TestSteamClient(TestCase):
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         response = client.get_escrow_duration(sample_trade_url)
         self.assertEqual(response, 15)
+
+    def test_get_wallet_balance(self):
+        with SteamClient(self.credentials.api_key, self.credentials.login,
+                         self.credentials.password, self.steam_guard_file) as client:
+            wallet_balance = client.get_wallet_balance()
+            self.assertTrue(type(wallet_balance), float)
+            wallet_balance = client.get_wallet_balance(convert_to_float=False)
+            self.assertTrue(type(wallet_balance), str)

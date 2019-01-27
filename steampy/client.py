@@ -1,5 +1,6 @@
+import bs4
 import urllib.parse as urlparse
-from typing import List
+from typing import List, Union
 
 import json
 import requests
@@ -12,7 +13,7 @@ from steampy.market import SteamMarket
 from steampy.models import Asset, TradeOfferState, SteamUrl, GameOptions
 from steampy.utils import text_between, texts_between, merge_items_with_descriptions_from_inventory, \
     steam_id_to_account_id, merge_items_with_descriptions_from_offers, get_description_key, \
-    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url
+    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url, price_to_float
 
 
 def login_required(func):
@@ -46,7 +47,7 @@ class SteamClient:
 
     @login_required
     def logout(self) -> None:
-        url = LoginExecutor.STORE_URL + '/logout/'
+        url = SteamUrl.STORE_URL + '/logout/'
         data = {'sessionid': self._get_session_id()}
         self._session.post(url, data=data)
         if self.is_session_alive():
@@ -313,3 +314,14 @@ class SteamClient:
     @staticmethod
     def _get_trade_offer_url(trade_offer_id: str) -> str:
         return SteamUrl.COMMUNITY_URL + '/tradeoffer/' + trade_offer_id
+
+    @login_required
+    def get_wallet_balance(self, convert_to_float=True) -> Union[str, float]:
+        url = SteamUrl.STORE_URL + '/account/history/'
+        response = self._session.get(url)
+        response_soup = bs4.BeautifulSoup(response.text, "html.parser")
+        balance = response_soup.find(id='header_wallet_balance').string
+        if convert_to_float:
+            return price_to_float(balance)
+        else:
+            return balance

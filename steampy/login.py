@@ -3,13 +3,11 @@ import time
 import requests
 from steampy import guard
 import rsa
-
+from steampy.models import SteamUrl
 from steampy.exceptions import InvalidCredentials, CaptchaRequired
 
 
 class LoginExecutor:
-    COMMUNITY_URL = "https://steamcommunity.com"
-    STORE_URL = 'https://store.steampowered.com'
 
     def __init__(self, username: str, password: str, shared_secret: str, session: requests.Session) -> None:
         self.username = username
@@ -32,12 +30,12 @@ class LoginExecutor:
         encrypted_password = self._encrypt_password(rsa_params)
         rsa_timestamp = rsa_params['rsa_timestamp']
         request_data = self._prepare_login_request_data(encrypted_password, rsa_timestamp)
-        return self.session.post(self.STORE_URL + '/login/dologin', data=request_data)
+        return self.session.post(SteamUrl.STORE_URL + '/login/dologin', data=request_data)
 
     def set_sessionid_cookies(self):
         sessionid = self.session.cookies.get_dict()['sessionid']
-        community_domain = self.COMMUNITY_URL[8:]
-        store_domain = self.STORE_URL[8:]
+        community_domain = SteamUrl.COMMUNITY_URL[8:]
+        store_domain = SteamUrl.STORE_URL[8:]
         community_cookie = self._create_session_id_cookie(sessionid, community_domain)
         store_cookie = self._create_session_id_cookie(sessionid, store_domain)
         self.session.cookies.set(**community_cookie)
@@ -51,7 +49,7 @@ class LoginExecutor:
 
     def _fetch_rsa_params(self, current_number_of_repetitions: int = 0) -> dict:
         maximal_number_of_repetitions = 5
-        key_response = self.session.post(self.STORE_URL + '/login/getrsakey/',
+        key_response = self.session.post(SteamUrl.STORE_URL + '/login/getrsakey/',
                                          data={'username': self.username}).json()
         try:
             rsa_mod = int(key_response['publickey_mod'], 16)
@@ -107,4 +105,4 @@ class LoginExecutor:
             self.session.post(url, parameters)
 
     def _fetch_home_page(self, session: requests.Session) -> requests.Response:
-        return session.post(self.COMMUNITY_URL + '/my/home/')
+        return session.post(SteamUrl.COMMUNITY_URL + '/my/home/')
