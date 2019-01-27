@@ -1,3 +1,5 @@
+import os
+
 import copy
 import struct
 import urllib.parse as urlparse
@@ -166,7 +168,8 @@ def get_key_value_from_url(url: str, key: str, case_sensitive: bool=True) -> str
 
 
 def load_credentials():
-    with open('credentials.pwd', 'r') as f:
+    dirname = os.path.dirname(os.path.abspath(__file__))
+    with open(dirname + '/../secrets/credentials.pwd', 'r') as f:
         return [Credentials(line.split()[0], line.split()[1], line.split()[2]) for line in f]
 
 

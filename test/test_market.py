@@ -1,3 +1,5 @@
+import os
+
 from unittest import TestCase
 
 from steampy.client import SteamClient
@@ -11,7 +13,8 @@ class TestMarket(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.credentials = load_credentials()[0]
-        cls.steam_guard_file = 'Steamguard'
+        dirname = os.path.dirname(os.path.abspath(__file__))
+        cls.steam_guard_file = dirname + '/../secrets/Steamguard.txt'
 
     def test_get_price(self):
         client = SteamClient(self.credentials.api_key)
