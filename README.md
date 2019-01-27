@@ -43,7 +43,7 @@ Usage
 =======
 [Obtaining API Key](http://steamcommunity.com/dev/apikey)
 
-[Obtaining SteamGuard from mobile device]( https://github.com/SMVampire/SteamBotDev/wiki )
+[Obtaining SteamGuard from mobile device]( https://github.com/SteamTimeIdler/stidler/wiki/Getting-your-%27shared_secret%27-code-for-use-with-Auto-Restarter-on-Mobile-Authentication )
 
 [Obtaining SteamGuard using Android emulation]( https://github.com/codepath/android_guides/wiki/Genymotion-2.0-Emulators-with-Google-Play-support)
 
