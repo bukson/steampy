@@ -210,13 +210,13 @@ class SteamClient:
 
     def decline_trade_offer(self, trade_offer_id: str) -> dict:
         url = 'https://steamcommunity.com/tradeoffer/' + trade_offer_id + '/decline'
-        response = self._session.post(url, data={'sessionid': self._get_session_id()})
-        return response.json()
+        response = self._session.post(url, data={'sessionid': self._get_session_id()}).json()
+        return response
 
     def cancel_trade_offer(self, trade_offer_id: str) -> dict:
         url = 'https://steamcommunity.com/tradeoffer/' + trade_offer_id + '/cancel'
-        response = self._session.post(url, data={'sessionid': self._get_session_id()})
-        return response.json()
+        response = self._session.post(url, data={'sessionid': self._get_session_id()}).json()
+        return response
     
     @login_required
     def make_offer(self, items_from_me: List[Asset], items_from_them: List[Asset], partner_steam_id: str,
