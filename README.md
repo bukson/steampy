@@ -372,14 +372,14 @@ Inventory items can be merged like in `SteamClient.get_my_inventory` method
 
 **get_wallet_balance(convert_to_float: bool = True) -> Union[str, float]**
 
-Check account balance of steam acccount. It uses `price_to_float` method from utils
-to covnert money string to float if `convert_to_float` is set to `True`.
+Check account balance of steam acccount. It uses `parse_price` method from utils
+to covnert money string to Decimal if `convert_to_decimal` is set to `True`.
 
 Example:
 ```python
  with SteamClient(api_key, login, password, steam_guard_file) as client:
             wallet_balance = client.get_wallet_balance()
-            self.assertTrue(type(wallet_balance), float)
+            self.assertTrue(type(wallet_balance), decimal.Decimal)
 ```
 
 market methods

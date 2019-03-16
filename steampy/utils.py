@@ -1,3 +1,4 @@
+import decimal
 import os
 
 import copy
@@ -39,11 +40,11 @@ def steam_id_to_account_id(steam_id: str) -> str:
     return str(struct.unpack('>L', int(steam_id).to_bytes(8, byteorder='big')[4:])[0])
 
 
-def price_to_float(price: str) -> float:
+def parse_price(price: str) -> decimal.Decimal:
     pattern = '\D?(\\d*)(\\.|,)?(\\d*)'
     tokens = re.search(pattern, price, re.UNICODE)
-    float_str = tokens.group(1) + '.' + tokens.group(3)
-    return float(float_str)
+    decimal_str = tokens.group(1) + '.' + tokens.group(3)
+    return decimal.Decimal(decimal_str)
 
 
 def merge_items_with_descriptions_from_inventory(inventory_response: dict, game: GameOptions) -> dict:

@@ -1,3 +1,4 @@
+import decimal
 import os
 
 from unittest import TestCase
@@ -157,6 +158,6 @@ class TestSteamClient(TestCase):
         with SteamClient(self.credentials.api_key, self.credentials.login,
                          self.credentials.password, self.steam_guard_file) as client:
             wallet_balance = client.get_wallet_balance()
-            self.assertTrue(type(wallet_balance), float)
-            wallet_balance = client.get_wallet_balance(convert_to_float=False)
+            self.assertTrue(type(wallet_balance), decimal.Decimal)
+            wallet_balance = client.get_wallet_balance(convert_to_decimal=False)
             self.assertTrue(type(wallet_balance), str)
