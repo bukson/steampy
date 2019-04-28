@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "steampy"
+version = "0.60.0"
+description = "A Steam lib for trade automation"
+authors = ["Michał Bukowski <gigibukson@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.5"
+requests = "^2.21"
+beautifulsoup4 = "^4.7"
+rsa = "^4.0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
