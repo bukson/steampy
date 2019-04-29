@@ -103,7 +103,9 @@ steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
 You can also use `with` statement to automatically login and logout.
 
 ```python
-with SteamClient(api_key, login, password, steam_guard_file) as client:
+from steampy.client import SteamClientManager
+
+with SteamClientManager(api_key, username, password, steam_guard_path) as client:
     client.some_method1(...)
     client.some_method2(...)
     ...
@@ -125,7 +127,9 @@ steam_client.logout()
 You can also use `with` statement to automatically login and logout.
 
 ```python
-with SteamClient(api_key, login, password, steam_guard_file) as client:
+from steampy.client import SteamClientManager
+
+with SteamClientManager(api_key, username, password, steam_guard_file) as client:
     client.some_method1(...)
     client.some_method2(...)
     ...
