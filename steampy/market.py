@@ -128,6 +128,29 @@ class SteamMarket:
         return response
 
     @login_required
+    def buy_item(self, market_name: str, market_id: str, price: int, fee: int, game: GameOptions,
+                 currency: Currency = Currency.USD) -> dict:
+        data = {
+            "sessionid": self._session_id,
+            "currency": currency.value,
+            "subtotal" : price - fee,
+            "fee" : fee,
+            "total" : price,
+            "quantity": '1'
+        }
+        headers = {'Referer': "%s/market/listings/%s/%s" % (SteamUrl.COMMUNITY_URL, game.app_id, market_name)}
+        response = self._session.post(SteamUrl.COMMUNITY_URL + "/market/buylisting/" + market_id, data,
+                                      headers=headers).json()
+        try:
+            if response["wallet_info"]["success"] != 1:
+                raise ApiException("There was a problem buying this item. Are you using the right currency? success: %s"
+                                   % response['wallet_info']['success'])
+        except:
+            raise ApiException("There was a problem buying this item. Message: %s"
+                               % response.get("message"))
+        return response
+
+    @login_required
     def cancel_sell_order(self, sell_listing_id: str) -> None:
         data = {"sessionid": self._session_id}
         headers = {'Referer': SteamUrl.COMMUNITY_URL + "/market/"}

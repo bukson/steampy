@@ -459,6 +459,20 @@ response = steam_client.market.create_buy_order("AK-47 | Redline (Field-Tested)"
 buy_order_id = response["buy_orderid"]
 ```
 
+**buy_item(market_name: str, market_id: str, price: int, fee: int, game: GameOptions, currency: Currency = Currency.USD) -> dict**
+
+Using `SteamClient.login` method is required before usage
+
+Buy a certain item from market listing.
+
+```python
+steam_client = SteamClient(self.credentials.api_key)
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+response = steam_client.market.buy_item('AK-47 | Redline (Field-Tested)', '1942659007774983251', 81, 10,
+                                        GameOptions.CS, Currency.RUB)
+wallet_balance = response["wallet_info"]["wallet_balance"]
+```
+
 **cancel_sell_order(sell_listing_id: str) -> None**
 
 Using `SteamClient.login` method is required before usage
