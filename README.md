@@ -59,7 +59,7 @@ If you have `steamid`, `shared_secret` and `identity_secret` you can place it in
 {
     "steamid": "YOUR_STEAM_ID_64",
     "shared_secret": "YOUR_SHARED_SECRET",
-    "identity_secret": "YOUR_IDENTITY_SECRET",
+    "identity_secret": "YOUR_IDENTITY_SECRET"
 }
 ```
 
