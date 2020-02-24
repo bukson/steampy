@@ -4,7 +4,7 @@ import sys
 if not sys.version_info[0] == 3 and sys.version_info[1] < 5:
     sys.exit('Python < 3.5 is not supported')
 
-version = '0.60'
+version = '0.62'
 
 setup(
     name='steampy',
