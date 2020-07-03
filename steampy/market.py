@@ -43,10 +43,9 @@ class SteamMarket:
         return response.json()
 
     @login_required
-    def fetch_price_history(self, item_hash_name: str, game: GameOptions, currency: str = Currency.USD) -> dict:
+    def fetch_price_history(self, item_hash_name: str, game: GameOptions) -> dict:
         url = SteamUrl.COMMUNITY_URL + '/market/pricehistory/'
         params = {'country': 'PL',
-                  'currency': currency,
                   'appid': game.app_id,
                   'market_hash_name': item_hash_name}
         response = self._session.get(url, params=params)
