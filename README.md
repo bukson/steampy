@@ -403,7 +403,7 @@ steam_client.market.fetch_price(item, game=GameOptions.CS)
 {'volume': '208', 'lowest_price': '$11.30 USD', 'median_price': '$11.33 USD', 'success': True}
 ```
 
-**fetch_price_history(item_hash_name: str, game: GameOptions, currency: str = Currency.USD) -> dict**
+**fetch_price_history(item_hash_name: str, game: GameOptions) -> dict**
 
 Using `SteamClient.login` method is required before usage
 
