@@ -34,7 +34,7 @@ class SteamMarket:
     def fetch_price(self, item_hash_name: str, game: GameOptions, currency: str = Currency.USD) -> dict:
         url = SteamUrl.COMMUNITY_URL + '/market/priceoverview/'
         params = {'country': 'PL',
-                  'currency': currency,
+                  'currency': currency.value,
                   'appid': game.app_id,
                   'market_hash_name': item_hash_name}
         response = self._session.get(url, params=params)
