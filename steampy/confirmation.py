@@ -110,7 +110,7 @@ class ConfirmationExecutor:
     @staticmethod
     def _get_confirmation_sell_listing_id(confirmation_details_page: str) -> str:
         soup = BeautifulSoup(confirmation_details_page, 'html.parser')
-        scr_raw = soup.select("script")[2].text.strip()
+        scr_raw = soup.select("script")[2].string.strip()
         scr_raw = scr_raw[scr_raw.index("'confiteminfo', ") + 16:]
         scr_raw = scr_raw[:scr_raw.index(", UserYou")].replace("\n", "")
         return json.loads(scr_raw)["id"]
