@@ -446,6 +446,8 @@ game = GameOptions.DOTA2
 sell_response = steam_client.market.create_sell_order(asset_id_to_sell, game, "10000")
 ```
  
+❗ `money_to_receive` has in cents, so "100.00" should be passed has "10000"
+
 **create_buy_order(market_name: str, price_single_item: str, quantity: int, game: GameOptions, currency: Currency = Currency.USD) -> dict**
 
 Using `SteamClient.login` method is required before usage
@@ -455,9 +457,10 @@ Create buy order of the assets on the steam market.
 ```python
 steam_client = SteamClient(self.credentials.api_key)
 steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
-response = steam_client.market.create_buy_order("AK-47 | Redline (Field-Tested)", "10.34", 2, GameOptions.CS, Currency.EURO)
+response = steam_client.market.create_buy_order("AK-47 | Redline (Field-Tested)", "1034", 2, GameOptions.CS, Currency.EURO)
 buy_order_id = response["buy_orderid"]
 ```
+❗ `price_single_item` has to be in cents, so "10.34" should be passed has "1034"
 
 **buy_item(market_name: str, market_id: str, price: int, fee: int, game: GameOptions, currency: Currency = Currency.USD) -> dict**
 
