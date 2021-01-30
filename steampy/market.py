@@ -1,3 +1,4 @@
+import urllib.parse
 import json
 
 from decimal import Decimal
@@ -137,7 +138,8 @@ class SteamMarket:
             "total" : price,
             "quantity": '1'
         }
-        headers = {'Referer': "%s/market/listings/%s/%s" % (SteamUrl.COMMUNITY_URL, game.app_id, market_name)}
+        headers = {'Referer': "%s/market/listings/%s/%s" % (SteamUrl.COMMUNITY_URL, game.app_id,
+                                                            urllib.parse.quote(market_name))}
         response = self._session.post(SteamUrl.COMMUNITY_URL + "/market/buylisting/" + market_id, data,
                                       headers=headers).json()
         try:
