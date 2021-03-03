@@ -119,7 +119,8 @@ class SteamMarket:
             "price_total": str(Decimal(price_single_item) * Decimal(quantity)),
             "quantity": quantity
         }
-        headers = {'Referer': "%s/market/listings/%s/%s" % (SteamUrl.COMMUNITY_URL, game.app_id, market_name)}
+        headers = {'Referer': "%s/market/listings/%s/%s" % (SteamUrl.COMMUNITY_URL, game.app_id, 
+                                                            urllib.parse.quote(market_name))}
         response = self._session.post(SteamUrl.COMMUNITY_URL + "/market/createbuyorder/", data,
                                       headers=headers).json()
         if response.get("success") != 1:
