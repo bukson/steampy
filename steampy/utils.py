@@ -5,6 +5,8 @@ import copy
 import struct
 import urllib.parse as urlparse
 import re
+import aiohttp
+# from multidict import CIMultiDict
 from requests.structures import CaseInsensitiveDict
 from typing import List
 
@@ -182,3 +184,9 @@ class Credentials:
         self.login = login
         self.password = password
         self.api_key = api_key
+
+
+def get_sessionid_from_cookie(cookie_jar: aiohttp.CookieJar) -> str:
+    for cookie in cookie_jar:
+        if cookie.key == 'sessionid':
+            return cookie.value
