@@ -15,7 +15,8 @@ from steampy.asyncsteampy.market import SteamMarket
 from steampy.models import Asset, TradeOfferState, SteamUrl, GameOptions
 from steampy.utils import text_between, texts_between, merge_items_with_descriptions_from_inventory, \
     steam_id_to_account_id, merge_items_with_descriptions_from_offers, get_description_key, \
-    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url, parse_price, get_sessionid_from_cookie
+    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url, parse_price, \
+    get_sessionid_from_cookie, normalize_params
 
 
 def login_required(func):
@@ -69,7 +70,6 @@ class SteamClient:
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        await self.logout()
         await self.close()
 
     @login_required
@@ -82,11 +82,12 @@ class SteamClient:
     async def api_call(self, request_method: str, interface: str, api_method: str, version: str,
                  params: dict = None) -> aiohttp.ClientResponse:
         url = '/'.join([SteamUrl.API_URL, interface, api_method, version])
+        normalized_params = normalize_params(params)
         async with aiohttp.ClientSession() as session:
             if request_method == 'GET':
-                response = await session.get(url, params=params)
+                response = await session.get(url, params=normalized_params)
             else:
-                response = await session.post(url, data=params)
+                response = await session.post(url, data=normalized_params)
             await response.read()
         if self._is_invalid_api_key(await response.text()):
             raise InvalidCredentials('Invalid API key')
@@ -182,7 +183,7 @@ class SteamClient:
 
     @login_required
     async def get_trade_receipt(self, trade_id: str) -> list:
-        response = await self._session.get("https://steamcommunity.com/trade/{}/receipt".format(trade_id))
+        response = await self._session.get(f"https://steamcommunity.com/trade/{trade_id}/receipt")
         content = await response.content.read()
         html = content.decode()
         items = []
@@ -197,7 +198,7 @@ class SteamClient:
         if trade_offer_state is not TradeOfferState.Active:
             raise ApiException("Invalid trade offer state: {} ({})".format(trade_offer_state.name,
                                                                            trade_offer_state.value))
-        partner = self._fetch_trade_partner_id(trade_offer_id)
+        partner = await self._fetch_trade_partner_id(trade_offer_id)
         session_id = get_sessionid_from_cookie(self._session.cookie_jar)
         accept_url = SteamUrl.COMMUNITY_URL + '/tradeoffer/' + trade_offer_id + '/accept'
         params = {'sessionid': session_id,
@@ -212,9 +213,10 @@ class SteamClient:
             return await self._confirm_transaction(trade_offer_id)
         return response_json
 
-    def _fetch_trade_partner_id(self, trade_offer_id: str) -> str:
+    async def _fetch_trade_partner_id(self, trade_offer_id: str) -> str:
         url = self._get_trade_offer_url(trade_offer_id)
-        offer_response_text = self._session.get(url).text
+        response = await self._session.get(url)
+        offer_response_text = await response.text()
         if 'You have logged in from a new device. In order to protect the items' in offer_response_text:
             raise SevenDaysHoldException("Account has logged in a new device and can't trade for 7 days")
         return text_between(offer_response_text, "var g_ulTradePartnerSteamID = '", "';")

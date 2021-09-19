@@ -190,3 +190,8 @@ def get_sessionid_from_cookie(cookie_jar: aiohttp.CookieJar) -> str:
     for cookie in cookie_jar:
         if cookie.key == 'sessionid':
             return cookie.value
+
+def normalize_params(params: dict) -> dict:
+    normalized_params = {key: value for key, value in params.items() if value is not None}
+    normalized_params = {key: str(value).lower() for key, value in normalized_params.items() if type(value) is bool}
+    return normalized_params
