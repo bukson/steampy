@@ -85,7 +85,7 @@ class ConfirmationExecutor:
 
     def _create_confirmation_params(self, tag_string: str) -> dict:
         timestamp = int(time.time())
-        confirmation_key = guard.generate_confirmation_key(self._identity_secret, tag_string, timestamp)
+        confirmation_key = guard.generate_confirmation_key(self._identity_secret, tag_string, timestamp).decode()
         android_id = guard.generate_device_id(self._my_steam_id)
         return {'p': android_id,
                 'a': self._my_steam_id,
