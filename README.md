@@ -562,7 +562,7 @@ response = await steam_client.market.cancel_buy_order(buy_order_id)
 await async_steam_client.close()
 ```
 
-If you end your operations, ceep in mind, you always need to `close` your `async_steam_client`. This will do `logout` and close `aiohttp` [session]( https://docs.aiohttp.org/en/stable/client_reference.html#client-session) properly. Also, you can `await async_steam_client.logout()` without closing session if you need this for some reason.
+If you end your operations, ⚠️ `keep in mind`, you always need to close your `async_steam_client`. This will do `logout` and close `aiohttp` [session]( https://docs.aiohttp.org/en/stable/client_reference.html#client-session) properly. Also, you can `await async_steam_client.logout()` without closing session if you need this for some reason.
 
 Async context manager usage example:
 
@@ -591,10 +591,11 @@ proxy = {
     'http': 'proxy_type://proxy_url_with_or_no_auth',
     'https': 'proxy_type://proxy_url_with_or_no_auth', # for steam you actually need this
 }
-session_with_proxy.proxies.update()
+session_with_proxy.proxies.update(proxy)
 ```
-Async way is much complex, if proxy type is socks4/5 ypu should look at this small but precious [library]( https://github.com/romis2012/aiohttp-socks), if proxy type http/https or you dont like [aiohttp-socks]( https://github.com/romis2012/aiohttp-socks) you can use [aiohttp-proxy](
-https://github.com/Skactor/aiohttp-proxy) instead. 
+
+Async way is much complex, if proxy type is socks4/5 you should look at this small but precious [library]( https://github.com/romis2012/aiohttp-socks), if proxy type http/https or you dont like [aiohttp-socks]( https://github.com/romis2012/aiohttp-socks) you can use [aiohttp-proxy](
+https://github.com/Skactor/aiohttp-proxy) instead.
 
 ```python
 connector = ProxyConnector.from_url('proxy_type://proxy_url_with_or_no_auth')
