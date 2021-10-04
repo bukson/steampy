@@ -16,7 +16,7 @@ setup(
     license='MIT',
     url='https://github.com/bukson/steampy',
     download_url='https://github.com/bukson/steampy/tarball/' + version,
-    keywords=['steam', 'trade', ],
+    keywords=['steam', 'trade', 'async', 'await', 'asyncio'],
     classifiers=[],
     install_requires=[
         "requests",

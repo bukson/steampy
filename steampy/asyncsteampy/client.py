@@ -3,9 +3,9 @@ import decimal
 import bs4
 import urllib.parse as urlparse
 from typing import List, Union, Optional
+from aiohttp import ClientSession, ClientResponse
 
 import json
-import aiohttp
 from steampy import guard
 from steampy.asyncsteampy.chat import SteamChat
 from steampy.asyncsteampy.confirmation import ConfirmationExecutor
@@ -30,9 +30,10 @@ def login_required(func):
 
 
 class SteamClient:
-    def __init__(self, api_key: str, username: str = None, password: str = None, steam_guard: Optional[Union[str, dict]] = None) -> None:
+    def __init__(self, api_key: str, username: str = None, password: str = None, steam_guard: Optional[Union[str, dict]] = None, 
+                 session: ClientSession = ClientSession()) -> None:
         self._api_key = api_key
-        self._session = aiohttp.ClientSession()
+        self._session = session
         self.steam_guard = steam_guard
         self.was_login_executed = False
         self.username = username
@@ -80,10 +81,10 @@ class SteamClient:
         return steam_login.lower() in main_page_response_text.lower()
 
     async def api_call(self, request_method: str, interface: str, api_method: str, version: str,
-                 params: dict = None) -> aiohttp.ClientResponse:
+                 params: dict = None) -> ClientResponse:
         url = '/'.join([SteamUrl.API_URL, interface, api_method, version])
         normalized_params = normalize_params(params)
-        async with aiohttp.ClientSession() as session:
+        async with ClientSession(connector=self.proxy_connector) as session:
             if request_method == 'GET':
                 response = await session.get(url, params=normalized_params)
             else:

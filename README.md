@@ -51,10 +51,11 @@ Usage
 from steampy.client import SteamClient
 
 steam_client = SteamClient('MY_API_KEY')
-steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE/DICT')
 ```
 
-If you have `steamid`, `shared_secret` and `identity_secret` you can place it in file `Steamguard.txt` instead of fetching SteamGuard file from device.
+If you have `steamid`, `shared_secret` and `identity_secret` you can place it in file `Steamguard.txt` instead of fetching SteamGuard file from device or pass directly to method as dict below:
+
 ```python
 {
     "steamid": "YOUR_STEAM_ID_64",
@@ -89,7 +90,7 @@ SteamClient methods
 Unless specified in documentation, the method does not require login to work(it uses API Key from constructor instead)
 
 
-**login(username: str, password: str, steam_guard: str) -> requests.Response**
+**login(username: str, password: str, steam_guard: str or dict) -> requests.Response**
 
 Log into the steam account. Allows to accept trade offers and some other methods.
 
@@ -97,13 +98,13 @@ Log into the steam account. Allows to accept trade offers and some other methods
 from steampy.client import SteamClient
 
 steam_client = SteamClient('MY_API_KEY')
-steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE/DICT')
 ```
 
 You can also use `with` statement to automatically login and logout.
 
 ```python
-with SteamClient(api_key, login, password, steam_guard_file) as client:
+with SteamClient(api_key, login, password, steam_guard_file_or_dict) as client:
     client.some_method1(...)
     client.some_method2(...)
     ...
@@ -118,14 +119,14 @@ Logout from steam.
 from steampy.client import SteamClient
 
 steam_client = SteamClient('MY_API_KEY')
-steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE/DICT')
 steam_client.logout()
 ```
 
 You can also use `with` statement to automatically login and logout.
 
 ```python
-with SteamClient(api_key, login, password, steam_guard_file) as client:
+with SteamClient(api_key, login, password, steam_guard_file_or_dict) as client:
     client.some_method1(...)
     client.some_method2(...)
     ...
@@ -141,7 +142,7 @@ if user name is there. Thanks for vasia123 for this solution.
 from steampy.client import SteamClient
 
 steam_client = SteamClient('MY_API_KEY')
-steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE/DICT')
 is_session_alive = steam_client.is_session_alive()
 ```
 
@@ -201,7 +202,7 @@ from steampy.client import SteamClient, Asset
 from steampy.utils import GameOptions
 
 steam_client = SteamClient('MY_API_KEY')
-steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE/DICT')
 partner_id = 'PARTNER_ID'
 game = GameOptions.CS
 my_items = steam_client.get_my_inventory(game)
@@ -377,7 +378,7 @@ to covnert money string to Decimal if `convert_to_decimal` is set to `True`.
 
 Example:
 ```python
- with SteamClient(api_key, login, password, steam_guard_file) as client:
+ with SteamClient(api_key, login, password, steam_guard_file_or_dict) as client:
             wallet_balance = client.get_wallet_balance()
             self.assertTrue(type(wallet_balance), decimal.Decimal)
 ```
@@ -427,7 +428,7 @@ Returns market listings posted by user
 
 ```python
 steam_client = SteamClient(self.credentials.api_key)
-steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE/DICT')
 listings = steam_client.market.get_my_market_listings()
 ```
 
@@ -440,7 +441,7 @@ Create sell order of the asset on the steam market.
 
 ```python
 steam_client = SteamClient(self.credentials.api_key)
-steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE/DICT')
 asset_id_to_sell = 'some_asset_id'
 game = GameOptions.DOTA2
 sell_response = steam_client.market.create_sell_order(asset_id_to_sell, game, "10000")
@@ -456,7 +457,7 @@ Create buy order of the assets on the steam market.
 
 ```python
 steam_client = SteamClient(self.credentials.api_key)
-steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE/DICT')
 response = steam_client.market.create_buy_order("AK-47 | Redline (Field-Tested)", "1034", 2, GameOptions.CS, Currency.EURO)
 buy_order_id = response["buy_orderid"]
 ```
@@ -470,7 +471,7 @@ Buy a certain item from market listing.
 
 ```python
 steam_client = SteamClient(self.credentials.api_key)
-steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE/DICT')
 response = steam_client.market.buy_item('AK-47 | Redline (Field-Tested)', '1942659007774983251', 81, 10,
                                         GameOptions.CS, Currency.RUB)
 wallet_balance = response["wallet_info"]["wallet_balance"]
@@ -484,7 +485,7 @@ Cancel previously requested sell order on steam market.
 
 ```python
 steam_client = SteamClient(self.credentials.api_key)
-steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE/DICT')
 sell_order_id = "some_sell_order_id"
 response = steam_client.market.cancel_sell_order(sell_order_id)
 ```
@@ -497,7 +498,7 @@ Cancel previously requested buy order on steam market.
 
 ```python
 steam_client = SteamClient(self.credentials.api_key)
-steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE/DICT')
 buy_order_id = "some_buy_order_id"
 response = steam_client.market.cancel_buy_order(buy_order_id)
 ```
@@ -542,6 +543,76 @@ Returns a dictionary with all new sent and received messages:
 ```
 
 `client.chat.fetch_messages()`
+
+Asyncio
+====
+
+All methods that requires connection to steam network now have asyncio support (it uses [aiohttp]( https://github.com/aio-libs/aiohttp) ) and are asynchronous : `client`, `market`, `chat`.
+
+```python
+from steampy.asyncsteampy.client import SteamClient as AsyncSteamClient
+
+...
+
+async_steam_client = await AsyncSteamClient(self.credentials.api_key)
+await async_steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE/DICT')
+buy_order_id = "some_buy_order_id"
+response = await steam_client.market.cancel_buy_order(buy_order_id)
+
+await async_steam_client.close()
+```
+
+If you end your operations, ceep in mind, you always need to `close` your `async_steam_client`. This will do `logout` and close `aiohttp` [session]( https://docs.aiohttp.org/en/stable/client_reference.html#client-session) properly. Also, you can `await async_steam_client.logout()` without closing session if you need this for some reason.
+
+Async context manager usage example:
+
+```python
+async with AsyncSteamClient(self.credentials.api_key,'MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE/DICT') as async_steam_client:
+    await async_steam_client.do_what_you_need()
+
+```
+
+There you no need to call `close`, async context manager do it automatically when execution passes the block of code.
+
+Proxy support
+====
+
+Sync way, simple:
+1. Create [session]( https://docs.python-requests.org/en/master/user/advanced/#session-objects) instance:
+
+```python
+session_with_proxy = requests.Session()
+```
+
+2. Update instance with your proxy url this way:
+
+```python
+proxy = {
+    'http': 'proxy_type://proxy_url_with_or_no_auth',
+    'https': 'proxy_type://proxy_url_with_or_no_auth', # for steam you actually need this
+}
+session_with_proxy.proxies.update()
+```
+Async way is much complex, if proxy type is socks4/5 ypu should look at this small but precious [library]( https://github.com/romis2012/aiohttp-socks), if proxy type http/https or you dont like [aiohttp-socks]( https://github.com/romis2012/aiohttp-socks) you can use [aiohttp-proxy](
+https://github.com/Skactor/aiohttp-proxy) instead. 
+
+```python
+connector = ProxyConnector.from_url('proxy_type://proxy_url_with_or_no_auth')
+session_with_proxy = aiohttp.ClientSession(connector=connector)
+```
+
+Finally, pass session object in `SteamClient`:
+
+```python
+SteamClient(..., session=session_with_proxy)
+with SteamClient(..., session=session_with_proxy) as steam_client:
+    ...
+
+###
+async_steam_client = AsyncSteamClient(..., session=session_with_proxy)
+async with AsyncSteamClient(..., session=session_with_proxy) as async_steam_client:
+    ...
+```
 
 Test
 ====
