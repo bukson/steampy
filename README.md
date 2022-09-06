@@ -2,7 +2,8 @@ Steam Trade Offers Client for Python
 =======
 
 [![PayPal Donate Button](https://img.shields.io/badge/donate-paypal-orange.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XC8BMJ8QRD9ZY "Donate to this project via PayPal")
-[![Bitcoin Donate Button](https://img.shields.io/badge/donate-bitcoin-orange.svg)](https://blockchain.info/payment_request?address=3FCe4D73J7tJ1zH2Q8NM3xnEeLsevvX3jR&message=Development+of+steampy&amount_local=12&currency=USD&nosavecurrency=true "Donate to this project via Bitcoin")
+
+Donate bitcoin: 3KrB6B5YRQuSEEZ5EVMAQeGa3SLCFZ76T7
 
 `steampy` is a library for Python, inspired by node-steam-tradeoffers, node-steam and other libraries for Node.js.
 It was designed as a simple lightweight library, combining features of many steam libraries from Node.js into a single python module.
