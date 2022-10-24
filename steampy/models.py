@@ -39,6 +39,7 @@ class Currency(enum.IntEnum):
     CHF = 4
     RUB = 5
     UAH = 18
+    AUD = 21
 
 class TradeOfferState(enum.IntEnum):
     Invalid = 1
