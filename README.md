@@ -391,7 +391,7 @@ market methods
 Some games are predefined in `GameOptions` class, such as `GameOptions.DOTA2`, `GameOptions.CS` and `GameOptions.TF2,
 but `GameOptions` object can be constructed with custom parameters.
 
-Currencies are defined in Currency class, currently `Currency.USD`, `Currency.GBP`, `Currency.EURO`, `Currency.CHF`
+Currencies are defined in Currency class, [currently](https://github.com/bukson/steampy#currencies)
 
 Default currency is USD
 
@@ -502,6 +502,59 @@ steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
 buy_order_id = "some_buy_order_id"
 response = steam_client.market.cancel_buy_order(buy_order_id)
 ```
+
+Currencies
+----------
+
+| Currency class | Description                 |
+| ---            | ---                         |
+| Currency.USD   | United States Dollar        |
+| Currency.GBP   | United Kingdom Pound        |
+| Currency.EURO  | European Union Euro         |
+| Currency.CHF   | Swiss Francs                |
+| Currency.RUB   | Russian Rouble              |
+| Currency.PLN   | Polish Złoty                |
+| Currency.BRL   | Brazilian Reals             |
+| Currency.JPY   | Japanese Yen                |
+| Currency.NOK   | Norwegian Krone             |
+| Currency.IDR   | Indonesian Rupiah           |
+| Currency.MYR   | Malaysian Ringgit           |
+| Currency.PHP   | Philippine Peso             |
+| Currency.SGD   | Singapore Dollar            |
+| Currency.THB   | Thai Baht                   |
+| Currency.VND   | Vietnamese Dong             |
+| Currency.KRW   | South Korean Won            |
+| Currency.TRY   | Turkish Lira                |
+| Currency.UAH   | Ukrainian Hryvnia           |
+| Currency.MXN   | Mexican Peso                |
+| Currency.CAD   | Canadian Dollars            |
+| Currency.AUD   | Australian Dollars          |
+| Currency.NZD   | New Zealand Dollar          |
+| Currency.CNY   | Chinese Renminbi (yuan)     |
+| Currency.INR   | Indian Rupee                |
+| Currency.CLP   | Chilean Peso                |
+| Currency.PEN   | Peruvian Sol                |
+| Currency.COP   | Colombian Peso              |
+| Currency.ZAR   | South African Rand          |
+| Currency.HKD   | Hong Kong Dollar            |
+| Currency.TWD   | New Taiwan Dollar           |
+| Currency.SAR   | Saudi Riyal                 |
+| Currency.AED   | United Arab Emirates Dirham |
+| Currency.SEK   | Swedish Krona               |
+| Currency.ARS   | Argentine Peso              |
+| Currency.ILS   | Israeli New Shekel          |
+| Currency.BYN   | Belarusian Ruble            |
+| Currency.KZT   | Kazakhstani Tenge           |
+| Currency.KWD   | Kuwaiti Dinar               |
+| Currency.QAR   | Qatari Riyal                |
+| Currency.CRC   | Costa Rican Colón           |
+| Currency.UYU   | Uruguayan Peso              |
+| Currency.BGN   | Bulgarian Lev               |
+| Currency.HRK   | Croatian Kuna               |
+| Currency.CZK   | Czech Koruna                |
+| Currency.DKK   | Danish Krone                |
+| Currency.HUF   | Hungarian Forint            |
+| Currency.RON   | Romanian Leu                |
 
 guard module functions
 ======================
