@@ -18,6 +18,18 @@ class LoginExecutor:
         self.shared_secret = shared_secret
         self.session = session
 
+    def _api_call(self, method: str, service: str, endpoint: str, version: str = 'v1', params: dict = None) -> Response:
+        url = '/'.join([SteamUrl.API_URL, service, endpoint, version])
+        # all requests from the login page use the same "Referer" and "Origin" values
+        headers = {
+            "Referer": SteamUrl.COMMUNITY_URL + '/',
+            "Origin": SteamUrl.COMMUNITY_URL
+        }
+        if method.upper() == 'GET':
+            return self.session.get(url, params=params, headers=headers)
+        else:
+            return self.session.post(url, data=params, headers=headers)
+
     def login(self) -> Session:
         login_response = self._send_login_request()
         self._check_for_captcha(login_response)
@@ -50,20 +62,22 @@ class LoginExecutor:
                 "domain": domain}
 
     def _fetch_rsa_params(self, current_number_of_repetitions: int = 0) -> dict:
+        request_data = {'account_name': self.username}
+        response = self._api_call('GET', 'IAuthenticationService', 'GetPasswordRSAPublicKey', params=request_data)
+
+        if response.status_code == 200 and 'response' in response.json():
+            key_data = response.json()['response']
+            # Steam may return an empty "response" value even if the status is 200
+            if 'publickey_mod' in key_data and 'publickey_exp' in key_data and 'timestamp' in key_data:
+                rsa_mod = int(key_data['publickey_mod'], 16)
+                rsa_exp = int(key_data['publickey_exp'], 16)
+                return {'rsa_key': PublicKey(rsa_mod, rsa_exp), 'rsa_timestamp': key_data['timestamp']}
+
         maximal_number_of_repetitions = 5
-        key_response = self.session.post(SteamUrl.COMMUNITY_URL + '/login/getrsakey/',
-                                         data={'username': self.username}).json()
-        try:
-            rsa_mod = int(key_response['publickey_mod'], 16)
-            rsa_exp = int(key_response['publickey_exp'], 16)
-            rsa_timestamp = key_response['timestamp']
-            return {'rsa_key': PublicKey(rsa_mod, rsa_exp),
-                    'rsa_timestamp': rsa_timestamp}
-        except KeyError:
-            if current_number_of_repetitions < maximal_number_of_repetitions:
-                return self._fetch_rsa_params(current_number_of_repetitions + 1)
-            else:
-                raise ValueError('Could not obtain rsa-key')
+        if current_number_of_repetitions < maximal_number_of_repetitions:
+            return self._fetch_rsa_params(current_number_of_repetitions + 1)
+
+        raise ApiException('Could not obtain rsa-key. Status code: %s' % response.status_code)
 
     def _encrypt_password(self, rsa_params: dict) -> bytes:
         return b64encode(encrypt(self.password.encode('utf-8'), rsa_params['rsa_key']))
