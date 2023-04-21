@@ -1,22 +1,24 @@
-import base64
-import time
-import requests
+from time import time
+from base64 import b64encode
+
+from rsa import encrypt, PublicKey
+from requests import Session, Response
+
 from steampy import guard
-import rsa
 from steampy.models import SteamUrl
-from steampy.exceptions import InvalidCredentials, CaptchaRequired
+from steampy.exceptions import InvalidCredentials, CaptchaRequired, ApiException
 
 
 class LoginExecutor:
 
-    def __init__(self, username: str, password: str, shared_secret: str, session: requests.Session) -> None:
+    def __init__(self, username: str, password: str, shared_secret: str, session: Session) -> None:
         self.username = username
         self.password = password
         self.one_time_code = ''
         self.shared_secret = shared_secret
         self.session = session
 
-    def login(self) -> requests.Session:
+    def login(self) -> Session:
         login_response = self._send_login_request()
         self._check_for_captcha(login_response)
         login_response = self._enter_steam_guard_if_necessary(login_response)
@@ -25,7 +27,7 @@ class LoginExecutor:
         self.set_sessionid_cookies()
         return self.session
 
-    def _send_login_request(self) -> requests.Response:
+    def _send_login_request(self) -> Response:
         rsa_params = self._fetch_rsa_params()
         encrypted_password = self._encrypt_password(rsa_params)
         rsa_timestamp = rsa_params['rsa_timestamp']
@@ -55,7 +57,7 @@ class LoginExecutor:
             rsa_mod = int(key_response['publickey_mod'], 16)
             rsa_exp = int(key_response['publickey_exp'], 16)
             rsa_timestamp = key_response['timestamp']
-            return {'rsa_key': rsa.PublicKey(rsa_mod, rsa_exp),
+            return {'rsa_key': PublicKey(rsa_mod, rsa_exp),
                     'rsa_timestamp': rsa_timestamp}
         except KeyError:
             if current_number_of_repetitions < maximal_number_of_repetitions:
@@ -63,10 +65,10 @@ class LoginExecutor:
             else:
                 raise ValueError('Could not obtain rsa-key')
 
-    def _encrypt_password(self, rsa_params: dict) -> str:
-        return base64.b64encode(rsa.encrypt(self.password.encode('utf-8'), rsa_params['rsa_key']))
+    def _encrypt_password(self, rsa_params: dict) -> bytes:
+        return b64encode(encrypt(self.password.encode('utf-8'), rsa_params['rsa_key']))
 
-    def _prepare_login_request_data(self, encrypted_password: str, rsa_timestamp: str) -> dict:
+    def _prepare_login_request_data(self, encrypted_password: bytes, rsa_timestamp: str) -> dict:
         return {
             'password': encrypted_password,
             'username': self.username,
@@ -78,22 +80,22 @@ class LoginExecutor:
             'emailsteamid': '',
             'rsatimestamp': rsa_timestamp,
             'remember_login': 'true',
-            'donotcache': str(int(time.time() * 1000))
+            'donotcache': str(int(time() * 1000))
         }
 
     @staticmethod
-    def _check_for_captcha(login_response: requests.Response) -> None:
+    def _check_for_captcha(login_response: Response) -> None:
         if login_response.json().get('captcha_needed', False):
             raise CaptchaRequired('Captcha required')
 
-    def _enter_steam_guard_if_necessary(self, login_response: requests.Response) -> requests.Response:
+    def _enter_steam_guard_if_necessary(self, login_response: Response) -> Response:
         if login_response.json()['requires_twofactor']:
             self.one_time_code = guard.generate_one_time_code(self.shared_secret)
             return self._send_login_request()
         return login_response
 
     @staticmethod
-    def _assert_valid_credentials(login_response: requests.Response) -> None:
+    def _assert_valid_credentials(login_response: Response) -> None:
         if not login_response.json()['success']:
             raise InvalidCredentials(login_response.json()['message'])
 
@@ -104,5 +106,5 @@ class LoginExecutor:
         for url in response_dict['transfer_urls']:
             self.session.post(url, parameters)
 
-    def _fetch_home_page(self, session: requests.Session) -> requests.Response:
+    def _fetch_home_page(self, session: Session) -> Response:
         return session.post(SteamUrl.COMMUNITY_URL + '/my/home/')
