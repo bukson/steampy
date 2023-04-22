@@ -602,7 +602,7 @@ Returns a dictionary with all new sent and received messages:
 Utils methods
 ======================
 
-**calculate_gross_price(price_net: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:
+**calculate_gross_price(price_net: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:**
 
 Calculate the price including the publisher's fee and the Steam fee. Most publishers have a `10%` fee with a minimum 
 fee of `$0.01`. The Steam fee is currently `5%` (with a minimum fee of `$0.01`) and may be increased or decreased by 
@@ -619,7 +619,7 @@ publisher_fee = Decimal('0.1')  # 10%
 calculate_gross_price(Decimal('100'), publisher_fee)     # returns Decimal('115')
 ```
 
-**calculate_net_price(price_gross: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:
+**calculate_net_price(price_gross: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:**
 
 Calculate the price without the publisher's fee and the Steam fee. Most publishers have a `10%` fee with a minimum fee 
 of `$0.01`. The Steam fee is currently `5%` (with a minimum fee of `$0.01`) and may be increased or decreased by Steam 
