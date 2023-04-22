@@ -1,6 +1,7 @@
 import os
 import re
 import copy
+import math
 import struct
 from typing import List
 from decimal import Decimal
@@ -44,6 +45,62 @@ def parse_price(price: str) -> Decimal:
     tokens = re.search(pattern, price, re.UNICODE)
     decimal_str = tokens.group(1) + '.' + tokens.group(3)
     return Decimal(decimal_str)
+
+
+def calculate_gross_price(price_net: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:
+    """Calculate the price including the publisher's fee and the Steam fee.
+
+    Arguments:
+        price_net (Decimal): The amount that the seller receives after a market transaction.
+        publisher_fee (Decimal): The Publisher Fee is a game specific fee that is determined and collected by the game
+            publisher. Most publishers have a `10%` fee - `Decimal('0.10')` with a minimum fee of `$0.01`.
+        steam_fee (Decimal): The Steam Transaction Fee is collected by Steam and is used to protect against nominal
+            fraud incidents and cover the cost of development of this and future Steam economy features. The fee is
+            currently `5%` (with a minimum fee of `$0.01`). This fee may be increased or decreased by Steam in the
+            future.
+    Returns:
+        Decimal: Gross price (including fees) - the amount that the buyer pays during a market transaction
+    """
+    price_net *= 100
+    steam_fee_amount = int(math.floor(max(price_net * steam_fee, 1)))
+    publisher_fee_amount = int(math.floor(max(price_net * publisher_fee, 1)))
+    price_gross = price_net + steam_fee_amount + publisher_fee_amount
+    return Decimal(price_gross) / 100
+
+
+def calculate_net_price(price_gross: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:
+    """Calculate the price without the publisher's fee and the Steam fee.
+
+    Arguments:
+        price_gross (Decimal): The amount that the buyer pays during a market transaction.
+        publisher_fee (Decimal): The Publisher Fee is a game specific fee that is determined and collected by the game
+            publisher. Most publishers have a `10%` fee - `Decimal('0.10')` with a minimum fee of `$0.01`.
+        steam_fee (Decimal): The Steam Transaction Fee is collected by Steam and is used to protect against nominal
+            fraud incidents and cover the cost of development of this and future Steam economy features. The fee is
+            currently `5%` (with a minimum fee of `$0.01`). This fee may be increased or decreased by Steam in the
+            future.
+    Returns:
+        Decimal: Net price (without fees) - the amount that the seller receives after a market transaction.
+    """
+    price_gross *= 100
+    estimated_net_price = Decimal(int(price_gross / (steam_fee + publisher_fee + 1)))
+    estimated_gross_price = calculate_gross_price(estimated_net_price / 100, publisher_fee, steam_fee) * 100
+
+    # since calculate_gross_price has a math.floor, we could be off a cent or two. Let's check:
+    iterations = 0  # shouldn't be needed, but included to be sure nothing unforeseen causes us to get stuck
+    ever_undershot = False
+    while estimated_gross_price != price_gross and iterations < 10:
+        if estimated_gross_price > price_gross:
+            if ever_undershot:
+                break
+            estimated_net_price -= 1
+        else:
+            ever_undershot = True
+            estimated_net_price += 1
+
+        estimated_gross_price = calculate_gross_price(estimated_net_price / 100, publisher_fee, steam_fee) * 100
+        iterations += 1
+    return estimated_net_price / 100
 
 
 def merge_items_with_descriptions_from_inventory(inventory_response: dict, game: GameOptions) -> dict:
