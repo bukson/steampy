@@ -1,14 +1,13 @@
-import decimal
 import os
-
+import re
 import copy
 import struct
-import urllib.parse as urlparse
-import re
-from requests.structures import CaseInsensitiveDict
 from typing import List
+from decimal import Decimal
+from urllib.parse import urlparse, parse_qs
 
 from bs4 import BeautifulSoup, Tag
+from requests.structures import CaseInsensitiveDict
 
 from steampy.models import GameOptions
 
@@ -40,11 +39,11 @@ def steam_id_to_account_id(steam_id: str) -> str:
     return str(struct.unpack('>L', int(steam_id).to_bytes(8, byteorder='big')[4:])[0])
 
 
-def parse_price(price: str) -> decimal.Decimal:
+def parse_price(price: str) -> Decimal:
     pattern = '\D?(\\d*)(\\.|,)?(\\d*)'
     tokens = re.search(pattern, price, re.UNICODE)
     decimal_str = tokens.group(1) + '.' + tokens.group(3)
-    return decimal.Decimal(decimal_str)
+    return Decimal(decimal_str)
 
 
 def merge_items_with_descriptions_from_inventory(inventory_response: dict, game: GameOptions) -> dict:
@@ -74,8 +73,7 @@ def merge_items_with_descriptions_from_offer(offer: dict, descriptions: dict) ->
     return offer
 
 
-def merge_items_with_descriptions_from_listing(listings: dict, ids_to_assets_address: dict,
-                                               descriptions: dict) -> dict:
+def merge_items_with_descriptions_from_listing(listings: dict, ids_to_assets_address: dict, descriptions: dict) -> dict:
     for listing_id, listing in listings.get("sell_listings").items():
         asset_address = ids_to_assets_address[listing_id]
         description = descriptions[asset_address[0]][asset_address[1]][asset_address[2]]
@@ -163,12 +161,12 @@ def get_description_key(item: dict) -> str:
     return item['classid'] + '_' + item['instanceid']
 
 
-def get_key_value_from_url(url: str, key: str, case_sensitive: bool=True) -> str:
-    params = urlparse.urlparse(url).query
+def get_key_value_from_url(url: str, key: str, case_sensitive: bool = True) -> str:
+    params = urlparse(url).query
     if case_sensitive:
-        return urlparse.parse_qs(params)[key][0]
+        return parse_qs(params)[key][0]
     else:
-        return CaseInsensitiveDict(urlparse.parse_qs(params))[key][0]
+        return CaseInsensitiveDict(parse_qs(params))[key][0]
 
 
 def load_credentials():
