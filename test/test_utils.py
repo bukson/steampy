@@ -57,3 +57,19 @@ class TestUtils(TestCase):
         url = 'https://steamcommunity.com/tradeoffer/new/?Partner=aaa&Token=bbb'
         self.assertEqual(utils.get_key_value_from_url(url, 'partner', case_sensitive=False), 'aaa')
         self.assertEqual(utils.get_key_value_from_url(url, 'token', case_sensitive=False), 'bbb')
+
+    def test_calculate_gross_price(self):
+        steam_fee = Decimal('0.05')  # 5%
+        publisher_fee = Decimal('0.1')  # 10%
+
+        self.assertEqual(utils.calculate_gross_price(Decimal('0.01'), publisher_fee, steam_fee), Decimal('0.03'))
+        self.assertEqual(utils.calculate_gross_price(Decimal('0.10'), publisher_fee, steam_fee), Decimal('0.12'))
+        self.assertEqual(utils.calculate_gross_price(Decimal('100'), publisher_fee, steam_fee), Decimal('115'))
+
+    def test_calculate_net_price(self):
+        steam_fee = Decimal('0.05')     # 5%
+        publisher_fee = Decimal('0.1')      # 10%
+
+        self.assertEqual(utils.calculate_net_price(Decimal('0.03'), publisher_fee, steam_fee), Decimal('0.01'))
+        self.assertEqual(utils.calculate_net_price(Decimal('0.12'), publisher_fee, steam_fee), Decimal('0.10'))
+        self.assertEqual(utils.calculate_net_price(Decimal('115'), publisher_fee, steam_fee), Decimal('100'))
