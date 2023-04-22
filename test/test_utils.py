@@ -1,4 +1,4 @@
-import decimal
+from decimal import Decimal
 from unittest import TestCase
 
 from steampy import utils
@@ -10,7 +10,7 @@ class TestUtils(TestCase):
         text = 'var a = "dupadupa";'
         text_between = utils.text_between(text, 'var a = "', '";')
         self.assertEqual(text_between, 'dupadupa')
-        
+
     def test_texts_between(self):
         text = "<li>element 1</li>\n<li>some random element</li>"
         items = []
@@ -31,22 +31,22 @@ class TestUtils(TestCase):
     def test_parse_price_with_currency_symbol(self):
         price = '$11.33 USD'
         decimal_price = utils.parse_price(price)
-        self.assertEqual(decimal_price, decimal.Decimal('11.33'))
+        self.assertEqual(decimal_price, Decimal('11.33'))
 
     def test_parse_price_without_currency_symbol(self):
         price = '11,33 USD'
         decimal_price = utils.parse_price(price)
-        self.assertEqual(decimal_price, decimal.Decimal('11.33'))
+        self.assertEqual(decimal_price, Decimal('11.33'))
 
     def test_parse_price_without_space(self):
         price = '21,37zł'
         decimal_price = utils.parse_price(price)
-        self.assertEqual(decimal_price, decimal.Decimal('21.37'))
+        self.assertEqual(decimal_price, Decimal('21.37'))
 
     def test_parse_price_without_decimal_separator(self):
         price = '2137 CZK'
         decimal_price = utils.parse_price(price)
-        self.assertEqual(decimal_price, decimal.Decimal('2137'))
+        self.assertEqual(decimal_price, Decimal('2137'))
 
     def test_get_key_value_from_url(self):
         url = 'https://steamcommunity.com/tradeoffer/new/?partner=aaa&token=bbb'
