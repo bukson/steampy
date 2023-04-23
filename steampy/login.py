@@ -1,4 +1,5 @@
 from time import time
+from http import HTTPStatus
 from base64 import b64encode
 
 from rsa import encrypt, PublicKey
@@ -65,7 +66,7 @@ class LoginExecutor:
         request_data = {'account_name': self.username}
         response = self._api_call('GET', 'IAuthenticationService', 'GetPasswordRSAPublicKey', params=request_data)
 
-        if response.status_code == 200 and 'response' in response.json():
+        if response.status_code == HTTPStatus.OK and 'response' in response.json():
             key_data = response.json()['response']
             # Steam may return an empty "response" value even if the status is 200
             if 'publickey_mod' in key_data and 'publickey_exp' in key_data and 'timestamp' in key_data:
