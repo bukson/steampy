@@ -3,16 +3,25 @@ import hmac
 import json
 import struct
 from time import time
+from typing import Dict
 from base64 import b64encode, b64decode
 from hashlib import sha1
 
 
-def load_steam_guard(steam_guard: str) -> dict:
+def load_steam_guard(steam_guard: str) -> Dict[str, str]:
+    """Load Steam Guard credentials from json (file or string).
+
+    Arguments:
+        steam_guard (str): If this string is a path to a file, then its contents will be parsed as a json data.
+            Otherwise, the string will be parsed as a json data.
+    Returns:
+        Dict[str, str]: Parsed json data as a dictionary of strings (both key and value).
+    """
     if os.path.isfile(steam_guard):
         with open(steam_guard, 'r') as f:
-            return json.loads(f.read())
+            return json.loads(f.read(), parse_int=str)
     else:
-        return json.loads(steam_guard)
+        return json.loads(steam_guard, parse_int=str)
 
 
 def generate_one_time_code(shared_secret: str, timestamp: int = None) -> str:
