@@ -1,10 +1,9 @@
-import base64
+import os
 import hmac
 import json
 import struct
-import time
-import os
-
+from time import time
+from base64 import b64encode, b64decode
 from hashlib import sha1
 
 
@@ -18,9 +17,9 @@ def load_steam_guard(steam_guard: str) -> dict:
 
 def generate_one_time_code(shared_secret: str, timestamp: int = None) -> str:
     if timestamp is None:
-        timestamp = int(time.time())
+        timestamp = int(time())
     time_buffer = struct.pack('>Q', timestamp // 30)  # pack as Big endian, uint64
-    time_hmac = hmac.new(base64.b64decode(shared_secret), time_buffer, digestmod=sha1).digest()
+    time_hmac = hmac.new(b64decode(shared_secret), time_buffer, digestmod=sha1).digest()
     begin = ord(time_hmac[19:20]) & 0xf
     full_code = struct.unpack('>I', time_hmac[begin:begin + 4])[0] & 0x7fffffff  # unpack as Big endian uint32
     chars = '23456789BCDFGHJKMNPQRTVWXY'
@@ -33,9 +32,9 @@ def generate_one_time_code(shared_secret: str, timestamp: int = None) -> str:
     return code
 
 
-def generate_confirmation_key(identity_secret: str, tag: str, timestamp: int = int(time.time())) -> bytes:
+def generate_confirmation_key(identity_secret: str, tag: str, timestamp: int = int(time())) -> bytes:
     buffer = struct.pack('>Q', timestamp) + tag.encode('ascii')
-    return base64.b64encode(hmac.new(base64.b64decode(identity_secret), buffer, digestmod=sha1).digest())
+    return b64encode(hmac.new(b64decode(identity_secret), buffer, digestmod=sha1).digest())
 
 
 # It works, however it's different that one generated from mobile app
