@@ -76,9 +76,9 @@ class SteamClient:
                  params: dict = None) -> requests.Response:
         url = '/'.join([SteamUrl.API_URL, interface, api_method, version])
         if request_method == 'GET':
-            response = requests.get(url, params=params)
+            response = requests.get(url, params=params, verify=self._session.verify)
         else:
-            response = requests.post(url, data=params)
+            response = requests.post(url, data=params, verify=self._session.verify)
         if self.is_invalid_api_key(response):
             raise InvalidCredentials('Invalid API key')
         return response
