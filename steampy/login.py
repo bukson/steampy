@@ -33,18 +33,18 @@ class LoginExecutor:
         return self.session.post(SteamUrl.COMMUNITY_URL + '/login/dologin', data=request_data)
 
     def set_sessionid_cookies(self):
-        sessionid = self.session.cookies.get_dict()['sessionid']
         community_domain = SteamUrl.COMMUNITY_URL[8:]
         store_domain = SteamUrl.STORE_URL[8:]
-        community_cookie = self._create_session_id_cookie(sessionid, community_domain)
-        store_cookie = self._create_session_id_cookie(sessionid, store_domain)
-        self.session.cookies.set(**community_cookie)
-        self.session.cookies.set(**store_cookie)
-
+        for name in ['sessionid','steamRememberLogin','steamLoginSecure']:
+            cookie = self.session.cookies.get_dict()[name]
+            community_cookie = self._create_cookie(name,cookie, community_domain)
+            store_cookie = self._create_cookie(name,cookie, store_domain)
+            self.session.cookies.set(**community_cookie)
+            self.session.cookies.set(**store_cookie)
     @staticmethod
-    def _create_session_id_cookie(sessionid: str, domain: str) -> dict:
-        return {"name": "sessionid",
-                "value": sessionid,
+    def _create_cookie(name: str, cookie: str, domain: str) -> dict:
+        return {"name": name,
+                "value": cookie,
                 "domain": domain}
 
     def _fetch_rsa_params(self, current_number_of_repetitions: int = 0) -> dict:
