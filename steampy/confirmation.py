@@ -13,6 +13,7 @@ from steampy.login import InvalidCredentials
 
 class Confirmation:
     def __init__(self, _id, data_confid, nonce):
+        self.id = _id
         self.data_confid = data_confid
         self.nonce = nonce
 
