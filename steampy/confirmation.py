@@ -12,8 +12,7 @@ from steampy.login import InvalidCredentials
 
 
 class Confirmation:
-    def __init__(self, _id, data_confid, nonce):
-        self.id = _id
+    def __init__(self, data_confid, nonce):
         self.data_confid = data_confid
         self.nonce = nonce
 
@@ -58,10 +57,9 @@ class ConfirmationExecutor:
         if confirmations_page.status_code == 200:
             confirmations_json = json.loads(confirmations_page.text)
             for conf in confirmations_json['conf']:
-                _id = conf['id']
                 data_confid = conf['id']
                 nonce = conf['nonce']
-                confirmations.append(Confirmation(_id, data_confid, nonce))
+                confirmations.append(Confirmation(data_confid, nonce))
             return confirmations
         else:
             raise ConfirmationExpected
@@ -76,9 +74,9 @@ class ConfirmationExecutor:
         return response
 
     def _fetch_confirmation_details_page(self, confirmation: Confirmation) -> str:
-        tag = 'details' + confirmation.id
+        tag = 'details' + confirmation.data_confid
         params = self._create_confirmation_params(tag)
-        response = self._session.get(self.CONF_URL + '/details/' + confirmation.id, params=params)
+        response = self._session.get(self.CONF_URL + '/details/' + confirmation.data_confid, params=params)
         return response.json()['html']
 
     def _create_confirmation_params(self, tag_string: str) -> dict:
