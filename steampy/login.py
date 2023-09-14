@@ -1,5 +1,4 @@
 from time import time
-from http import HTTPStatus
 from base64 import b64encode
 
 from rsa import encrypt, PublicKey
@@ -7,7 +6,7 @@ from requests import Session, Response
 
 from steampy import guard
 from steampy.models import SteamUrl
-from steampy.exceptions import InvalidCredentials, CaptchaRequired, ApiException
+from steampy.exceptions import InvalidCredentials, CaptchaRequired
 
 
 class LoginExecutor:
@@ -70,7 +69,7 @@ class LoginExecutor:
             rsa_mod = int(key_response['publickey_mod'], 16)
             rsa_exp = int(key_response['publickey_exp'], 16)
             rsa_timestamp = key_response['timestamp']
-            return {'rsa_key': rsa.PublicKey(rsa_mod, rsa_exp),
+            return {'rsa_key': PublicKey(rsa_mod, rsa_exp),
                     'rsa_timestamp': rsa_timestamp}
         except KeyError:
             if current_number_of_repetitions < maximal_number_of_repetitions:
@@ -79,7 +78,7 @@ class LoginExecutor:
                 raise ValueError('Could not obtain rsa-key')
 
     def _encrypt_password(self, rsa_params: dict) -> str:
-        return base64.b64encode(rsa.encrypt(self.password.encode('utf-8'), rsa_params['rsa_key']))
+        return b64encode(rsa.encrypt(self.password.encode('utf-8'), rsa_params['rsa_key']))
 
     def _prepare_login_request_data(self, encrypted_password: str, rsa_timestamp: str) -> dict:
         return {
