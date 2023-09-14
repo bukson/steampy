@@ -28,6 +28,8 @@ Table of Content
 
 * [SteamChat methods](https://github.com/bukson/steampy#steamchat-methods)
 
+* [Utils methods](https://github.com/bukson/steampy#utils-methods)
+
 * [Test](https://github.com/bukson/steampy#test)
 
 * [License](https://github.com/bukson/steampy#license)
@@ -596,6 +598,43 @@ Returns a dictionary with all new sent and received messages:
 ```
 
 `client.chat.fetch_messages()`
+
+Utils methods
+======================
+
+**calculate_gross_price(price_net: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:**
+
+Calculate the price including the publisher's fee and the Steam fee. Most publishers have a `10%` fee with a minimum 
+fee of `$0.01`. The Steam fee is currently `5%` (with a minimum fee of `$0.01`) and may be increased or decreased by 
+Steam in the future.
+
+Returns the amount that the buyer pays during a market transaction:
+
+```python
+from decimal import Decimal
+from steampy.utils import calculate_gross_price
+
+publisher_fee = Decimal('0.1')  # 10%
+
+calculate_gross_price(Decimal('100'), publisher_fee)     # returns Decimal('115')
+```
+
+**calculate_net_price(price_gross: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:**
+
+Calculate the price without the publisher's fee and the Steam fee. Most publishers have a `10%` fee with a minimum fee 
+of `$0.01`. The Steam fee is currently `5%` (with a minimum fee of `$0.01`) and may be increased or decreased by Steam 
+in the future.
+
+Returns the amount that the seller receives after a market transaction:
+
+```python
+from decimal import Decimal
+from steampy.utils import calculate_net_price
+
+publisher_fee = Decimal('0.1')  # 10%
+
+calculate_net_price(Decimal('115'), publisher_fee)     # returns Decimal('100')
+```
 
 Test
 ====
