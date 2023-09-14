@@ -1,5 +1,7 @@
 import os
 import re
+import requests
+import re
 import copy
 import math
 import struct
@@ -11,6 +13,17 @@ from bs4 import BeautifulSoup, Tag
 from requests.structures import CaseInsensitiveDict
 
 from steampy.models import GameOptions
+from steampy.exceptions import ProxyConnectionError, LoginRequired
+
+
+def login_required(func):
+    def func_wrapper(self, *args, **kwargs):
+        if not self.was_login_executed:
+            raise LoginRequired('Use login method first')
+        else:
+            return func(self, *args, **kwargs)
+
+    return func_wrapper
 
 
 def text_between(text: str, begin: str, end: str) -> str:
@@ -200,7 +213,9 @@ def get_buy_orders_from_node(node: Tag) -> dict:
             "order_id": order.attrs["id"].replace("mybuyorder_", ""),
             "quantity": int(qnt_price_raw[0].strip()),
             "price": qnt_price_raw[1].strip(),
-            "item_name": order.a.text
+            "item_name": order.a.text,
+            "icon_url": order.select(f"img[class=market_listing_item_img]")[0].attrs["src"].rsplit('/', 2)[-2],
+            "game_name": order.select("span[class=market_listing_game_name]")[0].text
         }
         buy_orders_dict[order["order_id"]] = order
     return buy_orders_dict
@@ -237,3 +252,10 @@ class Credentials:
         self.login = login
         self.password = password
         self.api_key = api_key
+
+def ping_proxy(proxies: dict):
+    try:
+        requests.get('https://steamcommunity.com/', proxies = proxies)
+        return True
+    except Exception as e:
+        raise ProxyConnectionError("Proxy not working for steamcommunity.com")

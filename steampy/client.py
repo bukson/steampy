@@ -1,5 +1,5 @@
 import decimal
-
+import re
 import bs4
 import urllib.parse as urlparse
 from typing import List, Union
@@ -15,35 +15,72 @@ from steampy.market import SteamMarket
 from steampy.models import Asset, TradeOfferState, SteamUrl, GameOptions
 from steampy.utils import text_between, texts_between, merge_items_with_descriptions_from_inventory, \
     steam_id_to_account_id, merge_items_with_descriptions_from_offers, get_description_key, \
-    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url, parse_price
-
-
-def login_required(func):
-    def func_wrapper(self, *args, **kwargs):
-        if not self.was_login_executed:
-            raise LoginRequired('Use login method first')
-        else:
-            return func(self, *args, **kwargs)
-
-    return func_wrapper
+    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url, parse_price, \
+    ping_proxy, login_required
 
 
 class SteamClient:
-    def __init__(self, api_key: str, username: str = None, password: str = None, steam_guard:str = None) -> None:
+    def __init__(self, api_key: str, username: str = None, password: str = None, steam_guard: str = None,
+                 login_cookies: dict = None, proxies: dict = None) -> None:
         self._api_key = api_key
         self._session = requests.Session()
-        self.steam_guard = steam_guard
+        if proxies:
+            self.set_proxies(proxies)
+        self.steam_guard_string = steam_guard
+        if self.steam_guard_string is not None:
+            self.steam_guard = guard.load_steam_guard(self.steam_guard)
+        else:
+            self.steam_guard = None
         self.was_login_executed = False
         self.username = username
         self._password = password
         self.market = SteamMarket(self._session)
         self.chat = SteamChat(self._session)
+        if login_cookies:
+            self.set_login_cookies(login_cookies)
 
-    def login(self, username: str, password: str, steam_guard: str) -> None:
-        self.steam_guard = guard.load_steam_guard(steam_guard)
-        self.username = username
-        self._password = password
-        LoginExecutor(username, password, self.steam_guard['shared_secret'], self._session).login()
+    def set_proxies(self, proxies: dict) -> dict:
+        if not isinstance(proxies, dict):
+            raise TypeError(
+                'proxy must be a dict. Example: \{"http": "http://login:password@host:port"\, "https": "http://login:password@host:port"\}')
+        proxy_status = ping_proxy(proxies)
+        if proxy_status is True:
+            self._session.proxies.update(proxies)
+        return proxies
+
+    def set_login_cookies(self, cookies: dict) -> None:
+        self._session.cookies.update(cookies)
+        self.was_login_executed = True
+        if self.steam_guard is None:
+            self.steam_guard = {"steam_id": self.get_steam_id()}
+        self.market._set_login_executed(self.steam_guard, self._get_session_id())
+
+    @login_required
+    def get_steam_id(self) -> int:
+        url = SteamUrl.COMMUNITY_URL
+        response = self._session.get(url)
+        steam_id = re.match(r'g_steamID = "(\d+)";', response.text)
+        if steam_id:
+            return int(steam_id.group(1))
+        else:
+            raise ValueError('Invalid steam_id: {}'.format(steam_id))
+
+    def login(self, username: str = None, password: str = None, steam_guard: str = None) -> None:
+        if self.was_login_executed and self.is_session_alive():
+            # session is alive, no need login again
+            return
+
+        if None in [self.username, self._password, self.steam_guard_string] and None in [username, password, steam_guard]:
+            raise InvalidCredentials('You have to pass username, password and steam_guard'
+                                     'parameters when using "login" method')
+
+        if None in [self.username, self._password, self.steam_guard_string]:
+            self.steam_guard_string = steam_guard
+            self.steam_guard = guard.load_steam_guard(steam_guard)
+            self.username = username
+            self._password = password
+
+        LoginExecutor(self.username, self._password, self.steam_guard['shared_secret'], self._session).login()
         self.was_login_executed = True
         self.market._set_login_executed(self.steam_guard, self._get_session_id())
 
@@ -57,10 +94,7 @@ class SteamClient:
         self.was_login_executed = False
 
     def __enter__(self):
-        if None in [self.username, self._password, self.steam_guard]:
-            raise InvalidCredentials('You have to pass username, password and steam_guard'
-                                     'parameters when using "with" statement')
-        self.login(self.username, self._password, self.steam_guard)
+        self.login(self.username, self._password, self.steam_guard_string)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -76,9 +110,9 @@ class SteamClient:
                  params: dict = None) -> requests.Response:
         url = '/'.join([SteamUrl.API_URL, interface, api_method, version])
         if request_method == 'GET':
-            response = requests.get(url, params=params, verify=self._session.verify, auth=self._session.auth)
+            response = self._session.get(url, params=params)
         else:
-            response = requests.post(url, data=params, verify=self._session.verify, auth=self._session.auth)
+            response = self._session.post(url, data=params)
         if self.is_invalid_api_key(response):
             raise InvalidCredentials('Invalid API key')
         return response
@@ -94,7 +128,8 @@ class SteamClient:
         return self.get_partner_inventory(steam_id, game, merge, count)
 
     @login_required
-    def get_partner_inventory(self, partner_steam_id: str, game: GameOptions, merge: bool = True, count: int = 5000) -> dict:
+    def get_partner_inventory(self, partner_steam_id: str, game: GameOptions, merge: bool = True,
+                              count: int = 5000) -> dict:
         url = '/'.join([SteamUrl.COMMUNITY_URL, 'inventory', partner_steam_id, game.app_id, game.context_id])
         params = {'l': 'english',
                   'count': count}
@@ -250,7 +285,7 @@ class SteamClient:
         data = response.json()
         return data['response']['players'][0]
 
-    def get_friend_list(self, steam_id: str, relationship_filter: str="all") -> dict:
+    def get_friend_list(self, steam_id: str, relationship_filter: str = "all") -> dict:
         params = {
             'key': self._api_key,
             'steamid': steam_id,
@@ -288,7 +323,7 @@ class SteamClient:
 
     @login_required
     def make_offer_with_url(self, items_from_me: List[Asset], items_from_them: List[Asset],
-                            trade_offer_url: str, message: str = '', case_sensitive: bool=True) -> dict:
+                            trade_offer_url: str, message: str = '', case_sensitive: bool = True) -> dict:
         token = get_key_value_from_url(trade_offer_url, 'token', case_sensitive)
         partner_account_id = get_key_value_from_url(trade_offer_url, 'partner', case_sensitive)
         partner_steam_id = account_id_to_steam_id(partner_account_id)
