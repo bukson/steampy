@@ -1,16 +1,18 @@
-import decimal
 import os
-
-import copy
-import struct
-import urllib.parse as urlparse
+import requests
 import re
-from requests.structures import CaseInsensitiveDict
+import copy
+import math
+import struct
 from typing import List
+from decimal import Decimal
+from urllib.parse import urlparse, parse_qs
 
 from bs4 import BeautifulSoup, Tag
+from requests.structures import CaseInsensitiveDict
 
 from steampy.models import GameOptions
+from steampy.exceptions import ProxyConnectionError
 
 
 def text_between(text: str, begin: str, end: str) -> str:
@@ -40,11 +42,67 @@ def steam_id_to_account_id(steam_id: str) -> str:
     return str(struct.unpack('>L', int(steam_id).to_bytes(8, byteorder='big')[4:])[0])
 
 
-def parse_price(price: str) -> decimal.Decimal:
+def parse_price(price: str) -> Decimal:
     pattern = '\D?(\\d*)(\\.|,)?(\\d*)'
     tokens = re.search(pattern, price, re.UNICODE)
     decimal_str = tokens.group(1) + '.' + tokens.group(3)
-    return decimal.Decimal(decimal_str)
+    return Decimal(decimal_str)
+
+
+def calculate_gross_price(price_net: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:
+    """Calculate the price including the publisher's fee and the Steam fee.
+
+    Arguments:
+        price_net (Decimal): The amount that the seller receives after a market transaction.
+        publisher_fee (Decimal): The Publisher Fee is a game specific fee that is determined and collected by the game
+            publisher. Most publishers have a `10%` fee - `Decimal('0.10')` with a minimum fee of `$0.01`.
+        steam_fee (Decimal): The Steam Transaction Fee is collected by Steam and is used to protect against nominal
+            fraud incidents and cover the cost of development of this and future Steam economy features. The fee is
+            currently `5%` (with a minimum fee of `$0.01`). This fee may be increased or decreased by Steam in the
+            future.
+    Returns:
+        Decimal: Gross price (including fees) - the amount that the buyer pays during a market transaction
+    """
+    price_net *= 100
+    steam_fee_amount = int(math.floor(max(price_net * steam_fee, 1)))
+    publisher_fee_amount = int(math.floor(max(price_net * publisher_fee, 1)))
+    price_gross = price_net + steam_fee_amount + publisher_fee_amount
+    return Decimal(price_gross) / 100
+
+
+def calculate_net_price(price_gross: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:
+    """Calculate the price without the publisher's fee and the Steam fee.
+
+    Arguments:
+        price_gross (Decimal): The amount that the buyer pays during a market transaction.
+        publisher_fee (Decimal): The Publisher Fee is a game specific fee that is determined and collected by the game
+            publisher. Most publishers have a `10%` fee - `Decimal('0.10')` with a minimum fee of `$0.01`.
+        steam_fee (Decimal): The Steam Transaction Fee is collected by Steam and is used to protect against nominal
+            fraud incidents and cover the cost of development of this and future Steam economy features. The fee is
+            currently `5%` (with a minimum fee of `$0.01`). This fee may be increased or decreased by Steam in the
+            future.
+    Returns:
+        Decimal: Net price (without fees) - the amount that the seller receives after a market transaction.
+    """
+    price_gross *= 100
+    estimated_net_price = Decimal(int(price_gross / (steam_fee + publisher_fee + 1)))
+    estimated_gross_price = calculate_gross_price(estimated_net_price / 100, publisher_fee, steam_fee) * 100
+
+    # since calculate_gross_price has a math.floor, we could be off a cent or two. Let's check:
+    iterations = 0  # shouldn't be needed, but included to be sure nothing unforeseen causes us to get stuck
+    ever_undershot = False
+    while estimated_gross_price != price_gross and iterations < 10:
+        if estimated_gross_price > price_gross:
+            if ever_undershot:
+                break
+            estimated_net_price -= 1
+        else:
+            ever_undershot = True
+            estimated_net_price += 1
+
+        estimated_gross_price = calculate_gross_price(estimated_net_price / 100, publisher_fee, steam_fee) * 100
+        iterations += 1
+    return estimated_net_price / 100
 
 
 def merge_items_with_descriptions_from_inventory(inventory_response: dict, game: GameOptions) -> dict:
@@ -74,8 +132,7 @@ def merge_items_with_descriptions_from_offer(offer: dict, descriptions: dict) ->
     return offer
 
 
-def merge_items_with_descriptions_from_listing(listings: dict, ids_to_assets_address: dict,
-                                               descriptions: dict) -> dict:
+def merge_items_with_descriptions_from_listing(listings: dict, ids_to_assets_address: dict, descriptions: dict) -> dict:
     for listing_id, listing in listings.get("sell_listings").items():
         asset_address = ids_to_assets_address[listing_id]
         description = descriptions[asset_address[0]][asset_address[1]][asset_address[2]]
@@ -145,7 +202,9 @@ def get_buy_orders_from_node(node: Tag) -> dict:
             "order_id": order.attrs["id"].replace("mybuyorder_", ""),
             "quantity": int(qnt_price_raw[0].strip()),
             "price": qnt_price_raw[1].strip(),
-            "item_name": order.a.text
+            "item_name": order.a.text,
+            "icon_url": order.select(f"img[class=market_listing_item_img]")[0].attrs["src"].rsplit('/', 2)[-2],
+            "game_name": order.select("span[class=market_listing_game_name]")[0].text
         }
         buy_orders_dict[order["order_id"]] = order
     return buy_orders_dict
@@ -163,12 +222,12 @@ def get_description_key(item: dict) -> str:
     return item['classid'] + '_' + item['instanceid']
 
 
-def get_key_value_from_url(url: str, key: str, case_sensitive: bool=True) -> str:
-    params = urlparse.urlparse(url).query
+def get_key_value_from_url(url: str, key: str, case_sensitive: bool = True) -> str:
+    params = urlparse(url).query
     if case_sensitive:
-        return urlparse.parse_qs(params)[key][0]
+        return parse_qs(params)[key][0]
     else:
-        return CaseInsensitiveDict(urlparse.parse_qs(params))[key][0]
+        return CaseInsensitiveDict(parse_qs(params))[key][0]
 
 
 def load_credentials():
@@ -182,3 +241,10 @@ class Credentials:
         self.login = login
         self.password = password
         self.api_key = api_key
+
+def ping_proxy(proxies: dict):
+    try:
+        requests.get('https://steamcommunity.com/', proxies = proxies)
+        return True
+    except Exception as e:
+        raise ProxyConnectionError("Proxy not working for steamcommunity.com")
