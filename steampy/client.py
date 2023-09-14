@@ -135,7 +135,7 @@ class SteamClient:
         params = {'l': 'english',
                   'count': count}
         response_dict = self._session.get(url, params=params).json()
-        if response_dict['success'] != 1:
+        if response_dict is None or response_dict.get('success') != 1:
             raise ApiException('Success value should be 1.')
         if merge:
             return merge_items_with_descriptions_from_inventory(response_dict, game)
@@ -255,7 +255,7 @@ class SteamClient:
         url = 'https://steamcommunity.com/tradeoffer/' + trade_offer_id + '/cancel'
         response = self._session.post(url, data={'sessionid': self._get_session_id()}).json()
         return response
-    
+
     @login_required
     def make_offer(self, items_from_me: List[Asset], items_from_them: List[Asset], partner_steam_id: str,
                    message: str = '') -> dict:

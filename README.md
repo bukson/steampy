@@ -3,7 +3,7 @@ Steam Trade Offers Client for Python
 
 [![PayPal Donate Button](https://img.shields.io/badge/donate-paypal-orange.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XC8BMJ8QRD9ZY "Donate to this project via PayPal")
 
-Donate bitcoin: 3KrB6B5YRQuSEEZ5EVMAQeGa3SLCFZ76T7
+Donate bitcoin: 3PRzESHsTVkCFK7osjwFGQLZjSf7qXP1Ta 
 
 `steampy` is a library for Python, inspired by node-steam-tradeoffers, node-steam and other libraries for Node.js.
 It was designed as a simple lightweight library, combining features of many steam libraries from Node.js into a single python module.
@@ -27,6 +27,8 @@ Table of Content
 * [Guard module functions](https://github.com/bukson/steampy#guard-module-functions)
 
 * [SteamChat methods](https://github.com/bukson/steampy#steamchat-methods)
+
+* [Utils methods](https://github.com/bukson/steampy#utils-methods)
 
 * [Test](https://github.com/bukson/steampy#test)
 
@@ -596,6 +598,43 @@ Returns a dictionary with all new sent and received messages:
 ```
 
 `client.chat.fetch_messages()`
+
+Utils methods
+======================
+
+**calculate_gross_price(price_net: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:**
+
+Calculate the price including the publisher's fee and the Steam fee. Most publishers have a `10%` fee with a minimum 
+fee of `$0.01`. The Steam fee is currently `5%` (with a minimum fee of `$0.01`) and may be increased or decreased by 
+Steam in the future.
+
+Returns the amount that the buyer pays during a market transaction:
+
+```python
+from decimal import Decimal
+from steampy.utils import calculate_gross_price
+
+publisher_fee = Decimal('0.1')  # 10%
+
+calculate_gross_price(Decimal('100'), publisher_fee)     # returns Decimal('115')
+```
+
+**calculate_net_price(price_gross: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:**
+
+Calculate the price without the publisher's fee and the Steam fee. Most publishers have a `10%` fee with a minimum fee 
+of `$0.01`. The Steam fee is currently `5%` (with a minimum fee of `$0.01`) and may be increased or decreased by Steam 
+in the future.
+
+Returns the amount that the seller receives after a market transaction:
+
+```python
+from decimal import Decimal
+from steampy.utils import calculate_net_price
+
+publisher_fee = Decimal('0.1')  # 10%
+
+calculate_net_price(Decimal('115'), publisher_fee)     # returns Decimal('100')
+```
 
 Test
 ====

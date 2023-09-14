@@ -48,42 +48,40 @@ class LoginExecutor:
         return self.session.post(SteamUrl.COMMUNITY_URL + '/login/dologin', data=request_data)
 
     def set_sessionid_cookies(self):
-        sessionid = self.session.cookies.get_dict()['sessionid']
         community_domain = SteamUrl.COMMUNITY_URL[8:]
         store_domain = SteamUrl.STORE_URL[8:]
-        community_cookie = self._create_session_id_cookie(sessionid, community_domain)
-        store_cookie = self._create_session_id_cookie(sessionid, store_domain)
-        self.session.cookies.set(**community_cookie)
-        self.session.cookies.set(**store_cookie)
-
+        for name in ['sessionid','steamRememberLogin','steamLoginSecure']:
+            cookie = self.session.cookies.get_dict()[name]
+            community_cookie = self._create_cookie(name,cookie, community_domain)
+            store_cookie = self._create_cookie(name,cookie, store_domain)
+            self.session.cookies.set(**community_cookie)
+            self.session.cookies.set(**store_cookie)
     @staticmethod
-    def _create_session_id_cookie(sessionid: str, domain: str) -> dict:
-        return {"name": "sessionid",
-                "value": sessionid,
+    def _create_cookie(name: str, cookie: str, domain: str) -> dict:
+        return {"name": name,
+                "value": cookie,
                 "domain": domain}
 
     def _fetch_rsa_params(self, current_number_of_repetitions: int = 0) -> dict:
-        request_data = {'account_name': self.username}
-        response = self._api_call('GET', 'IAuthenticationService', 'GetPasswordRSAPublicKey', params=request_data)
-
-        if response.status_code == HTTPStatus.OK and 'response' in response.json():
-            key_data = response.json()['response']
-            # Steam may return an empty "response" value even if the status is 200
-            if 'publickey_mod' in key_data and 'publickey_exp' in key_data and 'timestamp' in key_data:
-                rsa_mod = int(key_data['publickey_mod'], 16)
-                rsa_exp = int(key_data['publickey_exp'], 16)
-                return {'rsa_key': PublicKey(rsa_mod, rsa_exp), 'rsa_timestamp': key_data['timestamp']}
-
         maximal_number_of_repetitions = 5
-        if current_number_of_repetitions < maximal_number_of_repetitions:
-            return self._fetch_rsa_params(current_number_of_repetitions + 1)
+        key_response = self.session.post(SteamUrl.COMMUNITY_URL + '/login/getrsakey/',
+                                         data={'username': self.username}).json()
+        try:
+            rsa_mod = int(key_response['publickey_mod'], 16)
+            rsa_exp = int(key_response['publickey_exp'], 16)
+            rsa_timestamp = key_response['timestamp']
+            return {'rsa_key': rsa.PublicKey(rsa_mod, rsa_exp),
+                    'rsa_timestamp': rsa_timestamp}
+        except KeyError:
+            if current_number_of_repetitions < maximal_number_of_repetitions:
+                return self._fetch_rsa_params(current_number_of_repetitions + 1)
+            else:
+                raise ValueError('Could not obtain rsa-key')
 
-        raise ApiException('Could not obtain rsa-key. Status code: %s' % response.status_code)
+    def _encrypt_password(self, rsa_params: dict) -> str:
+        return base64.b64encode(rsa.encrypt(self.password.encode('utf-8'), rsa_params['rsa_key']))
 
-    def _encrypt_password(self, rsa_params: dict) -> bytes:
-        return b64encode(encrypt(self.password.encode('utf-8'), rsa_params['rsa_key']))
-
-    def _prepare_login_request_data(self, encrypted_password: bytes, rsa_timestamp: str) -> dict:
+    def _prepare_login_request_data(self, encrypted_password: str, rsa_timestamp: str) -> dict:
         return {
             'password': encrypted_password,
             'username': self.username,
