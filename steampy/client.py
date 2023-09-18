@@ -7,9 +7,8 @@ from typing import List, Union
 import json
 import requests
 from steampy import guard
-from steampy.chat import SteamChat
 from steampy.confirmation import ConfirmationExecutor
-from steampy.exceptions import SevenDaysHoldException, LoginRequired, ApiException
+from steampy.exceptions import SevenDaysHoldException, ApiException
 from steampy.login import LoginExecutor, InvalidCredentials
 from steampy.market import SteamMarket
 from steampy.models import Asset, TradeOfferState, SteamUrl, GameOptions
@@ -35,7 +34,6 @@ class SteamClient:
         self.username = username
         self._password = password
         self.market = SteamMarket(self._session)
-        self.chat = SteamChat(self._session)
         if login_cookies:
             self.set_login_cookies(login_cookies)
 
