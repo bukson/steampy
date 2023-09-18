@@ -37,6 +37,7 @@ Table of Content
 Installation
 ============
 
+Requires python 3.8 at least
 ```
 pip install steampy
 ```
