@@ -4,7 +4,7 @@ import sys
 if not sys.version_info[0] == 3 and sys.version_info[1] < 8:
     sys.exit('Python < 3.8 is not supported')
 
-version = '1.0'
+version = '1.0.1'
 
 setup(
     name='steampy',
