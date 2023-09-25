@@ -22,7 +22,7 @@ class SteamMarket:
         self._session_id = session_id
         self.was_login_executed = True
 
-    def fetch_price(self, item_hash_name: str, game: GameOptions, currency: str = Currency.USD, country='PL') -> dict:
+    def fetch_price(self, item_hash_name: str, game: GameOptions, currency: Currency = Currency.USD, country='PL') -> dict:
         url = SteamUrl.COMMUNITY_URL + '/market/priceoverview/'
         params = {'country': country,
                   'currency': currency.value,

@@ -77,7 +77,7 @@ class SteamClient:
             self.steam_guard = guard.load_steam_guard(steam_guard)
             self.username = username
             self._password = password
-
+        self._session.cookies.set("steamRememberLogin", 'true')
         LoginExecutor(self.username, self._password, self.steam_guard['shared_secret'], self._session).login()
         self.was_login_executed = True
         self.market._set_login_executed(self.steam_guard, self._get_session_id())
