@@ -64,9 +64,6 @@ class SteamClient:
             raise ValueError('Invalid steam_id: {}'.format(steam_id))
 
     def login(self, username: str = None, password: str = None, steam_guard: str = None) -> None:
-        if self.was_login_executed and self.is_session_alive():
-            # session is alive, no need login again
-            return
 
         if None in [self.username, self._password, self.steam_guard_string] and None in [username, password, steam_guard]:
             raise InvalidCredentials('You have to pass username, password and steam_guard'
@@ -77,6 +74,11 @@ class SteamClient:
             self.steam_guard = guard.load_steam_guard(steam_guard)
             self.username = username
             self._password = password
+            
+        if self.was_login_executed and self.is_session_alive():
+            # session is alive, no need login again
+            return
+        
         self._session.cookies.set("steamRememberLogin", 'true')
         LoginExecutor(self.username, self._password, self.steam_guard['shared_secret'], self._session).login()
         self.was_login_executed = True
