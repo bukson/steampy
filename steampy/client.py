@@ -27,7 +27,7 @@ class SteamClient:
             self.set_proxies(proxies)
         self.steam_guard_string = steam_guard
         if self.steam_guard_string is not None:
-            self.steam_guard = guard.load_steam_guard(self.steam_guard)
+            self.steam_guard = guard.load_steam_guard(self.steam_guard_string)
         else:
             self.steam_guard = None
         self.was_login_executed = False
@@ -71,10 +71,10 @@ class SteamClient:
 
         if None in [self.username, self._password, self.steam_guard_string]:
             self.steam_guard_string = steam_guard
-            self.steam_guard = guard.load_steam_guard(steam_guard)
+            self.steam_guard = guard.load_steam_guard(self.steam_guard_string)
             self.username = username
             self._password = password
-            
+
         if self.was_login_executed and self.is_session_alive():
             # session is alive, no need login again
             return
