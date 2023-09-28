@@ -17,6 +17,11 @@ class TestSteamClient(TestCase):
         dirname = os.path.dirname(os.path.abspath(__file__))
         cls.steam_guard_file = dirname + '/../secrets/Steamguard.txt'
 
+    def test_get_steam_id(self):
+        client = SteamClient(self.credentials.api_key)
+        client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
+        self.assertTrue(client.get_steam_id() == int(self.steam_guard_file["Session"]["SteamID"]))
+
     def test_login(self):
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)

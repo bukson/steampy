@@ -57,7 +57,7 @@ class SteamClient:
     def get_steam_id(self) -> int:
         url = SteamUrl.COMMUNITY_URL
         response = self._session.get(url)
-        steam_id = re.match(r'g_steamID = "(\d+)";', response.text)
+        steam_id = re.search(r'g_steamID = "(\d+)";', response.text)
         if steam_id:
             return int(steam_id.group(1))
         else:
