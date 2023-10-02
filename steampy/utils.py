@@ -54,6 +54,7 @@ def steam_id_to_account_id(steam_id: str) -> str:
 
 
 def parse_price(price: str) -> Decimal:
+    price = price.replace(' ', '')
     pattern = '\D?(\\d*)(\\.|,)?(\\d*)'
     tokens = re.search(pattern, price, re.UNICODE)
     decimal_str = tokens.group(1) + '.' + tokens.group(3)
