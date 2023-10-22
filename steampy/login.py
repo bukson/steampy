@@ -28,9 +28,9 @@ class LoginExecutor:
             "Origin": SteamUrl.COMMUNITY_URL
         }
         if method.upper() == 'GET':
-            return self.session.get(url, params=params, headers=headers)
+            return self.session.get(url, params = params, headers = headers)
         elif method.upper() == 'POST':
-            return self.session.post(url, data=params, headers=headers)
+            return self.session.post(url, data = params, headers = headers)
         else:
             raise ValueError('Method must be either GET or POST')
 
@@ -50,17 +50,18 @@ class LoginExecutor:
         encrypted_password = self._encrypt_password(rsa_params)
         rsa_timestamp = rsa_params['rsa_timestamp']
         request_data = self._prepare_login_request_data(encrypted_password, rsa_timestamp)
-        return self._api_call('POST', 'IAuthenticationService', 'BeginAuthSessionViaCredentials', params=request_data)
+        return self._api_call('POST', 'IAuthenticationService', 'BeginAuthSessionViaCredentials', params = request_data)
 
     def set_sessionid_cookies(self):
         community_domain = SteamUrl.COMMUNITY_URL[8:]
         store_domain = SteamUrl.STORE_URL[8:]
-        for name in ['sessionid','steamRememberLogin','steamLoginSecure']:
+        for name in ['sessionid', 'steamRememberLogin', 'steamLoginSecure']:
             cookie = self.session.cookies.get_dict()[name]
-            community_cookie = self._create_cookie(name,cookie, community_domain)
-            store_cookie = self._create_cookie(name,cookie, store_domain)
+            community_cookie = self._create_cookie(name, cookie, community_domain)
+            store_cookie = self._create_cookie(name, cookie, store_domain)
             self.session.cookies.set(**community_cookie)
             self.session.cookies.set(**store_cookie)
+
     @staticmethod
     def _create_cookie(name: str, cookie: str, domain: str) -> dict:
         return {"name": name,
@@ -70,7 +71,7 @@ class LoginExecutor:
     def _fetch_rsa_params(self, current_number_of_repetitions: int = 0) -> dict:
         self.session.post(SteamUrl.COMMUNITY_URL)
         request_data = {'account_name': self.username}
-        response = self._api_call('GET', 'IAuthenticationService', 'GetPasswordRSAPublicKey', params=request_data)
+        response = self._api_call('GET', 'IAuthenticationService', 'GetPasswordRSAPublicKey', params = request_data)
 
         if response.status_code == HTTPStatus.OK and 'response' in response.json():
             key_data = response.json()['response']
@@ -96,7 +97,6 @@ class LoginExecutor:
             'account_name': self.username,
             'encryption_timestamp': rsa_timestamp,
         }
-
 
     @staticmethod
     def _check_for_captcha(login_response: Response) -> None:
@@ -138,7 +138,8 @@ class LoginExecutor:
             'code_type': code_type,
             'code': code
         }
-        response = self._api_call('POST', 'IAuthenticationService', 'UpdateAuthSessionWithSteamGuardCode', params=update_data)
+        response = self._api_call('POST', 'IAuthenticationService', 'UpdateAuthSessionWithSteamGuardCode',
+                                  params = update_data)
         if response.status_code == 200:
             self._pool_sessions_steam(client_id, request_id)
             return True
@@ -150,7 +151,7 @@ class LoginExecutor:
             'client_id': client_id,
             'request_id': request_id
         }
-        response = self._api_call('POST', 'IAuthenticationService', 'PollAuthSessionStatus', params=pool_data)
+        response = self._api_call('POST', 'IAuthenticationService', 'PollAuthSessionStatus', params = pool_data)
         self.refresh_token = response.json()["response"]["refresh_token"]
 
     def _finallize_login(self):
