@@ -8,6 +8,7 @@ from requests import Session, Response
 from steampy import guard
 from steampy.models import SteamUrl
 from steampy.exceptions import InvalidCredentials, CaptchaRequired, ApiException
+from steampy.utils import create_cookie
 
 
 class LoginExecutor:
@@ -40,7 +41,7 @@ class LoginExecutor:
             raise ApiException('No response received from Steam API. Please try again later.')
         self._check_for_captcha(login_response)
         self._update_steam_guard(login_response)
-        finallized_response = self._finallize_login()
+        finallized_response = self._finalize_login()
         self._perform_redirects(finallized_response.json())
         self.set_sessionid_cookies()
         return self.session
@@ -57,16 +58,10 @@ class LoginExecutor:
         store_domain = SteamUrl.STORE_URL[8:]
         for name in ['steamLoginSecure', 'sessionid', 'steamRefresh_steam', 'steamCountry']:
             cookie = self.session.cookies.get_dict()[name]
-            community_cookie = self._create_cookie(name, cookie, community_domain)
-            store_cookie = self._create_cookie(name, cookie, store_domain)
+            community_cookie = create_cookie(name, cookie, community_domain)
+            store_cookie = create_cookie(name, cookie, store_domain)
             self.session.cookies.set(**community_cookie)
             self.session.cookies.set(**store_cookie)
-
-    @staticmethod
-    def _create_cookie(name: str, cookie: str, domain: str) -> dict:
-        return {"name": name,
-                "value": cookie,
-                "domain": domain}
 
     def _fetch_rsa_params(self, current_number_of_repetitions: int = 0) -> dict:
         self.session.post(SteamUrl.COMMUNITY_URL)
@@ -125,7 +120,7 @@ class LoginExecutor:
     def _fetch_home_page(self, session: Session) -> Response:
         return session.post(SteamUrl.COMMUNITY_URL + '/my/home/')
 
-    def _update_steam_guard(self, login_response: Response) -> bool:
+    def _update_steam_guard(self, login_response: Response) -> None:
         client_id = login_response.json()["response"]["client_id"]
         steamid = login_response.json()["response"]["steamid"]
         request_id = login_response.json()["response"]["request_id"]
@@ -142,11 +137,10 @@ class LoginExecutor:
                                   params = update_data)
         if response.status_code == 200:
             self._pool_sessions_steam(client_id, request_id)
-            return True
         else:
             raise Exception('Cannot update steam guard')
 
-    def _pool_sessions_steam(self, client_id, request_id):
+    def _pool_sessions_steam(self, client_id: str, request_id: str) -> None:
         pool_data = {
             'client_id': client_id,
             'request_id': request_id
@@ -154,14 +148,13 @@ class LoginExecutor:
         response = self._api_call('POST', 'IAuthenticationService', 'PollAuthSessionStatus', params = pool_data)
         self.refresh_token = response.json()["response"]["refresh_token"]
 
-    def _finallize_login(self):
+    def _finalize_login(self) -> Response:
         sessionid = self.session.cookies["sessionid"]
-        redir = "https://steamcommunity.com/login/home/?goto="
-
-        finallez_data = {
+        redir = SteamUrl.COMMUNITY_URL + '/login/home/?goto='
+        finalized_data = {
             'nonce': self.refresh_token,
             'sessionid': sessionid,
             'redir': redir
         }
-        response = self.session.post("https://login.steampowered.com/jwt/finalizelogin", data = finallez_data)
+        response = self.session.post(SteamUrl.LOGIN_URL + '/jwt/finalizelogin', data = finalized_data)
         return response
