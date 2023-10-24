@@ -100,6 +100,7 @@ class SteamUrl:
     API_URL = "https://api.steampowered.com"
     COMMUNITY_URL = "https://steamcommunity.com"
     STORE_URL = 'https://store.steampowered.com'
+    LOGIN_URL = 'https://login.steampowered.com'
 
 
 class Endpoints:
