@@ -57,7 +57,7 @@ def parse_price(price: str) -> Decimal:
     pattern = '\D?(\\d*)(\\.|,)?(\\d*)'
     tokens = re.search(pattern, price, re.UNICODE)
     decimal_str = tokens.group(1) + '.' + tokens.group(3)
-    return Decimal(decimal_str)
+    return Decimal(decimal_str)/100
 
 
 def calculate_gross_price(price_net: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:
