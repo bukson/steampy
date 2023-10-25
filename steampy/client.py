@@ -66,7 +66,7 @@ class SteamClient:
     def login(self, username: str = None, password: str = None, steam_guard: str = None) -> None:
 
         if None in [self.username, self._password, self.steam_guard_string] and None in [username, password, steam_guard]:
-            raise InvalidCredentials('You have to pass username, password and steam_guard'
+            raise InvalidCredentials('You have to pass username, password and steam_guard '
                                      'parameters when using "login" method')
 
         if None in [self.username, self._password, self.steam_guard_string]:
