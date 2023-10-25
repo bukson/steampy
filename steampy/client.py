@@ -3,6 +3,7 @@ import re
 import bs4
 import urllib.parse as urlparse
 from typing import List, Union
+from decimal import Decimal
 
 import json
 import requests
@@ -14,7 +15,7 @@ from steampy.market import SteamMarket
 from steampy.models import Asset, TradeOfferState, SteamUrl, GameOptions
 from steampy.utils import text_between, texts_between, merge_items_with_descriptions_from_inventory, \
     steam_id_to_account_id, merge_items_with_descriptions_from_offers, get_description_key, \
-    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url, parse_price, \
+    merge_items_with_descriptions_from_offer, account_id_to_steam_id, get_key_value_from_url, \
     ping_proxy, login_required
 
 
@@ -364,11 +365,11 @@ class SteamClient:
             raise LoginRequired
         if on_hold:
             if convert_to_decimal:
-                return parse_price(str(bal_dict['wallet_delayed_balance']))
+                return Decimal(bal_dict['wallet_delayed_balance']) / 100
             else:
                 return bal_dict['wallet_delayed_balance']
         else:
             if convert_to_decimal:
-                return parse_price(str(bal_dict['wallet_balance']))
+                return Decimal(bal_dict['wallet_balance']) / 100
             else:
                 return bal_dict['wallet_balance']
