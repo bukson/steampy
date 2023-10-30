@@ -442,8 +442,8 @@ Inventory items can be merged like in `SteamClient.get_my_inventory` method
 
 **get_wallet_balance(convert_to_decimal: bool = True, on_hold: bool = False) -> Union[str, float]**
 
-Check account balance of steam acccount. It uses `parse_price` method from utils
-to covnert money string to Decimal if `convert_to_decimal` is set to `True`. Otherwise, it will return the value without a decimal point.
+Check account balance of steam acccount. It converts money string to Decimal if `convert_to_decimal` is set to `True`, 
+otherwise, it will return the value string without a decimal point.
 If the `on_hold` parameter is set to `True`, it will return the current on-hold balance value.
 
 Example:
