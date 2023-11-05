@@ -3,12 +3,13 @@ import re
 import bs4
 import urllib.parse as urlparse
 from typing import List, Union
+from decimal import Decimal
 
 import json
 import requests
 from steampy import guard
 from steampy.confirmation import ConfirmationExecutor
-from steampy.exceptions import SevenDaysHoldException, ApiException
+from steampy.exceptions import SevenDaysHoldException, ApiException, LoginRequired
 from steampy.login import LoginExecutor, InvalidCredentials
 from steampy.market import SteamMarket
 from steampy.models import Asset, TradeOfferState, SteamUrl, GameOptions
@@ -353,12 +354,17 @@ class SteamClient:
         return SteamUrl.COMMUNITY_URL + '/tradeoffer/' + trade_offer_id
 
     @login_required
-    def get_wallet_balance(self, convert_to_decimal: bool = True) -> Union[str, decimal.Decimal]:
-        url = SteamUrl.STORE_URL + '/account/history/'
-        response = self._session.get(url)
-        response_soup = bs4.BeautifulSoup(response.text, "html.parser")
-        balance = response_soup.find(id='header_wallet_balance').string
-        if convert_to_decimal:
-            return parse_price(balance)
+    # If convert_to_decimal = False, the price will be returned WITHOUT a decimal point.
+    def get_wallet_balance(self, convert_to_decimal: bool = True, on_hold: bool = False) -> Union[str, decimal.Decimal]:
+        response = self._session.get("%s/market" % SteamUrl.COMMUNITY_URL)
+        wallet_info_match = re.search(r'var g_rgWalletInfo = (.*?);', response.text)
+        if wallet_info_match:
+            balance_dict_str = wallet_info_match.group(1)
+            balance_dict = json.loads(balance_dict_str)
         else:
-            return balance
+            raise Exception("Unable to get wallet balance string match")
+        balance_dict_key = 'wallet_delayed_balance' if on_hold else 'wallet_balance'
+        if convert_to_decimal:
+            return Decimal(balance_dict[balance_dict_key]) / 100
+        else:
+            return balance_dict[balance_dict_key]

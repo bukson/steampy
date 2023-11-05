@@ -53,13 +53,6 @@ def steam_id_to_account_id(steam_id: str) -> str:
     return str(struct.unpack('>L', int(steam_id).to_bytes(8, byteorder = 'big')[4:])[0])
 
 
-def parse_price(price: str) -> Decimal:
-    pattern = '\D?(\\d*)(\\.|,)?(\\d*)'
-    tokens = re.search(pattern, price, re.UNICODE)
-    decimal_str = tokens.group(1) + '.' + tokens.group(3)
-    return Decimal(decimal_str)
-
-
 def calculate_gross_price(price_net: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:
     """Calculate the price including the publisher's fee and the Steam fee.
 
