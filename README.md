@@ -70,7 +70,7 @@ User can also provide login_cookies from browser to log in by cookies.
 from steampy.client import SteamClient
 
 login_cookies = {} # provide dict with cookies
-steam_client = SteamClient('MY_API_KEY',login_cookies=login_cookies)
+steam_client = SteamClient('MY_API_KEY',username='MY_USERNAME',login_cookies=login_cookies)
 assert steam_client.was_login_executed
 ```
 
@@ -148,7 +148,7 @@ Set login cookies, can be used instead of normal `login` method.
 from steampy.client import SteamClient
 
 login_cookies = {} # provide dict with cookies
-steam_client = SteamClient('MY_API_KEY',login_cookies=login_cookies)
+steam_client = SteamClient('MY_API_KEY',username='MY_USERNAME',login_cookies=login_cookies)
 assert steam_client.was_login_executed
 ```
 
