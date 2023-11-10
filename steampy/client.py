@@ -75,7 +75,7 @@ class SteamClient:
         self.was_login_executed = True
 
         if self.steam_guard is None:
-            self.steam_guard = {'steam_id': self.get_steam_id()}
+            self.steam_guard = {'steamid': str(self.get_steam_id())}
 
         self.market._set_login_executed(self.steam_guard, self._get_session_id())
 
