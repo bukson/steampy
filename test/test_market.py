@@ -1,12 +1,13 @@
 import os
 from unittest import TestCase
+import unittest
 
 from steampy.client import SteamClient
 from steampy.exceptions import TooManyRequests
 from steampy.models import GameOptions, Currency
 from steampy.utils import load_credentials
 
-
+@unittest.skip('Requires secrets/Steamguard.txt')
 class TestMarket(TestCase):
     @classmethod
     def setUpClass(cls):
