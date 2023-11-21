@@ -47,10 +47,34 @@ class SteamMarket:
 
         return response.json()
 
+    def fetch_item_orders_histogram(
+        self, item_nameid: str, currency: Currency = Currency.USD, country='PL', language='english'
+    ) -> dict:
+        url = f'{SteamUrl.COMMUNITY_URL}/market/itemordershistogram'
+        params = {
+            'country': country,
+            'language': language,
+            'currency': currency.value,
+            'item_nameid': item_nameid,
+            'two_factor': '0'
+        }
+
+        response = self._session.get(url, params=params)
+        if response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
+            raise TooManyRequests("You can fetch maximum 20 prices in 60s period")
+
+        return response.json()
+
     @login_required
-    def fetch_price_history(self, item_hash_name: str, game: GameOptions) -> dict:
+    def fetch_price_history(
+        self, item_hash_name: str, game: GameOptions, country='PL'
+    ) -> dict:
         url = f'{SteamUrl.COMMUNITY_URL}/market/pricehistory/'
-        params = {'country': 'PL', 'appid': game.app_id, 'market_hash_name': item_hash_name}
+        params = {
+            'country': country,
+            'appid': game.app_id,
+            'market_hash_name': item_hash_name
+        }
 
         response = self._session.get(url, params=params)
         if response.status_code == HTTPStatus.TOO_MANY_REQUESTS:

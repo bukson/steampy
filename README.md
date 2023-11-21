@@ -1,58 +1,54 @@
-Steam Trade Offers Client for Python
-=======
+# Steam Trade Offers Client for Python
 
 [![PayPal Donate Button](https://img.shields.io/badge/donate-paypal-orange.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XC8BMJ8QRD9ZY "Donate to this project via PayPal")
 
-Donate bitcoin: 3PRzESHsTVkCFK7osjwFGQLZjSf7qXP1Ta 
+Donate bitcoin: 3PRzESHsTVkCFK7osjwFGQLZjSf7qXP1Ta
 
 `steampy` is a library for Python, inspired by node-steam-tradeoffers, node-steam and other libraries for Node.js.
 It was designed as a simple lightweight library, combining features of many steam libraries from Node.js into a single python module.
 `steampy` is capable of logging into steam, fetching trade offers and handling them in simple manner, using steam user credentials
-and SteamGuard file, or by passing sessionID and webCookie cookies. 
+and SteamGuard file, or by passing sessionID and webCookie cookies.
 'steampy' is also capable of using proxies.
 `steampy` is developed with Python 3 using type hints and many other features its supported for Windows, Linux and MacOs.
 
-Table of Content
-================
+# Table of Content
 
-* [Installation](https://github.com/bukson/steampy#installation)
+- [Installation](https://github.com/bukson/steampy#installation)
 
-* [Usage](https://github.com/bukson/steampy#usage)
+- [Usage](https://github.com/bukson/steampy#usage)
 
-* [Examples](https://github.com/bukson/steampy#examples)
+- [Examples](https://github.com/bukson/steampy#examples)
 
-* [SteamClient methods](https://github.com/bukson/steampy#steamclient-methods)
+- [SteamClient methods](https://github.com/bukson/steampy#steamclient-methods)
 
-* [Market methods](https://github.com/bukson/steampy#market-methods)
+- [Market methods](https://github.com/bukson/steampy#market-methods)
 
-* [Guard module functions](https://github.com/bukson/steampy#guard-module-functions)
+- [Guard module functions](https://github.com/bukson/steampy#guard-module-functions)
 
-* [Utils methods](https://github.com/bukson/steampy#utils-methods)
+- [Utils methods](https://github.com/bukson/steampy#utils-methods)
 
-* [Test](https://github.com/bukson/steampy#test)
+- [Test](https://github.com/bukson/steampy#test)
 
-* [License](https://github.com/bukson/steampy#license)
+- [License](https://github.com/bukson/steampy#license)
 
-
-Installation
-============
+# Installation
 
 Requires python 3.8 at least
+
 ```
 pip install steampy
 ```
 
-Usage
-=======
+# Usage
+
 [Obtaining API Key](http://steamcommunity.com/dev/apikey)
 
-[Obtaining SteamGuard from mobile device]( https://github.com/SteamTimeIdler/stidler/wiki/Getting-your-%27shared_secret%27-code-for-use-with-Auto-Restarter-on-Mobile-Authentication )
+[Obtaining SteamGuard from mobile device](https://github.com/SteamTimeIdler/stidler/wiki/Getting-your-%27shared_secret%27-code-for-use-with-Auto-Restarter-on-Mobile-Authentication)
 
-[Obtaining SteamGuard using Android emulation]( https://github.com/codepath/android_guides/wiki/Genymotion-2.0-Emulators-with-Google-Play-support)
+[Obtaining SteamGuard using Android emulation](https://github.com/codepath/android_guides/wiki/Genymotion-2.0-Emulators-with-Google-Play-support)
 
-** __init__(self, api_key: str, username: str = None, password: str = None, steam_guard: str = None,
-                 login_cookies: dict = None, proxies: dict = None) -> None:**
-
+\*\* **init**(self, api_key: str, username: str = None, password: str = None, steam_guard: str = None,
+login_cookies: dict = None, proxies: dict = None) -> None:\*\*
 
 SteamClient needs at least api_key to provide some functionalities. User can also provide username, password
 and SteamGuard file to be able to log in and use more methods. Proxies are also supported.
@@ -80,7 +76,7 @@ assert steam_client.was_login_executed
 from steampy.client import SteamClient
 
 proxies =  {
-    "http": "http://login:password@host:port", 
+    "http": "http://login:password@host:port",
     "https": "http://login:password@host:port"
 }
 
@@ -88,9 +84,8 @@ steam_client = SteamClient('MY_API_KEY', proxies=proxies)
 
 ```
 
-
-
 If you have `steamid`, `shared_secret` and `identity_secret` you can place it in file `Steamguard.txt` instead of fetching SteamGuard file from device.
+
 ```python
 {
     "steamid": "YOUR_STEAM_ID_64",
@@ -99,10 +94,9 @@ If you have `steamid`, `shared_secret` and `identity_secret` you can place it in
 }
 ```
 
-Examples
-========
+# Examples
 
-You'll need to obtain your API key and SteamGuard file in order to run the examples, 
+You'll need to obtain your API key and SteamGuard file in order to run the examples,
 and then fill login and password in `storehose.py` file.
 The `storehouse.py` file contains an example of handling incoming trade offers.
 
@@ -118,22 +112,20 @@ The `desktop_authenticator.py` file contains examples of generating such one tim
 python desktop_authenticator.py
 ```
 
-
-SteamClient methods
-===================
+# SteamClient methods
 
 Unless specified in documentation, the method does not require login to work(it uses API Key from constructor instead)
 
 **def set_proxy(self, proxy: dict) -> dict**
 
-Set proxy for steampy session, example: 
+Set proxy for steampy session, example:
 
 ```python
 from steampy.client import SteamClient
 
 steam_client = SteamClient('MY_API_KEY')
 proxies =  {
-    "http": "http://login:password@host:port", 
+    "http": "http://login:password@host:port",
     "https": "http://login:password@host:port"
 }
 steam_client.set_proxies(proxies)
@@ -227,8 +219,8 @@ steam_client = SteamClient('MY_API_KEY')
 params = {'key': 'MY_API_KEY'}
 summaries =  steam_client.api_call('GET', 'IEconService', 'GetTradeOffersSummary', 'v1', params).json()
 ```
-**get_trade_offers_summary() -> dict**
 
+**get_trade_offers_summary() -> dict**
 
 **get_trade_offers(merge: bool = True) -> dict**
 
@@ -245,14 +237,12 @@ and descriptions merged with data are value.
 
 **get_trade_offer(trade_offer_id: str, merge: bool = True) -> dict**
 
-
 **get_trade_receipt(trade_id: str) -> list**
 
 Using `SteamClient.login` method is required before usage
 Getting the receipt for a trade with all item information after the items has been traded.
 Do NOT store any item ids before you got the receipt since the ids may change.
 "trade_id" can be found in trade offers: `offer['response']['offer']['tradeid']`. Do not use ´tradeofferid´.
-
 
 **make_offer(items_from_me: List[Asset], items_from_them: List[Asset], partner_steam_id: str, message:str ='') -> dict**
 
@@ -442,14 +432,15 @@ Inventory items can be merged like in `SteamClient.get_my_inventory` method
 
 **get_wallet_balance(convert_to_decimal: bool = True, on_hold: bool = False) -> Union[str, float]**
 
-Check account balance of steam acccount. It converts money string to Decimal if `convert_to_decimal` is set to `True`, 
+Check account balance of steam acccount. It converts money string to Decimal if `convert_to_decimal` is set to `True`,
 otherwise, it will return the value string without a decimal point.
 If the `on_hold` parameter is set to `True`, it will return the current on-hold balance value.
 
 Example:
+
 ```python
 from steampy.client import SteamClient
-from decimal import Decimal 
+from decimal import Decimal
 with SteamClient('MY_API_KEY', 'MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE') as client:
             wallet_balance = client.get_wallet_balance()
             on_hold_wallet_balance = client.get_wallet_balance(on_hold = True)
@@ -457,17 +448,16 @@ with SteamClient('MY_API_KEY', 'MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD
             assert type(on_hold_wallet_balance) == Decimal
 ```
 
-market methods
-==============
+# market methods
 
 **fetch_price(item_hash_name: str, game: GameOptions, currency: str = Currency.USD) -> dict**
 
-Some games are predefined in `GameOptions` class, such as `GameOptions.DOTA2`, `GameOptions.CS` and `GameOptions.TF2,
+Some games are predefined in `GameOptions` class, such as `GameOptions.DOTA2`, `GameOptions.CS` and `GameOptions.TF2`,
 but `GameOptions` object can be constructed with custom parameters.
 
 Currencies are defined in Currency class, [currently](https://github.com/bukson/steampy#currencies)
 
-Default currency is USD
+Default currency is USD.
 
 May rise `TooManyRequests` exception if used more than 20 times in 60 seconds.
 
@@ -481,11 +471,33 @@ price = steam_client.market.fetch_price(item, game=GameOptions.CS)
 # price == {'volume': '208', 'lowest_price': '$11.30 USD', 'median_price': '$11.33 USD', 'success': True}
 ```
 
+**fetch_item_orders_histogram(item_nameid: str, currency: Currency = Currency.USD, country='PL', language='english') -> dict**
+
+Given a item_nameid, it will return an order histogram.
+
+Currencies are defined in Currency class, [currently](https://github.com/bukson/steampy#currencies)
+
+Default currency is USD.
+
+May rise `TooManyRequests` exception if used more than 20 times in 60 seconds.
+
+```python
+from steampy.client import SteamClient
+from steampy.models import GameOptions, Currency
+
+steam_client = SteamClient('API_KEY')
+item_id = '1'
+item_orders_histogram = steam_client.market.fetch_item_orders_histogram(item_id, Currency.EURO)
+
+# item_orders_histogram == {'buy_order_graph': [[]], 'buy_order_summary: 'html', 'buy_order_table: 'html', 'graph_max_x': 1.85, 'graph_max_y': 100000, 'graph_min_x': 0.03, 'highest_buy_order': "93", 'lowest_sell_order': "94", 'price_prefix': "", 'price_suffix': "€", 'sell_order_graph': [[]], 'sell_order_summary': 'html', 'sell_order_table': 'html', 'success': True}
+```
+
 **fetch_price_history(item_hash_name: str, game: GameOptions) -> dict**
 
 Using `SteamClient.login` method is required before usage
 
 Returns list of price history of and item.
+
 ```python
 from steampy.client import SteamClient
 from steampy.models import GameOptions
@@ -512,7 +524,6 @@ with SteamClient('MY_API_KEY', 'MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD
     listings = client.market.get_my_market_listings()
 ```
 
-
 **create_sell_order(assetid: str, game: GameOptions, money_to_receive: str) -> dict**
 
 Using `SteamClient.login` method is required before usage
@@ -528,7 +539,7 @@ with SteamClient('MY_API_KEY', 'MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD
     game = GameOptions.DOTA2
     sell_response = client.market.create_sell_order(asset_id_to_sell, game, "10000")
 ```
- 
+
 ⚠️ `money_to_receive` has to be in cents, so "100.00" should be passed has "10000"
 
 **create_buy_order(market_name: str, price_single_item: str, quantity: int, game: GameOptions, currency: Currency = Currency.USD) -> dict**
@@ -545,6 +556,7 @@ with SteamClient('MY_API_KEY', 'MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD
     response = client.market.create_buy_order("AK-47 | Redline (Field-Tested)", "1034", 2, GameOptions.CS, Currency.EURO)
     buy_order_id = response["buy_orderid"]
 ```
+
 ⚠️ `price_single_item` has to be in cents, so "10.34" should be passed has "1034"
 
 **buy_item(market_name: str, market_id: str, price: int, fee: int, game: GameOptions, currency: Currency = Currency.USD) -> dict**
@@ -591,11 +603,10 @@ with SteamClient('MY_API_KEY', 'MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD
     response = client.market.cancel_buy_order(buy_order_id)
 ```
 
-Currencies
-----------
+## Currencies
 
 | Currency class | Description                 |
-| ---            | ---                         |
+| -------------- | --------------------------- |
 | Currency.USD   | United States Dollar        |
 | Currency.GBP   | United Kingdom Pound        |
 | Currency.EURO  | European Union Euro         |
@@ -644,8 +655,7 @@ Currencies
 | Currency.HUF   | Hungarian Forint            |
 | Currency.RON   | Romanian Leu                |
 
-guard module functions
-======================
+# guard module functions
 
 **load_steam_guard(steam_guard: str) -> dict**
 
@@ -658,17 +668,15 @@ If none timestamp provided, timestamp will be set to current time.
 
 **generate_confirmation_key(identity_secret: str, tag: str, timestamp: int = int(time.time())) -> bytes**
 
-Generate mobile device confirmation key for accepting trade offer. 
+Generate mobile device confirmation key for accepting trade offer.
 Default timestamp is current time.
 
-
-Utils methods
-======================
+# Utils methods
 
 **calculate_gross_price(price_net: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:**
 
-Calculate the price including the publisher's fee and the Steam fee. Most publishers have a `10%` fee with a minimum 
-fee of `$0.01`. The Steam fee is currently `5%` (with a minimum fee of `$0.01`) and may be increased or decreased by 
+Calculate the price including the publisher's fee and the Steam fee. Most publishers have a `10%` fee with a minimum
+fee of `$0.01`. The Steam fee is currently `5%` (with a minimum fee of `$0.01`) and may be increased or decreased by
 Steam in the future.
 
 Returns the amount that the buyer pays during a market transaction:
@@ -684,8 +692,8 @@ calculate_gross_price(Decimal('100'), publisher_fee)     # returns Decimal('115'
 
 **calculate_net_price(price_gross: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:**
 
-Calculate the price without the publisher's fee and the Steam fee. Most publishers have a `10%` fee with a minimum fee 
-of `$0.01`. The Steam fee is currently `5%` (with a minimum fee of `$0.01`) and may be increased or decreased by Steam 
+Calculate the price without the publisher's fee and the Steam fee. Most publishers have a `10%` fee with a minimum fee
+of `$0.01`. The Steam fee is currently `5%` (with a minimum fee of `$0.01`) and may be increased or decreased by Steam
 in the future.
 
 Returns the amount that the seller receives after a market transaction:
@@ -699,10 +707,9 @@ publisher_fee = Decimal('0.1')  # 10%
 calculate_net_price(Decimal('115'), publisher_fee)     # returns Decimal('100')
 ```
 
-Test
-====
+# Test
 
-All public methods are documented and tested. 
+All public methods are documented and tested.
 `guard` module has unit tests, `client` uses an acceptance test.
 For the acceptance test you have to put `credentials.pwd` and `Steamguard` file into `test` directory
 
@@ -719,8 +726,7 @@ You can do it by `SteamClient.get_trade_offers` or by logging manually into stea
 In some tests you also have to obtain partner steam id.
 You can do it by logging manually into steam account in browser and get it from url
 
-License
-=======
+# License
 
 MIT License
 
