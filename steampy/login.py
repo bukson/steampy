@@ -1,3 +1,6 @@
+"""
+Provides Login in Steam functions
+"""
 from http import HTTPStatus
 from base64 import b64encode
 

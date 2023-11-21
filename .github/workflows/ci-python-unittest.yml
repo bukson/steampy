@@ -5,7 +5,7 @@ on:
     branches: [master]
 
 jobs:
-  unittest:
+  ci-python-unittest:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -23,4 +23,4 @@ jobs:
       - name: Unit tests
         run: |
           pip install .
-          python -m unittest discover -s ./test  -p 'test_*.py'
+          python -m unittest discover -s ./test -p 'test_*.py'

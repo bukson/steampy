@@ -1,3 +1,6 @@
+"""
+Provides utility functions
+"""
 import os
 import re
 import copy
@@ -24,7 +27,6 @@ def login_required(func):
 
     return func_wrapper
 
-
 def text_between(text: str, begin: str, end: str) -> str:
     start = text.index(begin) + len(begin)
     end = text.index(end, start)
@@ -42,6 +44,7 @@ def texts_between(text: str, begin: str, end: str):
             return
 
 
+
 def account_id_to_steam_id(account_id: str) -> str:
     first_bytes = int(account_id).to_bytes(4, byteorder='big')
     last_bytes = 0x1100001.to_bytes(4, byteorder='big')
@@ -53,18 +56,20 @@ def steam_id_to_account_id(steam_id: str) -> str:
 
 
 def calculate_gross_price(price_net: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:
-    """Calculate the price including the publisher's fee and the Steam fee.
+    """
+    Calculate the price including the publisher's fee and the Steam fee.
 
-    Arguments:
-        price_net (Decimal): The amount that the seller receives after a market transaction.
-        publisher_fee (Decimal): The Publisher Fee is a game specific fee that is determined and collected by the game
-            publisher. Most publishers have a `10%` fee - `Decimal('0.10')` with a minimum fee of `$0.01`.
-        steam_fee (Decimal): The Steam Transaction Fee is collected by Steam and is used to protect against nominal
-            fraud incidents and cover the cost of development of this and future Steam economy features. The fee is
-            currently `5%` (with a minimum fee of `$0.01`). This fee may be increased or decreased by Steam in the
-            future.
-    Returns:
-        Decimal: Gross price (including fees) - the amount that the buyer pays during a market transaction
+    @param price_net (Decimal): The amount that the seller receives after a market transaction.
+    @param publisher_fee (Decimal): The Publisher Fee is a game specific fee that is determined and collected by the game
+    publisher. Most publishers have a 10% fee - Decimal('0.10') with a minimum fee of $0.01.
+
+    @param steam_fee (Decimal): The Steam Transaction Fee is collected by Steam and is used to protect against nominal
+    fraud incidents and cover the cost of development of this and future Steam economy features. The fee is
+    currently 5% (with a minimum fee of $0.01). This fee may be increased or decreased by Steam in the
+    future.
+
+    @return: Decimal: Gross price (including fees) - the amount that the buyer pays during a market transaction.
+
     """
     price_net *= 100
     steam_fee_amount = int(math.floor(max(price_net * steam_fee, 1)))
@@ -74,18 +79,18 @@ def calculate_gross_price(price_net: Decimal, publisher_fee: Decimal, steam_fee:
 
 
 def calculate_net_price(price_gross: Decimal, publisher_fee: Decimal, steam_fee: Decimal = Decimal('0.05')) -> Decimal:
-    """Calculate the price without the publisher's fee and the Steam fee.
+    """
+    Calculate the price without the publisher's fee and the Steam fee.
 
-    Arguments:
-        price_gross (Decimal): The amount that the buyer pays during a market transaction.
-        publisher_fee (Decimal): The Publisher Fee is a game specific fee that is determined and collected by the game
-            publisher. Most publishers have a `10%` fee - `Decimal('0.10')` with a minimum fee of `$0.01`.
-        steam_fee (Decimal): The Steam Transaction Fee is collected by Steam and is used to protect against nominal
-            fraud incidents and cover the cost of development of this and future Steam economy features. The fee is
-            currently `5%` (with a minimum fee of `$0.01`). This fee may be increased or decreased by Steam in the
-            future.
-    Returns:
-        Decimal: Net price (without fees) - the amount that the seller receives after a market transaction.
+    @param price_gross (Decimal): The amount that the buyer pays during a market transaction.
+    @param publisher_fee (Decimal): The Publisher Fee is a game specific fee that is determined and collected by the game
+    publisher. Most publishers have a 10% fee - Decimal('0.10') with a minimum fee of $0.01.
+    @param steam_fee (Decimal): The Steam Transaction Fee is collected by Steam and is used to protect against nominal
+    fraud incidents and cover the cost of development of this and future Steam economy features. The fee is
+    currently 5% (with a minimum fee of $0.01). This fee may be increased or decreased by Steam in the
+    future.
+
+    @return: Decimal: Net price (without fees) - the amount that the seller receives after a market transaction.
     """
     price_gross *= 100
     estimated_net_price = Decimal(int(price_gross / (steam_fee + publisher_fee + 1)))

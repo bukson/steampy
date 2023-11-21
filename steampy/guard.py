@@ -1,3 +1,6 @@
+"""
+Provides Steam Guard functions
+"""
 import os
 import hmac
 import json

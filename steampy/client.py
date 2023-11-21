@@ -1,3 +1,6 @@
+"""
+Provides interactions with Steam
+"""
 import re
 import bs4
 import json

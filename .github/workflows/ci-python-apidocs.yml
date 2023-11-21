@@ -1,0 +1,42 @@
+name: ci-python-apidocs
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  ci-python-apidocs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+
+      - name: Install requirements for documentation generation
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install docutils pydoctor
+
+      - name: Generate API documentation with pydoctor
+        run: |
+          pydoctor \
+              --project-name=steampy \
+              --project-url=https://github.com/$GITHUB_REPOSITORY \
+              --html-viewsource-base=https://github.com/$GITHUB_REPOSITORY/tree/$GITHUB_SHA \
+              --make-html \
+              --html-output=./apidocs \
+              --project-base-dir="$(pwd)" \
+              --docformat=restructuredtext \
+              --intersphinx=https://docs.python.org/3/objects.inv \
+              ./steampy
+
+      - name: Push API documentation to Github Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apidocs
+          commit_message: "Generate API documentation"

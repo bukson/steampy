@@ -1,3 +1,6 @@
+"""
+Provides exceptions handled in Steam
+"""
 class SevenDaysHoldException(Exception):
     pass
 

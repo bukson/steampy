@@ -1,3 +1,6 @@
+"""
+Provides Steam Market functions
+"""
 import json
 import urllib.parse
 from decimal import Decimal

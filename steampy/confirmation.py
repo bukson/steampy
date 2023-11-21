@@ -1,3 +1,6 @@
+"""
+Provides Confirmation handler to deal with Steam request (mostly trade and sell)
+"""
 import enum
 import json
 import time
