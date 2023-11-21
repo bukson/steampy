@@ -1,3 +1,4 @@
+import os
 from decimal import Decimal
 from unittest import TestCase
 
@@ -52,3 +53,27 @@ class TestUtils(TestCase):
         self.assertEqual(utils.calculate_net_price(Decimal('0.03'), publisher_fee, steam_fee), Decimal('0.01'))
         self.assertEqual(utils.calculate_net_price(Decimal('0.12'), publisher_fee, steam_fee), Decimal('0.10'))
         self.assertEqual(utils.calculate_net_price(Decimal('115'), publisher_fee, steam_fee), Decimal('100'))
+
+    def test_calculate_net_price_file(self):
+        steam_fee = Decimal('0.05')  # 5%
+        publisher_fee = Decimal('0.1')  # 10%
+
+        dirname = os.path.dirname(os.path.abspath(__file__))
+        csgo_market_selling_eff_taxes = dirname + "/data/csgo-market-selling-effective-taxes.txt"
+
+        with open(csgo_market_selling_eff_taxes, "r") as csgo_market_selling_eff_taxes_file:
+            lines = [line.rstrip() for line in csgo_market_selling_eff_taxes_file]
+
+        lines.pop(0)
+
+        previous_price = Decimal('0')
+
+        for line in lines:
+            x = line.split(",")
+
+            if previous_price == Decimal(x[1]):
+                continue
+
+            self.assertEqual(utils.calculate_net_price(Decimal(x[0]), publisher_fee, steam_fee), Decimal(x[1]))
+            self.assertEqual(utils.calculate_gross_price(Decimal(x[1]), publisher_fee, steam_fee), Decimal(x[0]))
+            previous_price = Decimal(x[1])
