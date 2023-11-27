@@ -41,7 +41,7 @@ class TestUtils(TestCase):
 
         assert utils.calculate_gross_price(Decimal('0.01'), publisher_fee, steam_fee) == Decimal('0.03')
         assert utils.calculate_gross_price(Decimal('0.10'), publisher_fee, steam_fee) == Decimal('0.12')
-        assert utils.calculate_gross_price(Decimal('100'), publisher_fee, steam_fee) == Decimal('115')
+        assert utils.calculate_gross_price(Decimal(100), publisher_fee, steam_fee) == Decimal(115)
 
     def test_calculate_net_price(self):
         steam_fee = Decimal('0.05')  # 5%
@@ -49,4 +49,4 @@ class TestUtils(TestCase):
 
         assert utils.calculate_net_price(Decimal('0.03'), publisher_fee, steam_fee) == Decimal('0.01')
         assert utils.calculate_net_price(Decimal('0.12'), publisher_fee, steam_fee) == Decimal('0.10')
-        assert utils.calculate_net_price(Decimal('115'), publisher_fee, steam_fee) == Decimal('100')
+        assert utils.calculate_net_price(Decimal(115), publisher_fee, steam_fee) == Decimal(100)
