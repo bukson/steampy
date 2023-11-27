@@ -1,13 +1,18 @@
+from __future__ import annotations
+
 from base64 import b64encode
 from http import HTTPStatus
+from typing import TYPE_CHECKING
 
-from requests import Response, Session
 from rsa import PublicKey, encrypt
 
 from steampy import guard
 from steampy.exceptions import ApiException, CaptchaRequired, InvalidCredentials
 from steampy.models import SteamUrl
 from steampy.utils import create_cookie
+
+if TYPE_CHECKING:
+    from requests import Response, Session
 
 
 class LoginExecutor:

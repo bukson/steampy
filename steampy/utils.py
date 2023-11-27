@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 import copy
 import math
 import re
 import struct
 from decimal import Decimal
 from pathlib import Path
+from typing import TYPE_CHECKING
 from urllib.parse import parse_qs, urlparse
 
 import requests
@@ -11,7 +14,9 @@ from bs4 import BeautifulSoup, Tag
 from requests.structures import CaseInsensitiveDict
 
 from steampy.exceptions import LoginRequired, ProxyConnectionError
-from steampy.models import GameOptions
+
+if TYPE_CHECKING:
+    from steampy.models import GameOptions
 
 
 def login_required(func):

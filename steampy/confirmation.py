@@ -1,14 +1,19 @@
+from __future__ import annotations
+
 import enum
 import json
 import time
 from http import HTTPStatus
+from typing import TYPE_CHECKING
 
-import requests
 from bs4 import BeautifulSoup
 
 from steampy import guard
 from steampy.exceptions import ConfirmationExpected
 from steampy.login import InvalidCredentials
+
+if TYPE_CHECKING:
+    import requests
 
 
 class Confirmation:
