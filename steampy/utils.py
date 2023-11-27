@@ -248,13 +248,13 @@ def load_credentials():
 
 
 class Credentials:
-    def __init__(self, login: str, password: str, api_key: str):
+    def __init__(self, login: str, password: str, api_key: str) -> None:
         self.login = login
         self.password = password
         self.api_key = api_key
 
 
-def ping_proxy(proxies: dict):
+def ping_proxy(proxies: dict) -> bool:
     try:
         requests.get('https://steamcommunity.com/', proxies=proxies)
         return True
