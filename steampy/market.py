@@ -7,14 +7,14 @@ from requests import Session
 
 from steampy.confirmation import ConfirmationExecutor
 from steampy.exceptions import ApiException, TooManyRequests
-from steampy.models import Currency, SteamUrl, GameOptions
+from steampy.models import Currency, GameOptions, SteamUrl
 from steampy.utils import (
-    text_between,
     get_listing_id_to_assets_address_from_html,
     get_market_listings_from_html,
-    merge_items_with_descriptions_from_listing,
     get_market_sell_listings_from_api,
     login_required,
+    merge_items_with_descriptions_from_listing,
+    text_between,
 )
 
 

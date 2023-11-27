@@ -1,11 +1,11 @@
-import os
 import hmac
 import json
+import os
 import struct
+from base64 import b64decode, b64encode
+from hashlib import sha1
 from time import time
 from typing import Dict
-from hashlib import sha1
-from base64 import b64encode, b64decode
 
 
 def load_steam_guard(steam_guard: str) -> Dict[str, str]:

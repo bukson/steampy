@@ -1,12 +1,13 @@
 import os
+import unittest
 from decimal import Decimal
 from unittest import TestCase
-import unittest
 
 from steampy.client import SteamClient
 from steampy.exceptions import LoginRequired
-from steampy.models import GameOptions, Asset
+from steampy.models import Asset, GameOptions
 from steampy.utils import account_id_to_steam_id, load_credentials
+
 
 @unittest.skip('Requires secrets/Steamguard.txt')
 class TestSteamClient(TestCase):

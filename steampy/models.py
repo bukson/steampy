@@ -1,5 +1,5 @@
-from enum import IntEnum
 from collections import namedtuple
+from enum import IntEnum
 
 
 class GameOptions:

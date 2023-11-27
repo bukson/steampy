@@ -1,18 +1,18 @@
-import os
-import re
 import copy
 import math
+import os
+import re
 import struct
-from typing import List
 from decimal import Decimal
-from urllib.parse import urlparse, parse_qs
+from typing import List
+from urllib.parse import parse_qs, urlparse
 
 import requests
 from bs4 import BeautifulSoup, Tag
 from requests.structures import CaseInsensitiveDict
 
+from steampy.exceptions import LoginRequired, ProxyConnectionError
 from steampy.models import GameOptions
-from steampy.exceptions import ProxyConnectionError, LoginRequired
 
 
 def login_required(func):

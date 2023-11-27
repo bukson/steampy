@@ -2,7 +2,6 @@ import time
 
 from steampy.client import SteamClient, TradeOfferState
 
-
 # Set API key
 api_key = ''
 # Set path to SteamGuard file
