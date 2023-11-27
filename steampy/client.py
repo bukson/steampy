@@ -136,7 +136,7 @@ class SteamClient:
     def api_call(
         self, method: str, interface: str, api_method: str, version: str, params: dict | None = None,
     ) -> requests.Response:
-        url = '/'.join((SteamUrl.API_URL, interface, api_method, version))
+        url = f'{SteamUrl.API_URL}/{interface}/{api_method}/{version}'
         response = self._session.get(url, params=params) if method == 'GET' else self._session.post(url, data=params)
 
         if self.is_invalid_api_key(response):
@@ -158,7 +158,7 @@ class SteamClient:
     def get_partner_inventory(
         self, partner_steam_id: str, game: GameOptions, merge: bool = True, count: int = 5000,
     ) -> dict:
-        url = '/'.join((SteamUrl.COMMUNITY_URL, 'inventory', partner_steam_id, game.app_id, game.context_id))
+        url = f'{SteamUrl.COMMUNITY_URL}/inventory/{partner_steam_id}/{game.app_id}/{game.context_id}'
         params = {'l': 'english', 'count': count}
 
         response_dict = self._session.get(url, params=params).json()
