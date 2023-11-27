@@ -12,9 +12,7 @@ class TestUtils(TestCase):
 
     def test_texts_between(self):
         text = '<li>element 1</li>\n<li>some random element</li>'
-        items = []
-        for el in utils.texts_between(text, '<li>', '</li>'):
-            items.append(el)
+        items = list(utils.texts_between(text, '<li>', '</li>'))
         assert items == ['element 1', 'some random element']
 
     def test_account_id_to_steam_id(self):
