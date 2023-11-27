@@ -60,7 +60,7 @@ class SteamClient:
         if not isinstance(proxies, dict):
             raise TypeError(
                 'Proxy must be a dict. Example: '
-                '\{"http": "http://login:password@host:port"\, "https": "http://login:password@host:port"\}',
+                r'\{"http": "http://login:password@host:port"\, "https": "http://login:password@host:port"\}',
             )
 
         if ping_proxy(proxies):

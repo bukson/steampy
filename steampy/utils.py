@@ -180,7 +180,7 @@ def get_market_listings_from_html(html: str) -> dict:
 
 
 def get_sell_listings_from_node(node: Tag) -> dict:
-    sell_listings_raw = node.findAll('div', {'id': re.compile('mylisting_\d+')})
+    sell_listings_raw = node.findAll('div', {'id': re.compile(r'mylisting_\d+')})
     sell_listings_dict = {}
 
     for listing_raw in sell_listings_raw:
@@ -224,7 +224,7 @@ def get_buy_orders_from_node(node: Tag) -> dict:
 
 def get_listing_id_to_assets_address_from_html(html: str) -> dict:
     listing_id_to_assets_address = {}
-    regex = "CreateItemHoverFromContainer\( [\w]+, 'mylisting_([\d]+)_[\w]+', ([\d]+), '([\d]+)', '([\d]+)', [\d]+ \);"
+    regex = r"CreateItemHoverFromContainer\( [\w]+, 'mylisting_([\d]+)_[\w]+', ([\d]+), '([\d]+)', '([\d]+)', [\d]+ \);"
 
     for match in re.findall(regex, html):
         listing_id_to_assets_address[match[0]] = [str(match[1]), match[2], match[3]]
