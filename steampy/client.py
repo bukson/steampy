@@ -235,14 +235,12 @@ class SteamClient:
             'include_failed': include_failed,
             'include_total': include_total,
         }
-        response = self.api_call('GET', 'IEconService', 'GetTradeHistory', 'v1', params).json()
-        return response
+        return self.api_call('GET', 'IEconService', 'GetTradeHistory', 'v1', params).json()
 
     @login_required
     def get_trade_receipt(self, trade_id: str):
         html = self._session.get(f'https://steamcommunity.com/trade/{trade_id}/receipt').content.decode()
-        items = [json.loads(item) for item in texts_between(html, 'oItem = ', ';\r\n\toItem')]
-        return items
+        return [json.loads(item) for item in texts_between(html, 'oItem = ', ';\r\n\toItem')]
 
     @login_required
     def accept_trade_offer(self, trade_offer_id: str) -> dict:
@@ -286,13 +284,11 @@ class SteamClient:
 
     def decline_trade_offer(self, trade_offer_id: str) -> dict:
         url = f'https://steamcommunity.com/tradeoffer/{trade_offer_id}/decline'
-        response = self._session.post(url, data={'sessionid': self._get_session_id()}).json()
-        return response
+        return self._session.post(url, data={'sessionid': self._get_session_id()}).json()
 
     def cancel_trade_offer(self, trade_offer_id: str) -> dict:
         url = f'https://steamcommunity.com/tradeoffer/{trade_offer_id}/cancel'
-        response = self._session.post(url, data={'sessionid': self._get_session_id()}).json()
-        return response
+        return self._session.post(url, data={'sessionid': self._get_session_id()}).json()
 
     @login_required
     def make_offer(
