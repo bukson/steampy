@@ -121,7 +121,7 @@ class LoginExecutor:
 
         update_data = {'client_id': client_id, 'steamid': steamid, 'code_type': code_type, 'code': code}
         response = self._api_call(
-            'POST', 'IAuthenticationService', 'UpdateAuthSessionWithSteamGuardCode', params=update_data
+            'POST', 'IAuthenticationService', 'UpdateAuthSessionWithSteamGuardCode', params=update_data,
         )
         if response.status_code == HTTPStatus.OK:
             self._pool_sessions_steam(client_id, request_id)

@@ -62,7 +62,7 @@ class SteamClient:
         if not isinstance(proxies, dict):
             raise TypeError(
                 'Proxy must be a dict. Example: '
-                '\{"http": "http://login:password@host:port"\, "https": "http://login:password@host:port"\}'
+                '\{"http": "http://login:password@host:port"\, "https": "http://login:password@host:port"\}',
             )
 
         if ping_proxy(proxies):
@@ -94,7 +94,7 @@ class SteamClient:
 
         if invalid_client_credentials_is_present and invalid_login_credentials_is_present:
             raise InvalidCredentials(
-                'You have to pass username, password and steam_guard parameters when using "login" method'
+                'You have to pass username, password and steam_guard parameters when using "login" method',
             )
 
         if invalid_client_credentials_is_present:
@@ -136,7 +136,7 @@ class SteamClient:
         return steam_login.lower() in main_page_response.text.lower()
 
     def api_call(
-        self, method: str, interface: str, api_method: str, version: str, params: dict = None
+        self, method: str, interface: str, api_method: str, version: str, params: dict = None,
     ) -> requests.Response:
         url = '/'.join((SteamUrl.API_URL, interface, api_method, version))
         response = self._session.get(url, params=params) if method == 'GET' else self._session.post(url, data=params)
@@ -158,7 +158,7 @@ class SteamClient:
 
     @login_required
     def get_partner_inventory(
-        self, partner_steam_id: str, game: GameOptions, merge: bool = True, count: int = 5000
+        self, partner_steam_id: str, game: GameOptions, merge: bool = True, count: int = 5000,
     ) -> dict:
         url = '/'.join((SteamUrl.COMMUNITY_URL, 'inventory', partner_steam_id, game.app_id, game.context_id))
         params = {'l': 'english', 'count': count}
@@ -198,10 +198,10 @@ class SteamClient:
         offers_sent = offers_response['response'].get('trade_offers_sent', [])
 
         offers_response['response']['trade_offers_received'] = list(
-            filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active, offers_received)
+            filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active, offers_received),
         )
         offers_response['response']['trade_offers_sent'] = list(
-            filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active, offers_sent)
+            filter(lambda offer: offer['trade_offer_state'] == TradeOfferState.Active, offers_sent),
         )
 
         return offers_response
@@ -282,7 +282,7 @@ class SteamClient:
 
     def _confirm_transaction(self, trade_offer_id: str) -> dict:
         confirmation_executor = ConfirmationExecutor(
-            self.steam_guard['identity_secret'], self.steam_guard['steamid'], self._session
+            self.steam_guard['identity_secret'], self.steam_guard['steamid'], self._session,
         )
         return confirmation_executor.send_trade_allow_request(trade_offer_id)
 
@@ -298,7 +298,7 @@ class SteamClient:
 
     @login_required
     def make_offer(
-        self, items_from_me: List[Asset], items_from_them: List[Asset], partner_steam_id: str, message: str = ''
+        self, items_from_me: List[Asset], items_from_them: List[Asset], partner_steam_id: str, message: str = '',
     ) -> dict:
         offer = self._create_offer_dict(items_from_me, items_from_them)
         session_id = self._get_session_id()

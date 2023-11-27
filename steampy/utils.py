@@ -121,10 +121,10 @@ def merge_items_with_descriptions_from_offers(offers_response: dict) -> dict:
     received_offers = offers_response['response'].get('trade_offers_received', [])
     sent_offers = offers_response['response'].get('trade_offers_sent', [])
     offers_response['response']['trade_offers_received'] = list(
-        map(lambda offer: merge_items_with_descriptions_from_offer(offer, descriptions), received_offers)
+        map(lambda offer: merge_items_with_descriptions_from_offer(offer, descriptions), received_offers),
     )
     offers_response['response']['trade_offers_sent'] = list(
-        map(lambda offer: merge_items_with_descriptions_from_offer(offer, descriptions), sent_offers)
+        map(lambda offer: merge_items_with_descriptions_from_offer(offer, descriptions), sent_offers),
     )
     return offers_response
 

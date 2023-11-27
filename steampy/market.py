@@ -31,7 +31,7 @@ class SteamMarket:
         self.was_login_executed = True
 
     def fetch_price(
-        self, item_hash_name: str, game: GameOptions, currency: Currency = Currency.USD, country='PL'
+        self, item_hash_name: str, game: GameOptions, currency: Currency = Currency.USD, country='PL',
     ) -> dict:
         url = f'{SteamUrl.COMMUNITY_URL}/market/priceoverview/'
         params = {
@@ -68,15 +68,15 @@ class SteamMarket:
         listing_id_to_assets_address = get_listing_id_to_assets_address_from_html(response.text)
         listings = get_market_listings_from_html(response.text)
         listings = merge_items_with_descriptions_from_listing(
-            listings, listing_id_to_assets_address, assets_descriptions
+            listings, listing_id_to_assets_address, assets_descriptions,
         )
 
         if '<span id="tabContentsMyActiveMarketListings_end">' in response.text:
             n_showing = int(text_between(response.text, '<span id="tabContentsMyActiveMarketListings_end">', '</span>'))
             n_total = int(
                 text_between(response.text, '<span id="tabContentsMyActiveMarketListings_total">', '</span>').replace(
-                    ',', ''
-                )
+                    ',', '',
+                ),
             )
 
             if n_showing < n_total < 1000:
@@ -89,7 +89,7 @@ class SteamMarket:
                 listing_id_to_assets_address = get_listing_id_to_assets_address_from_html(jresp.get('hovers'))
                 listings_2 = get_market_sell_listings_from_api(jresp.get('results_html'))
                 listings_2 = merge_items_with_descriptions_from_listing(
-                    listings_2, listing_id_to_assets_address, jresp.get('assets')
+                    listings_2, listing_id_to_assets_address, jresp.get('assets'),
                 )
                 listings['sell_listings'] = {**listings['sell_listings'], **listings_2['sell_listings']}
             else:
@@ -98,13 +98,13 @@ class SteamMarket:
                     response = self._session.get(url)
                     if response.status_code != HTTPStatus.OK:
                         raise ApiException(
-                            f'There was a problem getting the listings. HTTP code: {response.status_code}'
+                            f'There was a problem getting the listings. HTTP code: {response.status_code}',
                         )
                     jresp = response.json()
                     listing_id_to_assets_address = get_listing_id_to_assets_address_from_html(jresp.get('hovers'))
                     listings_2 = get_market_sell_listings_from_api(jresp.get('results_html'))
                     listings_2 = merge_items_with_descriptions_from_listing(
-                        listings_2, listing_id_to_assets_address, jresp.get('assets')
+                        listings_2, listing_id_to_assets_address, jresp.get('assets'),
                     )
                     listings['sell_listings'] = {**listings['sell_listings'], **listings_2['sell_listings']}
 
@@ -147,14 +147,14 @@ class SteamMarket:
             'quantity': quantity,
         }
         headers = {
-            'Referer': f'{SteamUrl.COMMUNITY_URL}/market/listings/{game.app_id}/{urllib.parse.quote(market_name)}'
+            'Referer': f'{SteamUrl.COMMUNITY_URL}/market/listings/{game.app_id}/{urllib.parse.quote(market_name)}',
         }
 
         response = self._session.post(f'{SteamUrl.COMMUNITY_URL}/market/createbuyorder/', data, headers=headers).json()
 
         if (success := response.get('success')) != 1:
             raise ApiException(
-                f'There was a problem creating the order. Are you using the right currency? success: {success}'
+                f'There was a problem creating the order. Are you using the right currency? success: {success}',
             )
 
         return response
@@ -178,16 +178,16 @@ class SteamMarket:
             'quantity': '1',
         }
         headers = {
-            'Referer': f'{SteamUrl.COMMUNITY_URL}/market/listings/{game.app_id}/{urllib.parse.quote(market_name)}'
+            'Referer': f'{SteamUrl.COMMUNITY_URL}/market/listings/{game.app_id}/{urllib.parse.quote(market_name)}',
         }
         response = self._session.post(
-            f'{SteamUrl.COMMUNITY_URL}/market/buylisting/{market_id}', data, headers=headers
+            f'{SteamUrl.COMMUNITY_URL}/market/buylisting/{market_id}', data, headers=headers,
         ).json()
 
         try:
             if (success := response['wallet_info']['success']) != 1:
                 raise ApiException(
-                    f'There was a problem buying this item. Are you using the right currency? success: {success}'
+                    f'There was a problem buying this item. Are you using the right currency? success: {success}',
                 )
         except Exception:
             raise ApiException(f'There was a problem buying this item. Message: {response.get("message")}')
@@ -217,6 +217,6 @@ class SteamMarket:
 
     def _confirm_sell_listing(self, asset_id: str) -> dict:
         con_executor = ConfirmationExecutor(
-            self._steam_guard['identity_secret'], self._steam_guard['steamid'], self._session
+            self._steam_guard['identity_secret'], self._steam_guard['steamid'], self._session,
         )
         return con_executor.confirm_sell_listing(asset_id)

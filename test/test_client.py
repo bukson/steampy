@@ -39,7 +39,7 @@ class TestSteamClient(TestCase):
 
     def test_client_with_statement(self):
         with SteamClient(
-            self.credentials.api_key, self.credentials.login, self.credentials.password, self.steam_guard_file
+            self.credentials.api_key, self.credentials.login, self.credentials.password, self.steam_guard_file,
         ) as client:
             self.assertTrue(client.is_session_alive())
 
@@ -164,7 +164,7 @@ class TestSteamClient(TestCase):
 
     def test_get_wallet_balance(self):
         with SteamClient(
-            self.credentials.api_key, self.credentials.login, self.credentials.password, self.steam_guard_file
+            self.credentials.api_key, self.credentials.login, self.credentials.password, self.steam_guard_file,
         ) as client:
             wallet_balance = client.get_wallet_balance()
             self.assertIsInstance(wallet_balance, Decimal)

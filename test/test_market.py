@@ -34,7 +34,7 @@ class TestMarket(TestCase):
 
     def test_get_price_history(self):
         with SteamClient(
-            self.credentials.api_key, self.credentials.login, self.credentials.password, self.steam_guard_file
+            self.credentials.api_key, self.credentials.login, self.credentials.password, self.steam_guard_file,
         ) as client:
             item = 'M4A1-S | Cyrex (Factory New)'
             response = client.market.fetch_price_history(item, GameOptions.CS)
@@ -77,7 +77,7 @@ class TestMarket(TestCase):
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         # PUT THE REAL CURRENCY OF YOUR STEAM WALLET, OTHER CURRENCIES WON'T WORK
         response = client.market.create_buy_order(
-            'AK-47 | Redline (Field-Tested)', '10.34', 2, GameOptions.CS, Currency.EURO
+            'AK-47 | Redline (Field-Tested)', '10.34', 2, GameOptions.CS, Currency.EURO,
         )
         buy_order_id = response['buy_orderid']
         self.assertEqual(response['success'], 1)
