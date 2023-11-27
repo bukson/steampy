@@ -298,7 +298,7 @@ class SteamClient:
 
     @login_required
     def make_offer(
-        self, items_from_me: List[Asset], items_from_them: List[Asset], partner_steam_id: str, message: str = '',
+        self, items_from_me: list[Asset], items_from_them: list[Asset], partner_steam_id: str, message: str = '',
     ) -> dict:
         offer = self._create_offer_dict(items_from_me, items_from_them)
         session_id = self._get_session_id()
@@ -338,7 +338,7 @@ class SteamClient:
         return data['friendslist']['friends']
 
     @staticmethod
-    def _create_offer_dict(items_from_me: List[Asset], items_from_them: List[Asset]) -> dict:
+    def _create_offer_dict(items_from_me: list[Asset], items_from_them: list[Asset]) -> dict:
         return {
             'newversion': True,
             'version': 4,
@@ -362,8 +362,8 @@ class SteamClient:
     @login_required
     def make_offer_with_url(
         self,
-        items_from_me: List[Asset],
-        items_from_them: List[Asset],
+        items_from_me: list[Asset],
+        items_from_them: list[Asset],
         trade_offer_url: str,
         message: str = '',
         case_sensitive: bool = True,
@@ -403,7 +403,7 @@ class SteamClient:
 
     @login_required
     # If convert_to_decimal = False, the price will be returned WITHOUT a decimal point.
-    def get_wallet_balance(self, convert_to_decimal: bool = True, on_hold: bool = False) -> Union[str, Decimal]:
+    def get_wallet_balance(self, convert_to_decimal: bool = True, on_hold: bool = False) -> str | Decimal:
         response = self._session.get(f'{SteamUrl.COMMUNITY_URL}/market')
         wallet_info_match = re.search(r'var g_rgWalletInfo = (.*?);', response.text)
         if wallet_info_match:

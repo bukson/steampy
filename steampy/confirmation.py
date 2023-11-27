@@ -52,7 +52,7 @@ class ConfirmationExecutor:
         headers = {'X-Requested-With': 'XMLHttpRequest'}
         return self._session.get(f'{self.CONF_URL}/ajaxop', params=params, headers=headers).json()
 
-    def _get_confirmations(self) -> List[Confirmation]:
+    def _get_confirmations(self) -> list[Confirmation]:
         confirmations = []
         confirmations_page = self._fetch_confirmations_page()
         if confirmations_page.status_code == HTTPStatus.OK:
@@ -93,7 +93,7 @@ class ConfirmationExecutor:
             'tag': tag_string,
         }
 
-    def _select_trade_offer_confirmation(self, confirmations: List[Confirmation], trade_offer_id: str) -> Confirmation:
+    def _select_trade_offer_confirmation(self, confirmations: list[Confirmation], trade_offer_id: str) -> Confirmation:
         for confirmation in confirmations:
             confirmation_details_page = self._fetch_confirmation_details_page(confirmation)
             confirmation_id = self._get_confirmation_trade_offer_id(confirmation_details_page)
@@ -101,7 +101,7 @@ class ConfirmationExecutor:
                 return confirmation
         raise ConfirmationExpected
 
-    def _select_sell_listing_confirmation(self, confirmations: List[Confirmation], asset_id: str) -> Confirmation:
+    def _select_sell_listing_confirmation(self, confirmations: list[Confirmation], asset_id: str) -> Confirmation:
         for confirmation in confirmations:
             confirmation_details_page = self._fetch_confirmation_details_page(confirmation)
             confirmation_id = self._get_confirmation_sell_listing_id(confirmation_details_page)

@@ -8,7 +8,7 @@ from time import time
 from typing import Dict
 
 
-def load_steam_guard(steam_guard: str) -> Dict[str, str]:
+def load_steam_guard(steam_guard: str) -> dict[str, str]:
     """Load Steam Guard credentials from json (file or string).
 
     Arguments:

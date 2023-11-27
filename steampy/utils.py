@@ -145,7 +145,7 @@ def merge_items_with_descriptions_from_listing(listings: dict, ids_to_assets_add
     return listings
 
 
-def merge_items(items: List[dict], descriptions: dict, **kwargs) -> dict:
+def merge_items(items: list[dict], descriptions: dict, **kwargs) -> dict:
     merged_items = {}
 
     for item in items:
