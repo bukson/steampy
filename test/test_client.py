@@ -131,7 +131,7 @@ class TestSteamClient(TestCase):
         partner_asset = Asset(partner_first_item['id'], game)
         response = client.make_offer([my_asset], [partner_asset], partner_id, 'TESTOWA OFERTA')
         assert response is not None
-        assert 'tradeofferid' in response.keys()
+        assert 'tradeofferid' in response
 
     def test_make_offer_url(self):
         partner_account_id = '32384925'
@@ -152,7 +152,7 @@ class TestSteamClient(TestCase):
         partner_asset = Asset(partner_first_item['id'], game)
         response = client.make_offer_with_url([my_asset], [partner_asset], sample_trade_url, 'TESTOWA OFERTA')
         assert response is not None
-        assert 'tradeofferid' in response.keys()
+        assert 'tradeofferid' in response
 
     def test_get_escrow_duration(self):
         # A sample trade URL with escrow time of 15 days cause mobile auth not added
