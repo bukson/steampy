@@ -5,7 +5,6 @@ import struct
 from base64 import b64decode, b64encode
 from hashlib import sha1
 from time import time
-from typing import Dict
 
 
 def load_steam_guard(steam_guard: str) -> dict[str, str]:

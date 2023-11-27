@@ -2,9 +2,7 @@ import json
 import re
 import urllib.parse as urlparse
 from decimal import Decimal
-from typing import List, Union
 
-import bs4
 import requests
 
 from steampy import guard

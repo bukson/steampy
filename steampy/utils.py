@@ -4,7 +4,6 @@ import os
 import re
 import struct
 from decimal import Decimal
-from typing import List
 from urllib.parse import parse_qs, urlparse
 
 import requests

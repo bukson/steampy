@@ -2,7 +2,6 @@ import enum
 import json
 import time
 from http import HTTPStatus
-from typing import List
 
 import requests
 from bs4 import BeautifulSoup
