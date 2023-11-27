@@ -30,11 +30,11 @@ class SteamClient:
     def __init__(
         self,
         api_key: str,
-        username: str = None,
-        password: str = None,
-        steam_guard: str = None,
-        login_cookies: dict = None,
-        proxies: dict = None,
+        username: str | None = None,
+        password: str | None = None,
+        steam_guard: str | None = None,
+        login_cookies: dict | None = None,
+        proxies: dict | None = None,
     ) -> None:
         self._api_key = api_key
         self._session = requests.Session()
@@ -86,7 +86,7 @@ class SteamClient:
         else:
             raise ValueError(f'Invalid steam_id: {steam_id}')
 
-    def login(self, username: str = None, password: str = None, steam_guard: str = None) -> None:
+    def login(self, username: str | None = None, password: str | None = None, steam_guard: str | None = None) -> None:
         invalid_client_credentials_is_present = None in (self.username, self._password, self.steam_guard_string)
         invalid_login_credentials_is_present = None in (username, password, steam_guard)
 
@@ -134,7 +134,7 @@ class SteamClient:
         return steam_login.lower() in main_page_response.text.lower()
 
     def api_call(
-        self, method: str, interface: str, api_method: str, version: str, params: dict = None,
+        self, method: str, interface: str, api_method: str, version: str, params: dict | None = None,
     ) -> requests.Response:
         url = '/'.join((SteamUrl.API_URL, interface, api_method, version))
         response = self._session.get(url, params=params) if method == 'GET' else self._session.post(url, data=params)
