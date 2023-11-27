@@ -20,7 +20,7 @@ class TestUtils(TestCase):
     def test_account_id_to_steam_id(self):
         account_id = '358617487'
         steam_id = utils.account_id_to_steam_id(account_id)
-        assert '76561198318883215' == steam_id
+        assert steam_id == '76561198318883215'
 
     def test_steam_id_to_account_id(self):
         steam_id = '76561198318883215'
