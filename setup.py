@@ -2,7 +2,7 @@ import sys
 
 from setuptools import setup
 
-if not sys.version_info[0] == 3 and sys.version_info[1] < 8:
+if sys.version_info[0] != 3 and sys.version_info[1] < 8:
     sys.exit('Python < 3.8 is not supported')
 
 version = '1.1.2'
