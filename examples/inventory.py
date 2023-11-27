@@ -1,4 +1,5 @@
 import json
+import sys
 
 from steampy.client import InvalidCredentials, SteamClient
 from steampy.models import GameOptions
@@ -29,7 +30,7 @@ try:
     steam_client.login(username, password, steam_guard_path)
 except (ValueError, InvalidCredentials):
     print('Your login credentials are invalid!')
-    exit(1)
+    sys.exit(1)
 else:
     print('Finished! Logged in into Steam')
 
