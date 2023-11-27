@@ -410,5 +410,4 @@ class SteamClient:
         balance_dict_key = 'wallet_delayed_balance' if on_hold else 'wallet_balance'
         if convert_to_decimal:
             return Decimal(balance_dict[balance_dict_key]) / 100
-        else:
-            return balance_dict[balance_dict_key]
+        return balance_dict[balance_dict_key]
