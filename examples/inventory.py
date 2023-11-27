@@ -1,5 +1,6 @@
 import json
 import sys
+from pathlib import Path
 
 from steampy.client import InvalidCredentials, SteamClient
 from steampy.models import GameOptions
@@ -56,6 +57,6 @@ print(f'Done obtaining inventory for the game: {app_id}')
 
 # Dump all the info to inventory_(app_id)_(context_id).json file
 print('Saving information...')
-with open(f'inventory_{app_id}_{context_id}.json', 'w') as file:
+with Path(f'inventory_{app_id}_{context_id}.json').open('w') as file:
     json.dump(item_amounts, file)
 print(f'Done! Saved to file: inventory_{app_id}_{context_id}.json')

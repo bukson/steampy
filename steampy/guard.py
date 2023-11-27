@@ -1,9 +1,9 @@
 import hmac
 import json
-import os
 import struct
 from base64 import b64decode, b64encode
 from hashlib import sha1
+from pathlib import Path
 from time import time
 
 
@@ -16,8 +16,8 @@ def load_steam_guard(steam_guard: str) -> dict[str, str]:
     Returns:
         Dict[str, str]: Parsed json data as a dictionary of strings (both key and value).
     """
-    if os.path.isfile(steam_guard):
-        with open(steam_guard) as f:
+    if Path(steam_guard).is_file():
+        with Path(steam_guard).open() as f:
             return json.loads(f.read(), parse_int=str)
     else:
         return json.loads(steam_guard, parse_int=str)

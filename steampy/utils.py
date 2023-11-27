@@ -1,9 +1,9 @@
 import copy
 import math
-import os
 import re
 import struct
 from decimal import Decimal
+from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 import requests
@@ -238,8 +238,8 @@ def get_key_value_from_url(url: str, key: str, case_sensitive: bool = True) -> s
 
 
 def load_credentials():
-    dirname = os.path.dirname(os.path.abspath(__file__))
-    with open(f'{dirname}/../secrets/credentials.pwd') as f:
+    dirname = Path(__file__).resolve().parent
+    with Path(f'{dirname}/../secrets/credentials.pwd').open() as f:
         return [Credentials(line.split()[0], line.split()[1], line.split()[2]) for line in f]
 
 

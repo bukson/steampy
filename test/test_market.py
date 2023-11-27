@@ -1,5 +1,5 @@
-import os
 import unittest
+from pathlib import Path
 from unittest import TestCase
 
 from steampy.client import SteamClient
@@ -13,7 +13,7 @@ class TestMarket(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.credentials = load_credentials()[0]
-        dirname = os.path.dirname(os.path.abspath(__file__))
+        dirname = Path(__file__).resolve().parent
         cls.steam_guard_file = f'{dirname}/../secrets/Steamguard.txt'
 
     def test_get_price(self):
