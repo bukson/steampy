@@ -367,6 +367,7 @@ class SteamClient:
         trade_offer_url: str,
         message: str = '',
         case_sensitive: bool = True,
+        confirm_trade: bool = True,
     ) -> dict:
         token = get_key_value_from_url(trade_offer_url, 'token', case_sensitive)
         partner_account_id = get_key_value_from_url(trade_offer_url, 'partner', case_sensitive)
@@ -392,7 +393,7 @@ class SteamClient:
         }
 
         response = self._session.post(url, data=params, headers=headers).json()
-        if response.get('needs_mobile_confirmation'):
+        if confirm_trade and response.get('needs_mobile_confirmation'):
             response.update(self._confirm_transaction(response['tradeofferid']))
 
         return response
