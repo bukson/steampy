@@ -1,10 +1,12 @@
 from enum import IntEnum
-from collections import namedtuple
+from typing import NamedTuple
 
+
+class PredefinedOptions(NamedTuple):
+    app_id: str
+    context_id: str
 
 class GameOptions:
-    PredefinedOptions = namedtuple('PredefinedOptions', ['app_id', 'context_id'])
-
     STEAM = PredefinedOptions('753', '6')
     DOTA2 = PredefinedOptions('570', '2')
     CS = PredefinedOptions('730', '2')
