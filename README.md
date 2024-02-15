@@ -457,6 +457,30 @@ with SteamClient('MY_API_KEY', 'MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD
             assert type(on_hold_wallet_balance) == Decimal
 ```
 
+
+**add_friend(steam_id: str) -> bool**
+
+**accept_friend(steam_id: str) -> bool**
+
+**remove_friend(steam_id: str) -> bool**
+
+Using `SteamClient.login` method is required before usage.
+These methods perform the operations of adding, accepting and deleting friends using the provided `steam_id` of the friend.
+If the request was successful, True is returned, otherwise False.
+`remove_friend` method returns True even if `steam_id` has never been a friend
+
+Example:
+```python
+from steampy.client import SteamClient
+
+
+steam_client = SteamClient('MY_API_KEY')
+steam_client.login('MY_USERNAME', 'MY_PASSWORD', 'PATH_TO_STEAMGUARD_FILE')
+
+# if response True - was success
+response = steam_client.add_friend("FRIEND_STEAM_ID")
+```
+
 market methods
 ==============
 
