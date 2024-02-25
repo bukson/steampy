@@ -427,28 +427,39 @@ class SteamClient:
         return self._friend_ajax_request(steam_id, accept=1)
 
     _headers = {
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
     }
 
     def _friend_ajax_request(self, steam_id: str, accept: int = 0) -> dict:
         url = f'{SteamUrl.COMMUNITY_URL}/actions/AddFriendAjax'
         data = {
-            "sessionID": self._get_session_id(),
-            "steamid": steam_id,
-            "accept_invite": accept
+            'sessionID': self._get_session_id(),
+            'steamid': steam_id,
+            'accept_invite': accept
         }
+        response = self._session.post(url, data=data, headers=self._headers)
+
+        if response.status_code != 200:
+            raise ApiException(
+                f'Request failed with status code {response.status_code}')
+
         # returns True or json object if request was succes, otherwise False
-        return self._session.post(url, data=data, headers=self._headers).json()
+        return response.json()
 
     @login_required
     def remove_friend(self, steam_id: str) -> bool:
         url = f'{SteamUrl.COMMUNITY_URL}/actions/RemoveFriendAjax'
         data = {
-            "sessionID": self._get_session_id(),
-            "steamid": steam_id
+            'sessionID': self._get_session_id(),
+            'steamid': steam_id
         }
+        response = self._session.post(url, data=data, headers=self._headers)
+
+        if response.status_code != 200:
+            raise ApiException(
+                f'Request failed with status code {response.status_code}')
+
         # returns True if request was succes, otherwise False
         # returns True even if `steam_id` has never been a friend
-        return self._session.post(
-            url, data=data, headers=self._headers).json()
+        return response.json()
 
