@@ -26,8 +26,9 @@ def main():
     print('Bot logged in successfully, fetching offers every 60 seconds')
 
     while True:
-        offers = client.get_trade_offers()['response']['trade_offers_received']
-        for offer in offers:
+        response = client.get_trade_offers()['response']
+        received_offers = response['trade_offers_received']
+        for offer in received_offers:
             if is_donation(offer):
                 offer_id = offer['tradeofferid']
                 num_accepted_items = len(offer['items_to_receive'])
@@ -47,6 +48,7 @@ def is_donation(offer: dict) -> bool:
         and offer['trade_offer_state'] == TradeOfferState.Active
         and not offer['is_our_offer']
     )
+
 
 
 if __name__ == '__main__':

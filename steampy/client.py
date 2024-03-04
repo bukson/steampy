@@ -1,8 +1,12 @@
+from collections import namedtuple
+from dateutil.parser import parse
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 import re
 import bs4
 import json
 import urllib.parse as urlparse
-from typing import List, Union
+from typing import List, Union, Optional
 from decimal import Decimal
 
 import requests
@@ -27,6 +31,7 @@ from steampy.utils import (
     login_required,
 )
 
+Partner = namedtuple('Partner', ['id', 'name', 'level', 'registration_date', 'age'])
 
 class SteamClient:
     def __init__(
@@ -251,38 +256,43 @@ class SteamClient:
         return items
 
     @login_required
-    def accept_trade_offer(self, trade_offer_id: str) -> dict:
+    def accept_trade_offer(self, trade_offer_id: str, partner: Optional[Partner] = None) -> dict:
         trade = self.get_trade_offer(trade_offer_id)
         trade_offer_state = TradeOfferState(trade['response']['offer']['trade_offer_state'])
         if trade_offer_state is not TradeOfferState.Active:
             raise ApiException(f'Invalid trade offer state: {trade_offer_state.name} ({trade_offer_state.value})')
-
-        partner = self._fetch_trade_partner_id(trade_offer_id)
-        session_id = self._get_session_id()
+        if not partner:
+            partner = self.fetch_trade_partner(trade_offer_id)
+        session_id = self._session.cookies.get_dict("steamcommunity.com")['sessionid']
         accept_url = f'{SteamUrl.COMMUNITY_URL}/tradeoffer/{trade_offer_id}/accept'
         params = {
             'sessionid': session_id,
             'tradeofferid': trade_offer_id,
             'serverid': '1',
-            'partner': partner,
+            'partner': partner.id,
             'captcha': '',
         }
         headers = {'Referer': self._get_trade_offer_url(trade_offer_id)}
+        response = self._session.post(accept_url, data=params, headers=headers)
+        response = response.json()
 
-        response = self._session.post(accept_url, data=params, headers=headers).json()
         if response.get('needs_mobile_confirmation', False):
             return self._confirm_transaction(trade_offer_id)
 
         return response
 
-    def _fetch_trade_partner_id(self, trade_offer_id: str) -> str:
+    def fetch_trade_partner(self, trade_offer_id: str) -> Partner:
         url = self._get_trade_offer_url(trade_offer_id)
         offer_response_text = self._session.get(url).text
-
         if 'You have logged in from a new device. In order to protect the items' in offer_response_text:
             raise SevenDaysHoldException("Account has logged in a new device and can't trade for 7 days")
-
-        return text_between(offer_response_text, "var g_ulTradePartnerSteamID = '", "';")
+        partner_id = text_between(offer_response_text, "var g_ulTradePartnerSteamID = '", "';").strip()
+        partner_name = text_between(offer_response_text, '<meta property="og:title" content="Trade offer with ', '">').strip()
+        partner_level = int(text_between(offer_response_text, "has a Steam Level of ", "</div>").strip())
+        partner_member_since_str = text_between(offer_response_text, '<div class="trade_partner_member_since trade_partner_info_text ">', '</div>').strip()
+        partner_member_since_date = parse(partner_member_since_str)
+        partner_age = relativedelta(datetime.today(), partner_member_since_date).years
+        return Partner(partner_id,partner_name, partner_level, partner_member_since_str, partner_age)
 
     def _confirm_transaction(self, trade_offer_id: str) -> dict:
         confirmation_executor = ConfirmationExecutor(
