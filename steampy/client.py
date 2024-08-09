@@ -125,7 +125,7 @@ class SteamClient:
 
     @login_required
     def logout(self) -> None:
-        url = f'{SteamUrl.STORE_URL}/login/logout/'
+        url = f'{SteamUrl.COMMUNITY_URL}/login/logout/'
         data = {'sessionid': self._get_session_id()}
         self._session.post(url, data=data)
 
