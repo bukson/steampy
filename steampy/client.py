@@ -6,6 +6,7 @@ from typing import List, Union
 from decimal import Decimal
 
 import requests
+import time
 
 from steampy import guard
 from steampy.confirmation import ConfirmationExecutor
@@ -111,6 +112,17 @@ class SteamClient:
         self.was_login_executed = True
         self.market._set_login_executed(self.steam_guard, self._get_session_id())
 
+        steam_login_secure_cookies = [cookie for cookie in self._session.cookies if cookie.name == 'steamLoginSecure']
+        cookie_value = steam_login_secure_cookies[0].value
+        decoded_cookie_value = urlparse.unquote(cookie_value)
+        access_token_parts = decoded_cookie_value.split('||')
+        if len(access_token_parts) < 2:
+            print(decoded_cookie_value)
+            raise ValueError('Access token not found in steamLoginSecure cookie')
+
+        access_token = access_token_parts[1]
+        self._access_token = access_token
+
     @login_required
     def logout(self) -> None:
         url = f'{SteamUrl.STORE_URL}/login/logout/'
@@ -174,27 +186,36 @@ class SteamClient:
         return merge_items_with_descriptions_from_inventory(response_dict, game) if merge else response_dict
 
     def _get_session_id(self) -> str:
-        return self._session.cookies.get_dict()['sessionid']
+        return self._session.cookies.get_dict(domain="steamcommunity.com", path="/").get('sessionid')
 
     def get_trade_offers_summary(self) -> dict:
         params = {'key': self._api_key}
         return self.api_call('GET', 'IEconService', 'GetTradeOffersSummary', 'v1', params).json()
 
-    def get_trade_offers(self, merge: bool = True) -> dict:
-        params = {
-            'key': self._api_key,
-            'get_sent_offers': 1,
-            'get_received_offers': 1,
-            'get_descriptions': 1,
-            'language': 'english',
-            'active_only': 1,
-            'historical_only': 0,
-            'time_historical_cutoff': '',
-        }
-        response = self.api_call('GET', 'IEconService', 'GetTradeOffers', 'v1', params).json()
+    def get_trade_offers(self, merge: bool = True,sent:int=1,received:int=1,use_webtoken=False) -> dict:
+        params = {'key'if not use_webtoken else 'access_token': self._api_key if not use_webtoken else self._access_token,
+                  'get_sent_offers': sent,
+                  'get_received_offers': received,
+                  'get_descriptions': 1,
+                  'language': 'english',
+                  'active_only': 1,
+                  'historical_only': 0,
+                  'time_historical_cutoff': ''}
+
+
+        try:
+            response = self.api_call('GET', 'IEconService', 'GetTradeOffers', 'v1', params)
+
+            response = response.json()
+
+        except json.decoder.JSONDecodeError:
+            time.sleep(2)
+            return self.get_trade_offers(merge,sent,received)
         response = self._filter_non_active_offers(response)
 
-        return merge_items_with_descriptions_from_offers(response) if merge else response
+        if merge:
+            response = merge_items_with_descriptions_from_offers(response)
+        return response
 
     @staticmethod
     def _filter_non_active_offers(offers_response):
@@ -210,8 +231,14 @@ class SteamClient:
 
         return offers_response
 
-    def get_trade_offer(self, trade_offer_id: str, merge: bool = True) -> dict:
-        params = {'key': self._api_key, 'tradeofferid': trade_offer_id, 'language': 'english'}
+    def get_trade_offer(self, trade_offer_id: str, merge: bool = True, use_webtoken=False) -> dict:
+
+        params = {
+            'key' if not use_webtoken else 'access_token': self._api_key if not use_webtoken else self._access_token,
+            'tradeofferid': trade_offer_id,
+            'language': 'english'}
+
+        # params = {'key': self._api_key, 'tradeofferid': trade_offer_id, 'language': 'english'}
         response = self.api_call('GET', 'IEconService', 'GetTradeOffer', 'v1', params).json()
 
         if merge and 'descriptions' in response['response']:
@@ -252,13 +279,13 @@ class SteamClient:
 
     @login_required
     def accept_trade_offer(self, trade_offer_id: str) -> dict:
-        trade = self.get_trade_offer(trade_offer_id)
+        trade = self.get_trade_offer(trade_offer_id, use_webtoken=True)
         trade_offer_state = TradeOfferState(trade['response']['offer']['trade_offer_state'])
         if trade_offer_state is not TradeOfferState.Active:
             raise ApiException(f'Invalid trade offer state: {trade_offer_state.name} ({trade_offer_state.value})')
 
         partner = self._fetch_trade_partner_id(trade_offer_id)
-        session_id = self._get_session_id()
+        session_id = self._session.cookies.get_dict("steamcommunity.com")['sessionid']
         accept_url = f'{SteamUrl.COMMUNITY_URL}/tradeoffer/{trade_offer_id}/accept'
         params = {
             'sessionid': session_id,
