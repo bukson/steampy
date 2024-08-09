@@ -74,10 +74,8 @@ class SteamClient:
     def set_login_cookies(self, cookies: dict) -> None:
         self._session.cookies.update(cookies)
         self.was_login_executed = True
-
         if self.steam_guard is None:
             self.steam_guard = {'steamid': str(self.get_steam_id())}
-
         self.market._set_login_executed(self.steam_guard, self._get_session_id())
 
     @login_required
@@ -192,8 +190,8 @@ class SteamClient:
         params = {'key': self._api_key}
         return self.api_call('GET', 'IEconService', 'GetTradeOffersSummary', 'v1', params).json()
 
-    def get_trade_offers(self, merge: bool = True,sent:int=1,received:int=1,use_webtoken=False) -> dict:
-        params = {'key'if not use_webtoken else 'access_token': self._api_key if not use_webtoken else self._access_token,
+    def get_trade_offers(self, merge: bool = True, sent: int = 1, received: int = 1, use_webtoken=False) -> dict:
+        params = {'key' if not use_webtoken else 'access_token': self._api_key if not use_webtoken else self._access_token,
                   'get_sent_offers': sent,
                   'get_received_offers': received,
                   'get_descriptions': 1,
@@ -202,7 +200,6 @@ class SteamClient:
                   'historical_only': 0,
                   'time_historical_cutoff': ''}
 
-
         try:
             response = self.api_call('GET', 'IEconService', 'GetTradeOffers', 'v1', params)
 
@@ -210,7 +207,7 @@ class SteamClient:
 
         except json.decoder.JSONDecodeError:
             time.sleep(2)
-            return self.get_trade_offers(merge,sent,received)
+            return self.get_trade_offers(merge, sent, received)
         response = self._filter_non_active_offers(response)
 
         if merge:
