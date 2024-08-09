@@ -285,7 +285,7 @@ class SteamClient:
             raise ApiException(f'Invalid trade offer state: {trade_offer_state.name} ({trade_offer_state.value})')
 
         partner = self._fetch_trade_partner_id(trade_offer_id)
-        session_id = self._session.cookies.get_dict("steamcommunity.com")['sessionid']
+        session_id = self._get_session_id()
         accept_url = f'{SteamUrl.COMMUNITY_URL}/tradeoffer/{trade_offer_id}/accept'
         params = {
             'sessionid': session_id,
