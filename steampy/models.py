@@ -6,6 +6,7 @@ class PredefinedOptions(NamedTuple):
     app_id: str
     context_id: str
 
+
 class GameOptions:
     STEAM = PredefinedOptions('753', '6')
     DOTA2 = PredefinedOptions('570', '2')
