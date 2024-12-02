@@ -2,7 +2,6 @@ import time
 
 from steampy.client import SteamClient, TradeOfferState
 
-
 # Set API key
 api_key = ''
 # Set path to SteamGuard file
@@ -13,7 +12,7 @@ username = ''
 password = ''
 
 
-def main():
+def main() -> None:
     print('This is the donation bot accepting items for free.')
 
     if not are_credentials_filled():

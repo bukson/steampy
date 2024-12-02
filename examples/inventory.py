@@ -1,8 +1,9 @@
 import json
+import sys
+from pathlib import Path
 
-from steampy.client import SteamClient, InvalidCredentials
+from steampy.client import InvalidCredentials, SteamClient
 from steampy.models import GameOptions
-
 
 # Your Steam username
 username = ''
@@ -30,7 +31,7 @@ try:
     steam_client.login(username, password, steam_guard_path)
 except (ValueError, InvalidCredentials):
     print('Your login credentials are invalid!')
-    exit(1)
+    sys.exit(1)
 else:
     print('Finished! Logged in into Steam')
 
@@ -56,6 +57,6 @@ print(f'Done obtaining inventory for the game: {app_id}')
 
 # Dump all the info to inventory_(app_id)_(context_id).json file
 print('Saving information...')
-with open(f'inventory_{app_id}_{context_id}.json', 'w') as file:
+with Path(f'inventory_{app_id}_{context_id}.json').open('w') as file:
     json.dump(item_amounts, file)
 print(f'Done! Saved to file: inventory_{app_id}_{context_id}.json')

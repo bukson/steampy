@@ -1,13 +1,18 @@
-from http import HTTPStatus
-from base64 import b64encode
+from __future__ import annotations
 
-from rsa import encrypt, PublicKey
-from requests import Session, Response
+from base64 import b64encode
+from http import HTTPStatus
+from typing import TYPE_CHECKING
+
+from rsa import PublicKey, encrypt
 
 from steampy import guard
+from steampy.exceptions import ApiException, CaptchaRequired, InvalidCredentials
 from steampy.models import SteamUrl
 from steampy.utils import create_cookie
-from steampy.exceptions import InvalidCredentials, CaptchaRequired, ApiException
+
+if TYPE_CHECKING:
+    from requests import Response, Session
 
 
 class LoginExecutor:
@@ -19,8 +24,8 @@ class LoginExecutor:
         self.session = session
         self.refresh_token = ''
 
-    def _api_call(self, method: str, service: str, endpoint: str, version: str = 'v1', params: dict = None) -> Response:
-        url = '/'.join((SteamUrl.API_URL, service, endpoint, version))
+    def _api_call(self, method: str, service: str, endpoint: str, version: str = 'v1', params: dict | None = None) -> Response:
+        url = f'{SteamUrl.API_URL}/{service}/{endpoint}/{version}'
         # All requests from the login page use the same 'Referer' and 'Origin' values
         headers = {'Referer': f'{SteamUrl.COMMUNITY_URL}/', 'Origin': SteamUrl.COMMUNITY_URL}
         if method.upper() == 'GET':
@@ -126,7 +131,7 @@ class LoginExecutor:
 
         update_data = {'client_id': client_id, 'steamid': steamid, 'code_type': code_type, 'code': code}
         response = self._api_call(
-            'POST', 'IAuthenticationService', 'UpdateAuthSessionWithSteamGuardCode', params=update_data
+            'POST', 'IAuthenticationService', 'UpdateAuthSessionWithSteamGuardCode', params=update_data,
         )
         if response.status_code == HTTPStatus.OK:
             self._pool_sessions_steam(client_id, request_id)
@@ -142,5 +147,4 @@ class LoginExecutor:
         sessionid = self.session.cookies['sessionid']
         redir = f'{SteamUrl.COMMUNITY_URL}/login/home/?goto='
         finalized_data = {'nonce': self.refresh_token, 'sessionid': sessionid, 'redir': redir}
-        response = self.session.post(SteamUrl.LOGIN_URL + '/jwt/finalizelogin', data=finalized_data)
-        return response
+        return self.session.post(SteamUrl.LOGIN_URL + '/jwt/finalizelogin', data=finalized_data)
