@@ -9,7 +9,7 @@ import requests
 
 from steampy import guard
 from steampy.confirmation import ConfirmationExecutor
-from steampy.exceptions import ApiException, SevenDaysHoldException
+from steampy.exceptions import ApiException, SevenDaysHoldException, TooManyRequests
 from steampy.login import InvalidCredentials, LoginExecutor
 from steampy.market import SteamMarket
 from steampy.models import Asset, GameOptions, SteamUrl, TradeOfferState
@@ -163,7 +163,11 @@ class SteamClient:
         url = f'{SteamUrl.COMMUNITY_URL}/inventory/{partner_steam_id}/{game.app_id}/{game.context_id}'
         params = {'l': 'english', 'count': count}
 
-        response_dict = self._session.get(url, params=params).json()
+        full_response = self._session.get(url, params=params)
+        response_dict = full_response.json()
+        if full_response.status_code == 429:
+            raise TooManyRequests('Too many requests, try again later.')
+
         if response_dict is None or response_dict.get('success') != 1:
             raise ApiException('Success value should be 1.')
 
@@ -363,6 +367,7 @@ class SteamClient:
         trade_offer_url: str,
         message: str = '',
         case_sensitive: bool = True,
+        confirm_trade: bool = True,
     ) -> dict:
         token = get_key_value_from_url(trade_offer_url, 'token', case_sensitive)
         partner_account_id = get_key_value_from_url(trade_offer_url, 'partner', case_sensitive)
@@ -388,7 +393,7 @@ class SteamClient:
         }
 
         response = self._session.post(url, data=params, headers=headers).json()
-        if response.get('needs_mobile_confirmation'):
+        if confirm_trade and response.get('needs_mobile_confirmation'):
             response.update(self._confirm_transaction(response['tradeofferid']))
 
         return response
