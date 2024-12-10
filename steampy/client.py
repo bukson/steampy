@@ -85,8 +85,7 @@ class SteamClient:
         response = self._session.get(url)
         if steam_id := re.search(r'g_steamID = "(\d+)";', response.text):
             return int(steam_id.group(1))
-        else:
-            raise ValueError(f'Invalid steam_id: {steam_id}')
+        raise ValueError(f'Invalid steam_id: {steam_id}')
 
     def login(self, username: str | None = None, password: str | None = None, steam_guard: str | None = None) -> None:
         invalid_client_credentials_is_present = None in (self.username, self._password, self.steam_guard_string)

@@ -23,8 +23,7 @@ def login_required(func):
     def func_wrapper(self, *args, **kwargs):
         if not self.was_login_executed:
             raise LoginRequired('Use login method first')
-        else:
-            return func(self, *args, **kwargs)
+        return func(self, *args, **kwargs)
 
     return func_wrapper
 
