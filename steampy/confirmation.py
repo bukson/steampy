@@ -66,8 +66,7 @@ class ConfirmationExecutor:
                 nonce = conf['nonce']
                 confirmations.append(Confirmation(data_confid, nonce))
             return confirmations
-        else:
-            raise ConfirmationExpected
+        raise ConfirmationExpected
 
     def _fetch_confirmations_page(self) -> requests.Response:
         tag = Tag.CONF.value

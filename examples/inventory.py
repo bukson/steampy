@@ -57,6 +57,6 @@ print(f'Done obtaining inventory for the game: {app_id}')
 
 # Dump all the info to inventory_(app_id)_(context_id).json file
 print('Saving information...')
-with Path(f'inventory_{app_id}_{context_id}.json').open('w') as file:
+with Path(f'inventory_{app_id}_{context_id}.json').open('w', encoding='utf-8') as file:
     json.dump(item_amounts, file)
 print(f'Done! Saved to file: inventory_{app_id}_{context_id}.json')

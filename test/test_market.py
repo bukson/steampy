@@ -11,19 +11,19 @@ from steampy.utils import load_credentials
 @unittest.skip('Requires secrets/Steamguard.txt')
 class TestMarket(TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         cls.credentials = load_credentials()[0]
         dirname = Path(__file__).resolve().parent
         cls.steam_guard_file = f'{dirname}/../secrets/Steamguard.txt'
 
-    def test_get_price(self):
+    def test_get_price(self) -> None:
         client = SteamClient(self.credentials.api_key)
         item = 'M4A1-S | Cyrex (Factory New)'
         prices = client.market.fetch_price(item, GameOptions.CS)
         assert prices['success']
 
-    def test_get_price_to_many_requests(self):
-        def request_loop():
+    def test_get_price_to_many_requests(self) -> None:
+        def request_loop() -> None:
             item = 'M4A1-S | Cyrex (Factory New)'
             for _ in range(21):
                 client.market.fetch_price(item, GameOptions.CS)
@@ -32,7 +32,7 @@ class TestMarket(TestCase):
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         self.assertRaises(TooManyRequests, request_loop)
 
-    def test_get_price_history(self):
+    def test_get_price_history(self) -> None:
         with SteamClient(
             self.credentials.api_key, self.credentials.login, self.credentials.password, self.steam_guard_file,
         ) as client:
@@ -41,7 +41,7 @@ class TestMarket(TestCase):
             assert response['success']
             assert 'prices' in response
 
-    def test_get_all_listings_from_market(self):
+    def test_get_all_listings_from_market(self) -> None:
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         listings = client.market.get_my_market_listings()
@@ -50,7 +50,7 @@ class TestMarket(TestCase):
         assert len(listings.get('sell_listings')) == 1
         assert isinstance(next(iter(listings.get('sell_listings').values())).get('description'), dict)
 
-    def test_create_and_remove_sell_listing(self):
+    def test_create_and_remove_sell_listing(self) -> None:
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         game = GameOptions.DOTA2
@@ -72,7 +72,7 @@ class TestMarket(TestCase):
         assert listing_to_cancel is not None
         client.market.cancel_sell_order(listing_to_cancel)
 
-    def test_create_and_cancel_buy_order(self):
+    def test_create_and_cancel_buy_order(self) -> None:
         client = SteamClient(self.credentials.api_key)
         client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
         # PUT THE REAL CURRENCY OF YOUR STEAM WALLET, OTHER CURRENCIES WON'T WORK

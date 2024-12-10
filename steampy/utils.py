@@ -23,8 +23,7 @@ def login_required(func):
     def func_wrapper(self, *args, **kwargs):
         if not self.was_login_executed:
             raise LoginRequired('Use login method first')
-        else:
-            return func(self, *args, **kwargs)
+        return func(self, *args, **kwargs)
 
     return func_wrapper
 
@@ -67,8 +66,10 @@ def calculate_gross_price(price_net: Decimal, publisher_fee: Decimal, steam_fee:
             fraud incidents and cover the cost of development of this and future Steam economy features. The fee is
             currently `5%` (with a minimum fee of `$0.01`). This fee may be increased or decreased by Steam in the
             future.
+
     Returns:
         Decimal: Gross price (including fees) - the amount that the buyer pays during a market transaction
+
     """
     price_net *= 100
     steam_fee_amount = int(math.floor(max(price_net * steam_fee, 1)))
@@ -88,8 +89,10 @@ def calculate_net_price(price_gross: Decimal, publisher_fee: Decimal, steam_fee:
             fraud incidents and cover the cost of development of this and future Steam economy features. The fee is
             currently `5%` (with a minimum fee of `$0.01`). This fee may be increased or decreased by Steam in the
             future.
+
     Returns:
         Decimal: Net price (without fees) - the amount that the seller receives after a market transaction.
+
     """
     price_gross *= 100
     estimated_net_price = Decimal(int(price_gross / (steam_fee + publisher_fee + 1)))
@@ -244,7 +247,7 @@ def get_key_value_from_url(url: str, key: str, case_sensitive: bool = True) -> s
 
 def load_credentials():
     dirname = Path(__file__).resolve().parent
-    with Path(f'{dirname}/../secrets/credentials.pwd').open() as f:
+    with Path(f'{dirname}/../secrets/credentials.pwd').open(encoding='utf-8') as f:
         return [Credentials(line.split()[0], line.split()[1], line.split()[2]) for line in f]
 
 
