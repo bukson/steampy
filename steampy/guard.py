@@ -15,8 +15,10 @@ def load_steam_guard(steam_guard: str) -> dict[str, str]:
     Arguments:
         steam_guard (str): If this string is a path to a file, then its contents will be parsed as a json data.
             Otherwise, the string will be parsed as a json data.
+
     Returns:
         Dict[str, str]: Parsed json data as a dictionary of strings (both key and value).
+
     """
     if Path(steam_guard).is_file():
         with Path(steam_guard).open(encoding='utf-8') as f:
