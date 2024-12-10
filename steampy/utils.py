@@ -243,7 +243,7 @@ def get_key_value_from_url(url: str, key: str, case_sensitive: bool = True) -> s
 
 def load_credentials():
     dirname = Path(__file__).resolve().parent
-    with Path(f'{dirname}/../secrets/credentials.pwd').open() as f:
+    with Path(f'{dirname}/../secrets/credentials.pwd').open(encoding='utf-8') as f:
         return [Credentials(line.split()[0], line.split()[1], line.split()[2]) for line in f]
 
 
