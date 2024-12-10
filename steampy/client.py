@@ -88,8 +88,8 @@ class SteamClient:
         raise ValueError(f'Invalid steam_id: {steam_id}')
 
     def login(self, username: str | None = None, password: str | None = None, steam_guard: str | None = None) -> None:
-        invalid_client_credentials_is_present = None in (self.username, self._password, self.steam_guard_string)
-        invalid_login_credentials_is_present = None in (username, password, steam_guard)
+        invalid_client_credentials_is_present = None in {self.username, self._password, self.steam_guard_string}
+        invalid_login_credentials_is_present = None in {username, password, steam_guard}
 
         if invalid_client_credentials_is_present and invalid_login_credentials_is_present:
             raise InvalidCredentials(

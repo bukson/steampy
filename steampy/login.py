@@ -59,7 +59,7 @@ class LoginExecutor:
         store_cookie_dic = self.session.cookies.get_dict(domain=store_domain)
         for name in ('steamLoginSecure', 'sessionid', 'steamRefresh_steam', 'steamCountry'):
             cookie = self.session.cookies.get_dict()[name]
-            if name in ["sessionid", "steamLoginSecure"]:
+            if name in {"sessionid", "steamLoginSecure"}:
                 community_cookie = create_cookie(name, community_cookie_dic[name], community_domain)
             else:
                 community_cookie = create_cookie(name, cookie, community_domain)
