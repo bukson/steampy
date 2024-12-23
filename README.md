@@ -230,7 +230,7 @@ summaries =  steam_client.api_call('GET', 'IEconService', 'GetTradeOffersSummary
 **get_trade_offers_summary() -> dict**
 
 
-**get_trade_offers(merge: bool = True) -> dict**
+**get_trade_offers(merge: bool = True, get_sent_offers: bool = True, get_received_offers: bool = True, use_webtoken: bool =False, max_retry:int = 5) -> dict**
 
 Fetching trade offers from steam using an API call.
 Method is fetching offers with descriptions that satisfy conditions:
@@ -243,8 +243,13 @@ Method is fetching offers with descriptions that satisfy conditions:
 If `merge` is set `True` then offer items are merged from items data and items description into dict where items `id` is key
 and descriptions merged with data are value.
 
-**get_trade_offer(trade_offer_id: str, merge: bool = True) -> dict**
+`get_sent_offers` and `get_received_offers` control which offers are fetched.
 
+`max_retry` controls how many retries the api call will try.
+
+**get_trade_offer(trade_offer_id: str, merge: bool = True, use_webtoken:bool =False) -> dict**
+
+if `use_webtoken` is True, then request sent will contain access_token instead of api_key
 
 **get_trade_receipt(trade_id: str) -> list**
 
