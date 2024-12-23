@@ -5,7 +5,7 @@ from setuptools import setup
 if sys.version_info < (3, 12):
     sys.exit("Python < 3.12 is not supported")
 
-version = '1.1.3'
+version = '1.2.0'
 
 setup(
     name='steampy',
